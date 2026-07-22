@@ -16,7 +16,7 @@ export function Intro() {
 
         <div className="my-auto max-w-5xl py-16">
           <h1
-            data-hero-el
+            data-hero-lead
             className="type-serif text-display font-semibold text-balance"
           >
             {intro.name}

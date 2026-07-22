@@ -9,9 +9,10 @@ import { Label } from "@/components/primitives/Label";
  */
 function PortraitFrame() {
   return (
-    <figure data-portrait className="max-w-sm">
+    <figure className="max-w-sm">
       <div
-        className="flex aspect-[4/5] items-center justify-center rounded-xs bg-surface"
+        data-portrait
+        className="flex aspect-[4/5] items-center justify-center overflow-hidden rounded-xs bg-surface"
         aria-hidden="true"
       >
         <span className="type-serif text-display font-medium text-slate/40">

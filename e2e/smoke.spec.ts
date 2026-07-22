@@ -29,7 +29,7 @@ test("the six numbered sections render as one semantic document", async ({
   ).toBeAttached();
 });
 
-test("gsap animations settle and survive route changes cleanly", async ({
+test("gsap hero timeline settles and survives route changes cleanly", async ({
   page,
 }) => {
   // Motion spec §1: no ghost animations across App Router navigations.
@@ -51,9 +51,19 @@ test("gsap animations settle and survive route changes cleanly", async ({
   expect(errors).toEqual([]);
 });
 
+test("section reveals start hidden and play in on scroll", async ({ page }) => {
+  await page.goto("/");
+  const beat = page.getByText(/first real client, first real panic/i);
+  // Below the fold: hidden by the reveal set until scrolled into view.
+  await expect(beat).toBeHidden();
+  await beat.scrollIntoViewIfNeeded();
+  await expect(beat).toBeVisible();
+});
+
 test("the contact form is present and labeled", async ({ page }) => {
   await page.goto("/#contact");
   const form = page.locator("#contact form");
+  await form.scrollIntoViewIfNeeded();
   await expect(form.getByLabel("name")).toBeVisible();
   await expect(form.getByLabel("email")).toBeVisible();
   await expect(form.getByLabel("message")).toBeVisible();
@@ -66,4 +76,21 @@ test("unknown routes render the 404", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 1, name: "404" }),
   ).toBeVisible();
+});
+
+test.describe("reduced motion", () => {
+  test.use({ contextOptions: { reducedMotion: "reduce" } });
+
+  test("shows all content with nothing hidden by motion", async ({ page }) => {
+    await page.goto("/");
+    // A below-fold reveal element is visible immediately — the reduced branch
+    // never hides anything (motion spec §6).
+    await expect(
+      page.getByText(/first real client, first real panic/i),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCSS(
+      "opacity",
+      "1",
+    );
+  });
 });
