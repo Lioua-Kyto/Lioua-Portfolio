@@ -24,7 +24,8 @@
   --radius: 2px;
 
   /* Motion — CSS mirror of lib/motion/tokens.ts (the canonical source).
-     Keep the two files in sync; CSS cannot import TS. */
-  --dur-micro: 250ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+     Keep the two files in sync; CSS cannot import TS.
+     --ease-out is the cubic-bezier equivalent of GSAP's power3.out. */
+  --dur-micro: 350ms;
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
 }

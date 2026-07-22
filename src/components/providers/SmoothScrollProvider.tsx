@@ -7,8 +7,8 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import type Lenis from "lenis";
-import { loadGsap } from "@/lib/motion/gsapClient";
+import Lenis from "lenis";
+import { ScrollTrigger } from "@/lib/motion/gsap";
 import { ticker } from "@/lib/motion/ticker";
 
 interface SmoothScrollContextValue {
@@ -21,9 +21,11 @@ const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(
 );
 
 /**
- * Owns the site's one Lenis instance (brief §2.2), driven by the shared
- * ticker. Mounted once in the root layout; children stay server-rendered.
- * Under prefers-reduced-motion no Lenis is created — native scroll only.
+ * Owns the site's one Lenis instance, driven by the shared Ticker — one rAF
+ * loop total (V3 motion spec §1). Lenis scroll feeds `ScrollTrigger.update()`
+ * so scrubs/triggers track the smoothed position. Mounted once in the root
+ * layout; children stay server-rendered. Under prefers-reduced-motion no
+ * Lenis is created — native scroll only.
  */
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
@@ -33,28 +35,17 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let cancelled = false;
-    let unsubscribe: (() => void) | null = null;
-    // Lenis and GSAP arrive as async chunks after first paint (§2.3) — the
-    // page scrolls natively until smoothing takes over.
-    void Promise.all([import("lenis"), loadGsap()]).then(
-      ([{ default: LenisClass }, { ScrollTrigger }]) => {
-        if (cancelled) return;
-        const lenis = new LenisClass({ autoRaf: false });
-        lenisRef.current = lenis;
-        // Smoothed scroll position must feed ScrollTrigger, or triggers lag.
-        lenis.on("scroll", () => {
-          ScrollTrigger.update();
-        });
-        unsubscribe = ticker.add((now) => {
-          lenis.raf(now);
-        });
-      },
-    );
+    const lenis = new Lenis({ autoRaf: false });
+    lenisRef.current = lenis;
+    lenis.on("scroll", () => {
+      ScrollTrigger.update();
+    });
+    const unsubscribe = ticker.add((now) => {
+      lenis.raf(now);
+    });
     return () => {
-      cancelled = true;
-      unsubscribe?.();
-      lenisRef.current?.destroy();
+      unsubscribe();
+      lenis.destroy();
       lenisRef.current = null;
     };
   }, []);
