@@ -14,25 +14,23 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Fonts — font-display (Archivo Expanded), font-body, font-mono (Martian Mono). */
-  --font-display: var(--font-archivo);
+  /* Three voices — font-serif (display), font-body, font-mono (labels). */
+  --font-serif: var(--font-serif-stack);
   --font-body: var(--font-body-stack);
-  --font-mono: var(--font-martian-mono);
+  --font-mono: var(--font-mono-stack);
 
-  /* Fluid type scale — ratio ~1.25 desktop / ~1.2 mobile.
-     Display letter-spacing never tighter than −0.03em. */
+  /* Fluid editorial type scale — ratio ~1.25 desktop / ~1.2 mobile. */
   --text-*: initial;
-  --text-hero: clamp(2.75rem, 8.5vw, 7.5rem);
-  --text-hero--line-height: 0.92;
-  --text-hero--letter-spacing: -0.02em;
-  --text-station: clamp(1.75rem, 1.05rem + 2.6vw, 3.25rem);
-  --text-station--line-height: 1.02;
-  --text-station--letter-spacing: -0.015em;
-  --text-entry: clamp(1.3rem, 1.08rem + 1.1vw, 1.9rem);
-  --text-entry--line-height: 1.12;
-  --text-entry--letter-spacing: -0.01em;
-  --text-editorial: clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
-  --text-editorial--line-height: 1.55;
+  --text-display: clamp(2.875rem, 8.5vw, 7.5rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.01em;
+  --text-headline: clamp(2rem, 1.2rem + 3vw, 3.75rem);
+  --text-headline--line-height: 1.05;
+  --text-headline--letter-spacing: -0.005em;
+  --text-title: clamp(1.35rem, 1.1rem + 1.2vw, 2rem);
+  --text-title--line-height: 1.15;
+  --text-lede: clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
+  --text-lede--line-height: 1.5;
   --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   --text-base--line-height: 1.65;
   --text-label: 0.8125rem;
@@ -60,15 +58,15 @@
   padding-inline: clamp(1.25rem, 4.5vw, 3.5rem);
 }
 
-/* Display voice: Archivo in its Expanded width only. */
-@utility type-display {
-  font-family: var(--font-archivo);
-  font-stretch: 125%;
+/* Display voice: the serif, optical sizing on. */
+@utility type-serif {
+  font-family: var(--font-serif-stack);
+  font-optical-sizing: auto;
 }
 
 /* Structural hairline rule (row separation — not decoration). */
 @utility hairline {
-  border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
 }
 
 /* Micro-interaction transition preset from the motion tokens. */
@@ -90,6 +88,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
   /* cursor: pointer on every interactive element. */
   a,
   button,
@@ -106,6 +110,6 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--signal) 25%, transparent);
+    background: color-mix(in oklab, var(--signal) 22%, transparent);
   }
 }

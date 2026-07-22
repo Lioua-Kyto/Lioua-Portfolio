@@ -13,23 +13,23 @@ const generalSans = localFont({
   ],
   weight: "200 700",
   variable: "--font-general-sans",
-  display: "optional",
+  display: "swap",
 });
 
-// Self-hosted Google instance pinned at wdth=125 (the only width the site
-// uses) — 35KB vs 88KB for the full variable axis space.
-const archivo = localFont({
-  src: [{ path: "./fonts/ArchivoExpanded.woff2", style: "normal" }],
-  weight: "500 800",
-  variable: "--font-archivo",
-  display: "optional",
-  declarations: [{ prop: "font-stretch", value: "125%" }],
+// TEMPORARY serif display stand-in (v3 brief §2: author supplies the real
+// serif before Phase 2 ends) — Fraunces variable, latin, opsz 9–144 ·
+// wght 400–700. Tracked in TASKS.md; do not let it become permanent.
+const serif = localFont({
+  src: [{ path: "./fonts/FrauncesVariable.woff2", style: "normal" }],
+  weight: "400 700",
+  variable: "--font-fraunces",
+  display: "swap",
 });
 
 const martianMono = Martian_Mono({
   subsets: ["latin"],
   variable: "--font-martian-mono",
-  display: "optional",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${martianMono.variable} ${generalSans.variable}`}
+      className={`${serif.variable} ${martianMono.variable} ${generalSans.variable}`}
     >
       <body>
         <script

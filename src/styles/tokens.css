@@ -1,24 +1,28 @@
 /*
- * Single source of design-token values.
- * One editorial ground — the dual-layer palette is gone. Every color/type/
- * radius value on the site derives from these custom properties; no raw hex
- * values anywhere else.
+ * Single source of design-token values (v3 brief §2).
+ * Warm paper ground, three type voices, one restrained accent. Every
+ * color/type/radius value on the site derives from these custom properties;
+ * no raw hex values anywhere else.
  */
 :root {
-  /* Color — light editorial ground. */
-  --paper: #e7eaec; /* page ground */
-  --surface: #f3f5f6; /* raised surfaces / media mats */
-  --ink: #14181c; /* primary text */
-  --slate: #58626d; /* secondary text, labels */
-  --signal: #cf4a20; /* accent — vermilion tuned for light ground */
-  --ok: #4fb477; /* form/status states only */
-  --err: #e5484d; /* form/status states only */
+  /* Paper palette. */
+  --paper: #f4f1ea; /* warm off-white ground */
+  --surface: #ebe7dc; /* raised mats / image frames */
+  --ink: #14140f; /* near-black text */
+  --slate: #6b6559; /* secondary/muted text (AA on paper) */
+  --signal: #a63c26; /* the one restrained accent — links, one highlight per view */
+  --ok: #3f7a50; /* form states only */
+  --err: #b23830; /* form states only */
 
-  /* Type — General Sans self-hosted via next/font/local (src/app/fonts);
-     the injected variable resolves first, system faces are the safety net. */
+  /* Type — body voice: General Sans (Fontshare), self-hosted via next/font.
+     The serif display + mono stand-ins are marked temporary in TASKS.md. */
   --font-body-stack:
     var(--font-general-sans, "General Sans"), ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", sans-serif;
+  --font-serif-stack: var(--font-fraunces, "Fraunces"), georgia, serif;
+  --font-mono-stack:
+    var(--font-martian-mono, "Martian Mono"), ui-monospace, "Cascadia Mono",
+    monospace;
 
   /* Geometry — 2px everywhere, zero exceptions. */
   --radius: 2px;

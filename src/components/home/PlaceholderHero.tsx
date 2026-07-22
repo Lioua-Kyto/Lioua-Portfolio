@@ -39,10 +39,10 @@ export function PlaceholderHero({
 
   return (
     <div ref={scope}>
-      <h1 data-hero-el className="type-display text-hero font-extrabold">
+      <h1 data-hero-el className="type-serif text-display font-semibold">
         {name}
       </h1>
-      <p data-hero-el className="mt-6 max-w-[40ch] text-editorial text-slate">
+      <p data-hero-el className="mt-6 max-w-[40ch] text-lede text-slate">
         {thesis}
       </p>
     </div>
