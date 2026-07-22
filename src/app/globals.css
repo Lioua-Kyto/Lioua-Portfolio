@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  /* Colors — utilities like bg-paper, text-ink, border-slate. */
+  --color-*: initial;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-slate: var(--slate);
+  --color-signal: var(--signal);
+  --color-ok: var(--ok);
+  --color-err: var(--err);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Fonts — font-display (Archivo Expanded), font-body, font-mono (Martian Mono). */
+  --font-display: var(--font-archivo);
+  --font-body: var(--font-body-stack);
+  --font-mono: var(--font-martian-mono);
+
+  /* Fluid type scale — ratio ~1.25 desktop / ~1.2 mobile.
+     Display letter-spacing never tighter than −0.03em. */
+  --text-*: initial;
+  --text-hero: clamp(2.75rem, 8.5vw, 7.5rem);
+  --text-hero--line-height: 0.92;
+  --text-hero--letter-spacing: -0.02em;
+  --text-station: clamp(1.75rem, 1.05rem + 2.6vw, 3.25rem);
+  --text-station--line-height: 1.02;
+  --text-station--letter-spacing: -0.015em;
+  --text-entry: clamp(1.3rem, 1.08rem + 1.1vw, 1.9rem);
+  --text-entry--line-height: 1.12;
+  --text-entry--letter-spacing: -0.01em;
+  --text-editorial: clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
+  --text-editorial--line-height: 1.55;
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-base--line-height: 1.65;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.6;
+  --text-fine: 0.6875rem;
+  --text-fine--line-height: 1.5;
+
+  /* Radius — every rounded-* utility resolves to 2px (zero exceptions). */
+  --radius-*: initial;
+  --radius-xs: var(--radius);
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+}
+
+/* Editorial content column. */
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 84rem;
+  padding-inline: clamp(1.25rem, 4.5vw, 3.5rem);
+}
+
+/* Display voice: Archivo in its Expanded width only. */
+@utility type-display {
+  font-family: var(--font-archivo);
+  font-stretch: 125%;
+}
+
+/* Structural hairline rule (row separation — not decoration). */
+@utility hairline {
+  border-top: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+/* Micro-interaction transition preset from the motion tokens. */
+@utility transition-micro {
+  transition-duration: var(--dur-micro);
+  transition-timing-function: var(--ease-out);
+}
+
+@layer base {
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body-stack);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* cursor: pointer on every interactive element. */
+  a,
+  button,
+  [role="button"],
+  input[type="submit"],
+  summary {
+    cursor: pointer;
+  }
+
+  /* Visible focus everywhere. */
+  :focus-visible {
+    outline: 1px solid var(--signal);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--signal) 25%, transparent);
+  }
+}

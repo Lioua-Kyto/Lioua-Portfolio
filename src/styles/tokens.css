@@ -1,0 +1,30 @@
+/*
+ * Single source of design-token values.
+ * One editorial ground — the dual-layer palette is gone. Every color/type/
+ * radius value on the site derives from these custom properties; no raw hex
+ * values anywhere else.
+ */
+:root {
+  /* Color — light editorial ground. */
+  --paper: #e7eaec; /* page ground */
+  --surface: #f3f5f6; /* raised surfaces / media mats */
+  --ink: #14181c; /* primary text */
+  --slate: #58626d; /* secondary text, labels */
+  --signal: #cf4a20; /* accent — vermilion tuned for light ground */
+  --ok: #4fb477; /* form/status states only */
+  --err: #e5484d; /* form/status states only */
+
+  /* Type — General Sans self-hosted via next/font/local (src/app/fonts);
+     the injected variable resolves first, system faces are the safety net. */
+  --font-body-stack:
+    var(--font-general-sans, "General Sans"), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+
+  /* Geometry — 2px everywhere, zero exceptions. */
+  --radius: 2px;
+
+  /* Motion — CSS mirror of lib/motion/tokens.ts (the canonical source).
+     Keep the two files in sync; CSS cannot import TS. */
+  --dur-micro: 250ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# testing
+coverage/
+playwright-report/
+test-results/
+
+# misc
+*.tsbuildinfo
+.DS_Store
+*.rar
+
+# source footage from the abandoned video concept (kept on disk, not in git)
+assets/
+
+# third-party skill installs (symlinked into .claude/skills)
+.agents/
+.claude/skills/*
+!.claude/skills/find-skills
+
+# lighthouse artifacts
+.lighthouseci/
+
+# env
+.env
+.env.*
+!.env.example
