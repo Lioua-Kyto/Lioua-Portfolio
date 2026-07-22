@@ -1,6 +1,7 @@
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
 import { Label } from "@/components/primitives/Label";
+import { MaskText } from "@/components/motion/MaskText";
 
 /**
  * 03 — Experience (v3 brief §3.03): Rezervitoo and Faderco as editorial
@@ -15,16 +16,17 @@ export function Experience() {
       <div className="mt-14 space-y-24">
         {experience.map((entry) => (
           <article key={entry.company}>
-            <div
-              data-reveal
-              className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2"
-            >
-              <h3 className="type-serif text-headline font-medium">
-                {entry.company}
-              </h3>
-              <Label>
-                {entry.role} · {entry.engagement} · {entry.period}
-              </Label>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2">
+              <MaskText
+                as="h3"
+                text={entry.company}
+                className="type-serif block text-headline font-medium"
+              />
+              <span data-reveal>
+                <Label>
+                  {entry.role} · {entry.engagement} · {entry.period}
+                </Label>
+              </span>
             </div>
 
             <div className="mt-10 grid gap-x-16 gap-y-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">

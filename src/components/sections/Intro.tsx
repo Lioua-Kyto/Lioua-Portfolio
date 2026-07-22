@@ -1,10 +1,12 @@
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
+import { MaskText } from "@/components/motion/MaskText";
+import { RotatingWords } from "@/components/motion/RotatingWords";
 
 /**
- * 00 — Intro (v3 brief §3.00): name, role, one honest line, then three proof
- * numbers stated flatly. Above the fold; the Phase 3 hero timeline animates
- * these elements in reading order.
+ * 00 — Intro (v3 brief §3.00): name, role, one honest line, rotating
+ * descriptor, three proof numbers. The name mask-reveals on mount; the
+ * supporting elements rise + fade via the hero timeline (Motion controller).
  */
 export function Intro() {
   const { intro } = content;
@@ -15,16 +17,24 @@ export function Intro() {
         <Label index="00">Intro</Label>
 
         <div className="my-auto max-w-5xl py-16">
-          <h1
-            data-hero-lead
-            className="type-serif text-display font-semibold text-balance"
+          <MaskText
+            as="h1"
+            scroll={false}
+            delay={0.15}
+            text={intro.name}
+            className="type-serif block text-display font-semibold"
+          />
+          <p
+            data-hero-el
+            className="mt-6 flex flex-wrap items-baseline gap-x-3 font-mono text-label text-slate"
           >
-            {intro.name}
-          </h1>
-          <p data-hero-el className="mt-6 font-mono text-label text-slate">
-            {intro.role}
+            <span>{intro.role}</span>
+            <span aria-hidden="true" className="text-signal">
+              /
+            </span>
+            <RotatingWords words={intro.roleWords} className="text-ink" />
           </p>
-          <p data-hero-el className="mt-3 max-w-[36ch] text-lede">
+          <p data-hero-el className="mt-4 max-w-[36ch] text-lede">
             {intro.line}
           </p>
         </div>

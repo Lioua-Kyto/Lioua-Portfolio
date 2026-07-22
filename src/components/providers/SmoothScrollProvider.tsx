@@ -35,7 +35,13 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const lenis = new Lenis({ autoRaf: false });
+    // Luxe momentum glide — a low lerp gives the weighted, heynesh-grade
+    // feel where scroll settles rather than snaps.
+    const lenis = new Lenis({
+      autoRaf: false,
+      lerp: 0.085,
+      wheelMultiplier: 0.9,
+    });
     lenisRef.current = lenis;
     lenis.on("scroll", () => {
       ScrollTrigger.update();

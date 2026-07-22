@@ -1,5 +1,6 @@
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
+import { MaskText } from "@/components/motion/MaskText";
 
 /**
  * 02 — How I build (v3 brief §3.02): a few genuine principles, not a
@@ -12,11 +13,15 @@ export function Principles() {
     <Section id="principles" index="02" label="How I build">
       <div className="mt-14 grid gap-x-14 gap-y-12 md:grid-cols-3">
         {principles.map((principle) => (
-          <div key={principle.title} data-reveal className="max-w-[38ch]">
-            <h3 className="type-serif text-title font-medium">
-              {principle.title}
-            </h3>
-            <p className="mt-4 text-base text-slate">{principle.body}</p>
+          <div key={principle.title} className="max-w-[38ch]">
+            <MaskText
+              as="h3"
+              text={principle.title}
+              className="type-serif block text-title font-medium"
+            />
+            <p data-reveal className="mt-4 text-base text-slate">
+              {principle.body}
+            </p>
           </div>
         ))}
       </div>

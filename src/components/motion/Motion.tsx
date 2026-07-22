@@ -26,15 +26,15 @@ export function Motion({ children }: { children: ReactNode }) {
 
       const media = gsap.matchMedia();
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Hero — plays once on mount.
-        gsap
-          .timeline({ defaults: { ease: ease.out, duration: dur.reveal } })
-          .from("[data-hero-lead]", { y: 24 })
-          .from(
-            "[data-hero-el]",
-            { y: 24, autoAlpha: 0, stagger: stagger.hero },
-            "-=0.72",
-          );
+        // Hero supporting elements rise + fade under the mask-revealing name.
+        gsap.from("[data-hero-el]", {
+          y: 28,
+          autoAlpha: 0,
+          duration: dur.reveal,
+          ease: ease.out,
+          stagger: stagger.hero,
+          delay: 0.35,
+        });
 
         // Section reveals — the workhorse. Hide, then batch-reveal on enter;
         // a max-scroll trigger flushes anything the 82% line can't reach.
@@ -42,7 +42,7 @@ export function Motion({ children }: { children: ReactNode }) {
           root.querySelectorAll("[data-reveal]"),
         );
         if (pending.size > 0) {
-          gsap.set([...pending], { y: 32, autoAlpha: 0 });
+          gsap.set([...pending], { y: 44, autoAlpha: 0 });
           const reveal = (batch: readonly Element[]) => {
             for (const el of batch) pending.delete(el);
             gsap.to(batch, {

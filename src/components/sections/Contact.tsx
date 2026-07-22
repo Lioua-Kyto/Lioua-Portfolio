@@ -1,6 +1,7 @@
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
 import { Label } from "@/components/primitives/Label";
+import { MaskText } from "@/components/motion/MaskText";
 import { ContactForm } from "./ContactForm";
 
 /**
@@ -14,12 +15,11 @@ export function Contact() {
     <Section id="contact" index="06" label="Contact">
       <div className="mt-14 grid gap-x-16 gap-y-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
         <div>
-          <h3
-            data-reveal
-            className="type-serif max-w-[14ch] text-headline font-medium"
-          >
-            Let&apos;s build something.
-          </h3>
+          <MaskText
+            as="h3"
+            text="Let's build something."
+            className="type-serif block max-w-[14ch] text-headline font-medium"
+          />
           <ul className="mt-10 max-w-md" data-reveal>
             <li className="hairline">
               <a
@@ -51,8 +51,14 @@ export function Contact() {
               <Label>{contact.phone}</Label>
             </li>
           </ul>
-          <p className="mt-6">
-            <Label>resume pdf — on its way</Label>
+          <p className="mt-6" data-reveal>
+            <a
+              href="/lioua-zeddam-resume.pdf"
+              download
+              className="transition-micro font-mono text-label text-signal underline underline-offset-4 transition-colors hover:text-ink"
+            >
+              download résumé (pdf)
+            </a>
           </p>
         </div>
 

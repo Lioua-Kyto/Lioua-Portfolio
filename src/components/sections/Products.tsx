@@ -2,6 +2,8 @@ import type { Project } from "@/content/schemas";
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
 import { Label } from "@/components/primitives/Label";
+import { MaskText } from "@/components/motion/MaskText";
+import { Parallax } from "@/components/motion/Parallax";
 
 /**
  * Designed screenshot placeholder (v3 brief §5/§6): a framed, labeled plate
@@ -11,17 +13,17 @@ import { Label } from "@/components/primitives/Label";
 function Plate({ project, figure }: { project: Project; figure: string }) {
   return (
     <figure data-reveal="plate">
-      <div className="group overflow-hidden rounded-xs bg-surface">
+      <Parallax className="group aspect-[16/10] rounded-xs bg-surface">
         <div
           data-plate-inner
-          className="transition-micro flex aspect-[16/10] items-center justify-center transition-transform group-hover:scale-[1.04]"
+          className="transition-micro flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.05]"
           aria-hidden="true"
         >
           <span className="type-serif text-display font-medium text-slate/35">
             {project.title.charAt(0)}
           </span>
         </div>
-      </div>
+      </Parallax>
       <figcaption className="mt-2 flex justify-between gap-6 font-mono text-fine text-slate">
         <span>{project.title.toLowerCase()} — capture pending</span>
         <span>{figure}</span>
@@ -32,9 +34,13 @@ function Plate({ project, figure }: { project: Project; figure: string }) {
 
 function ProjectInfo({ project }: { project: Project }) {
   return (
-    <div data-reveal>
-      <h3 className="type-serif text-title font-medium">{project.title}</h3>
-      <p className="mt-3 max-w-[48ch] text-base text-slate">
+    <div>
+      <MaskText
+        as="h3"
+        text={project.title}
+        className="type-serif block text-title font-medium"
+      />
+      <p data-reveal className="mt-3 max-w-[48ch] text-base text-slate">
         {project.summary}
       </p>
       <p className="mt-5">
