@@ -1,15 +1,31 @@
-import { content } from "@/content";
-import { PlaceholderHero } from "@/components/home/PlaceholderHero";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { Intro } from "@/components/sections/Intro";
+import { Background } from "@/components/sections/Background";
+import { Principles } from "@/components/sections/Principles";
+import { Experience } from "@/components/sections/Experience";
+import { Products } from "@/components/sections/Products";
+import { Toolkit } from "@/components/sections/Toolkit";
+import { Contact } from "@/components/sections/Contact";
 
 /**
- * Placeholder homepage — renders the kept foundation (fonts, tokens, Lenis
- * provider, typed content, GSAP wiring) with no concept code. The v3 build
- * replaces this.
+ * The site: six numbered editorial sections on one calm scroll (v3 brief §3).
+ * Static in Phase 2; the motion layer arrives in Phase 3.
  */
 export default function HomePage() {
   return (
-    <main className="shell flex min-h-svh flex-col justify-center">
-      <PlaceholderHero name={content.hero.name} thesis={content.hero.thesis} />
-    </main>
+    <>
+      <SiteHeader />
+      <main>
+        <Intro />
+        <Background />
+        <Principles />
+        <Experience />
+        <Products />
+        <Toolkit />
+        <Contact />
+      </main>
+      <SiteFooter />
+    </>
   );
 }

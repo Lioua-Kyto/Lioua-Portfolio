@@ -12,22 +12,65 @@ export const rawContent: z.input<typeof contentSchema> = {
       "I build the systems behind the screens. Django · React · Flutter · PostgreSQL.",
     domain: "liouazeddam.dev",
   },
-  hero: {
-    name: "LIOUA ZEDDAM",
-    subline: "Full Stack Developer — Django · React · Flutter · PostgreSQL",
-    thesis: "I build the systems behind the screens.",
-  },
-  about: {
-    summary: [
-      "I own the full stack end-to-end — production web and cross-platform mobile, from data model to deployed interface.",
-      "My specialty is high-performance backend architecture: REST design, real-time WebSocket systems, Redis caching, transactional integrity, containerized VPS deployments.",
-      "I work directly with clients and stakeholders, from requirements through production.",
+  intro: {
+    name: "Lioua Zeddam",
+    role: "Full Stack Developer",
+    line: "I build the systems behind the screens.",
+    proofs: [
+      { value: "100+", label: "endpoints shipped" },
+      { value: "176ms → 38ms", label: "repeat-request latency" },
+      { value: "6", label: "products built" },
     ],
+    roleWords: [
+      "Backend architecture",
+      "Real-time systems",
+      "Full-stack delivery",
+    ],
+  },
+  // TODO(author): confirm the first beat's framing and all dates (§3.01).
+  timeline: [
+    {
+      year: "Early",
+      text: "Started computer science and discovered the part I actually loved: building things people could use, not just passing exams about them.",
+    },
+    {
+      year: "2022",
+      text: "Began the CS diploma — dual-study, half classroom, half real placement. Finished ranked 1st in cohort with a 14.79/20 GPA, which I'm told is good.",
+    },
+    {
+      year: "2024",
+      text: "Faderco apprenticeship — my first production work. Built their HR recruitment portal solo over 10 months: 50+ candidates a cycle, the company's first remote interviews, and a lasting respect for the word 'production'.",
+    },
+    {
+      year: "2025",
+      text: "Learned Flutter properly by building BrewPhoria end to end — offline-first cart, atomic checkout, a loyalty ledger, and an AI barista that mostly does what it's told.",
+    },
+    {
+      year: "Dec 2025",
+      text: "Rezervitoo — first major freelance client. Backend architect on a real multi-provider booking platform. First real client, first real panic; 100+ endpoints later, still shipping.",
+    },
+  ],
+  about: {
     location: "Algeria · working worldwide (UTC+1)",
     languages: "AR native · EN C2 · FR B2",
     education:
       "Diploma, CS — ranked 1st in cohort · GPA 14.79/20 · dual-study, 2.5y placement",
   },
+  // TODO(author): confirm these are your real beliefs, reword freely (§3.02).
+  principles: [
+    {
+      title: "The server is the source of truth.",
+      body: "Clients lie — not maliciously, just constantly. Prices, stock, permissions: recompute everything server-side and let the client be a pretty view of the truth.",
+    },
+    {
+      title: "Real-time by default.",
+      body: "If data changes and someone has to refresh to see it, that's a bug with extra steps. A WebSocket is cheaper than a confused user.",
+    },
+    {
+      title: "Shipped beats perfect.",
+      body: "A deployed feature teaches more in a week than a perfect branch does in a month. Docker it, ship it, watch it, fix it.",
+    },
+  ],
   experience: [
     {
       company: "Rezervitoo",
@@ -37,12 +80,16 @@ export const rawContent: z.input<typeof contentSchema> = {
       framing:
         "Backend + admin panel: sole owner · mobile + website: collaborator",
       story: [
-        "A multi-provider travel & booking platform — Hotels, Hostels, Agencies, and Hosts on one backend.",
-        "100+ Swagger-documented REST endpoints across 7 domains, RBAC enforced on every route.",
-        "A bidirectional review and report system with moderation hooks feeding deep-linked admin views.",
-        "Full RTL/LTR mirroring for Arabic, English, and French — the layout structurally adapts to language direction.",
-        "React TypeScript admin panel with millisecond-range load times, Google OAuth2, Brevo transactional email, progressive provider onboarding.",
+        "Rezervitoo is a multi-provider travel and booking platform — hotels, hostels, agencies, and hosts on one backend — and the backend is mine, end to end.",
+        "That means 100+ endpoints across 7 domains, Swagger-documented, RBAC on every route: the kind of surface area where naming things badly punishes you for months.",
+        "Repeat requests dropped from 176ms to 38ms once Redis and TanStack Query started agreeing with each other. Notifications go out in real time over Channels and FCM, behind a custom JWT WebSocket middleware.",
+        "Four provider types wanted four schemas. They got one polymorphic model instead — 60% less onboarding surface, and the site speaks Arabic, English, and French with the layout mirroring properly, not just the words.",
       ],
+      pull: {
+        label: "repeat-request latency, redis warm",
+        value: "176ms → 38ms",
+      },
+      access: "code private — client work",
       readouts: [
         { label: "endpoints", value: "100+ across 7 domains" },
         { label: "t_repeat", value: "38ms ← 176ms · redis warm" },
@@ -78,11 +125,15 @@ export const rawContent: z.input<typeof contentSchema> = {
       period: "Jan 2024 – Apr 2025",
       framing: "Sole owner, requirements → production, 10 months",
       story: [
-        "Digitized the full HR recruitment pipeline — candidate intake through offer — for 50+ candidates per cycle, replacing manual spreadsheet tracking.",
-        "Shipped the company's first remote interviewing with WebRTC, eliminating up to 4 hours of round-trip travel per interview.",
-        "Real-time notifications to HR staff and candidates replaced manual follow-up across the interview and evaluation pipeline.",
-        "A worker evaluation module replaced paper-based assessment, saving HR 2+ hours of manual input per cycle.",
+        "An internal HR recruitment portal that retired the spreadsheets — candidate intake through offer, 50+ candidates a cycle. My first production system, built solo over 10 months from requirements gathering to deploy.",
+        "The company sits somewhere isolated, so I shipped their first remote interviewing with WebRTC — candidates stopped traveling up to 4 hours round-trip for an interview.",
+        "Real-time notifications replaced manual follow-up, and a worker evaluation module replaced paper, saving HR 2+ hours of typing per cycle.",
       ],
+      pull: {
+        label: "candidates per cycle, spreadsheets retired",
+        value: "50+",
+      },
+      access: "internal tool — code stays with Faderco",
       readouts: [
         { label: "candidates", value: "50+ per cycle · zero spreadsheets" },
         { label: "travel_saved", value: "up to 4h per interview · webrtc" },
@@ -125,6 +176,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         "cache: redis per-query keys + pattern-based invalidation on writes",
         "loyalty: append-only ledger schema",
       ],
+      repoLabel: "public repo — link on its way",
       links: { live: null, source: null },
       todos: [
         "TODO(author): screens",
@@ -148,6 +200,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         "cache: multi-layer nginx caching",
         "realtime: channels asgi order-status push over persistent websockets, replacing polling",
       ],
+      repoLabel: "live site — repo private",
       links: { live: null, source: null },
       todos: [
         "TODO(author): live URL + captures (catalog, variants, order-status mid-update)",
@@ -170,6 +223,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         "realtime multiplayer: channels websockets — global chat, private messaging, live leaderboards",
         "scoring: accuracy × streak × response time → per-category analytics and progression insights",
       ],
+      repoLabel: "repo private",
       links: { live: null, source: null },
       todos: [
         "TODO(author): captures (game mid-play, leaderboard, analytics)",

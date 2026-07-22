@@ -20,6 +20,10 @@ export const experienceEntrySchema = z.object({
   period: z.string().min(1),
   framing: z.string().min(1),
   story: z.array(z.string().min(1)).min(1),
+  /** The one metric pulled out as an editorial quote (§3.03). */
+  pull: readoutSchema,
+  /** Honest code-access label, e.g. `code private — client work`. */
+  access: z.string().min(1),
   readouts: z.array(readoutSchema),
   /** Real architecture facts (topology, pipelines, schema design). */
   architecture: z.array(z.string().min(1)).min(1),
@@ -44,6 +48,8 @@ export const projectSchema = z.object({
   highlights: z.array(z.string().min(1)).min(1),
   /** Real architecture facts. */
   architecture: z.array(z.string().min(1)).min(1),
+  /** Honest repo/live status label, e.g. `repo private — client work` (§3.04). */
+  repoLabel: z.string().min(1),
   links: z.object({
     live: z.url().nullable(),
     source: z.url().nullable(),
@@ -65,17 +71,32 @@ export const contentSchema = z.object({
     /** Assumed domain — confirm with author. */
     domain: z.string().min(1),
   }),
-  hero: z.object({
+  /** 00 — Intro (v3 brief §3.00): name, role, one honest line, proof numbers. */
+  intro: z.object({
     name: z.string().min(1),
-    subline: z.string().min(1),
-    thesis: z.string().min(1),
+    role: z.string().min(1),
+    line: z.string().min(1),
+    proofs: z
+      .array(z.object({ value: z.string().min(1), label: z.string().min(1) }))
+      .length(3),
+    /** Rotating role-words for the Phase 3 hero (motion spec §2). */
+    roleWords: z.array(z.string().min(1)).min(3).max(4),
   }),
+  /** 01 — Background (§3.01): the honest year-by-year arc. */
+  timeline: z
+    .array(z.object({ year: z.string().min(1), text: z.string().min(1) }))
+    .min(5)
+    .max(6),
   about: z.object({
-    summary: z.array(z.string().min(1)).length(3),
     location: z.string().min(1),
     languages: z.string().min(1),
     education: z.string().min(1),
   }),
+  /** 02 — How I build (§3.02): 2–3 genuine principles, human voice. */
+  principles: z
+    .array(z.object({ title: z.string().min(1), body: z.string().min(1) }))
+    .min(2)
+    .max(3),
   experience: z.array(experienceEntrySchema).length(2),
   projects: z.array(projectSchema).length(3),
   skills: z.object({
