@@ -22,9 +22,11 @@ export function Section({
   return (
     <section id={id} aria-label={label} className="py-[clamp(6rem,14vh,10rem)]">
       <div className="shell">
-        <div className="hairline pt-4">
+        {/* The mono label doubles as the section's h2 so the document reads
+            h1 → h2 → h3 with no skipped levels. */}
+        <h2 className="hairline pt-4">
           <Label index={index}>{label}</Label>
-        </div>
+        </h2>
         {children}
       </div>
     </section>

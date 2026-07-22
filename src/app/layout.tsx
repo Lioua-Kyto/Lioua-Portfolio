@@ -46,6 +46,11 @@ export const metadata: Metadata = {
     description: content.site.description,
     url: "/",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: content.site.title,
+    description: content.site.description,
+  },
 };
 
 /** Person structured data — the site's single subject. */
