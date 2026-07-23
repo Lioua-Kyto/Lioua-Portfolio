@@ -19,40 +19,26 @@ const stagger = (index: number) => ({ "--i": index }) as CSSProperties;
  */
 export function Intro() {
   const { intro, about, skills } = content;
-  const firstName = intro.name.split(" ")[0] ?? intro.name;
 
   return (
     <section
       id="intro"
       aria-label="Intro"
-      className="relative flex min-h-svh flex-col justify-between overflow-hidden pt-[4vh] pb-8"
+      // z-20 puts the hero's own stacking context above the portrait layer
+      // (z-10) so the claim and stats read in front of the photo. The pin sets
+      // position:fixed here, which makes this a stacking context — without an
+      // explicit z-index it would default below the portrait and the whole
+      // hero would be painted over.
+      className="relative z-20 flex min-h-svh flex-col justify-between overflow-hidden pt-[4vh] pb-8"
     >
-      {/* The name runs nearly edge to edge and sits BEHIND the portrait: the
-          cutout's shoulders and head occlude the middle letters, the heynesh
-          move. Live text, not artwork — it stays the h1 and the LCP element.
-          Each letter is its own span so it can fall from the top on load, big
-          to small across the word, and settle to a uniform size. */}
+      {/* Reserves exactly the wordmark's height. The name itself is painted by
+          <HeroName /> from a layer beneath the portrait, so the photo can sit
+          between it and the rest of this section. */}
       <div
-        data-hero="title"
-        className="pointer-events-none relative z-[5] px-[clamp(1rem,3vw,3rem)]"
-      >
-        <h1
-          aria-label={intro.name}
-          className="type-display -ml-[0.04em] flex text-name leading-[0.78] font-semibold text-accent-deep"
-        >
-          {firstName.split("").map((letter, index) => (
-            <span
-              key={`${letter}-${String(index)}`}
-              aria-hidden="true"
-              data-title-letter
-              style={{ "--i": index } as CSSProperties}
-              className="inline-block will-change-transform"
-            >
-              {letter}
-            </span>
-          ))}
-        </h1>
-      </div>
+        aria-hidden="true"
+        className="shrink-0"
+        style={{ height: "calc(var(--name-size) * var(--name-leading))" }}
+      />
 
       <nav aria-label="Primary" className="relative z-20 mt-5">
         <ul

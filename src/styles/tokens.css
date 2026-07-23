@@ -10,15 +10,21 @@
   --surface: #ebe7dc; /* raised mats / image frames */
   --ink: #14140f; /* near-black text */
   --slate: #6b6559; /* secondary/muted text (AA on paper) */
-  /* Accent derived from the portrait: the suit is ~89% hue 235° (royal
-     blue), so the complement lands at ~55°, pulled warm to ~45° to also
-     harmonize with the skin/belt tones (15–25°) and the warm paper.
-     --accent is for large fills only (contrast ~1.6:1); --signal is the
-     darkened form that stays AA on paper for links and small text. */
-  --accent: #f5b027; /* vivid gold — solid fills, with ink text on top */
-  --accent-deep: #b75c2d; /* giant/large accent type on paper (3:1, AA large) */
-  --accent-soft: #fbe3a8; /* tinted wash for surfaces */
-  --signal: #8a5a06; /* small accent text + links (4.5:1, AA normal) */
+  /* ONE accent, one hue. The site previously ran two — a gold (40°) for fills
+     and a terracotta (20°) for type — which read as two unrelated colours.
+     This is a single burnt amber at hue 31°, 85% saturation, expressed at
+     three strengths so the identity stays one colour while every use still
+     clears contrast:
+       --accent  #BF6A10  3.52:1 on paper (AA large: wordmark, headings)
+                          4.65:1 for ink on top (AA: solid fills)
+       --signal  #a0590d  4.74:1 on paper (AA normal: small text, links)
+       --accent-soft      light tint of the same hue for washes
+     The hue is the complement of the portrait's royal-blue suit (~235°),
+     pulled warm to sit with the cognac belt and the paper ground. */
+  --accent: #bf6a10;
+  --accent-deep: #bf6a10; /* same colour — kept as an alias for existing use */
+  --accent-soft: #f7cda1;
+  --signal: #a0590d;
   --ok: #3f7a50; /* form states only */
   --err: #b23830; /* form states only */
 
@@ -34,6 +40,12 @@
   --font-mono-stack:
     var(--font-martian-mono, "Martian Mono"), ui-monospace, "Cascadia Mono",
     monospace;
+
+  /* The wordmark's size. Declared here rather than only in the type scale
+     because the hero also has to reserve exactly this much height in flow
+     while the name itself is painted from a separate fixed layer. */
+  --name-size: clamp(4rem, min(43vw, 49vh), 32rem);
+  --name-leading: 0.78;
 
   /* Geometry — 2px everywhere, zero exceptions. */
   --radius: 2px;

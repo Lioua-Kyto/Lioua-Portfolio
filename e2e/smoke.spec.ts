@@ -189,33 +189,30 @@ test("work shows one project at a time and advances on scroll", async ({
   );
   await page.waitForTimeout(400);
 
-  const visibleCount = () =>
+  // Assert on the focus state rather than raw opacity: the dim/brighten is a
+  // 500ms transition, so mid-hand-over two cards legitimately read above any
+  // opacity threshold. `data-active` is the deterministic signal.
+  const activeCount = () =>
+    page.locator('[data-work-card][data-active="true"]').count();
+  const activeIndex = () =>
     page.evaluate(
       () =>
-        [...document.querySelectorAll("[data-work-card]")].filter(
-          (c) => parseFloat(getComputedStyle(c).opacity) > 0.5,
-        ).length,
+        document
+          .querySelector('[data-work-card][data-active="true"]')
+          ?.getAttribute("data-index") ?? null,
     );
-  const activeIndex = () => () =>
-    page.evaluate(() => {
-      const cards = [...document.querySelectorAll("[data-work-card]")];
-      const shown = cards.find(
-        (c) => parseFloat(getComputedStyle(c).opacity) > 0.5,
-      );
-      return shown?.getAttribute("data-index") ?? null;
-    });
 
-  // Exactly one project is on screen to begin with.
-  expect(await visibleCount()).toBe(1);
+  // Exactly one project is the focused one to begin with.
+  expect(await activeCount()).toBe(1);
   const first = await activeIndex();
 
-  // Scrolling inside the pin advances to a different project — still one shown.
+  // Scrolling inside the pin advances to a different project — still just one.
   await wheelUntil(page, async () => (await activeIndex()) !== first, {
     step: 350,
     max: 24,
   });
   expect(await activeIndex()).not.toBe(first);
-  expect(await visibleCount()).toBe(1);
+  expect(await activeCount()).toBe(1);
 });
 
 test("the section navigation highlights the section you are in", async ({
