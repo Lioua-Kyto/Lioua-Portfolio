@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Martian_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Martian_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { content } from "@/content";
@@ -16,13 +16,13 @@ const generalSans = localFont({
   display: "swap",
 });
 
-// TEMPORARY serif display stand-in (v3 brief §2: author supplies the real
-// serif before Phase 2 ends) — Fraunces variable, latin, opsz 9–144 ·
-// wght 400–700. Tracked in TASKS.md; do not let it become permanent.
-const serif = localFont({
-  src: [{ path: "./fonts/FrauncesVariable.woff2", style: "normal" }],
-  weight: "400 700",
-  variable: "--font-fraunces",
+// Display voice — Bricolage Grotesque. A contemporary variable grotesque with
+// an optical-size axis and quirky, humane terminals: distinctive at giant
+// sizes without the "AI luxury serif" default a Fraunces/Playfair would carry.
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -72,7 +72,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${serif.variable} ${martianMono.variable} ${generalSans.variable}`}
+      className={`${display.variable} ${martianMono.variable} ${generalSans.variable}`}
     >
       <body>
         <script

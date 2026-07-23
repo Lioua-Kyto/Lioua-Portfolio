@@ -2,6 +2,7 @@
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Flip } from "gsap/Flip";
 import { useGSAP } from "@gsap/react";
 
 /**
@@ -11,7 +12,7 @@ import { useGSAP } from "@gsap/react";
  * raw useEffect.
  */
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(useGSAP, ScrollTrigger);
+  gsap.registerPlugin(useGSAP, ScrollTrigger, Flip);
 }
 
-export { gsap, ScrollTrigger };
+export { gsap, ScrollTrigger, Flip };

@@ -22,12 +22,15 @@
   --ok: #3f7a50; /* form states only */
   --err: #b23830; /* form states only */
 
-  /* Type — body voice: General Sans (Fontshare), self-hosted via next/font.
-     The serif display + mono stand-ins are marked temporary in TASKS.md. */
+  /* Type — three voices. Display: Bricolage Grotesque (expressive grotesque,
+     the wordmark + headings). Body: General Sans. Utility: Martian Mono for
+     labels, data, and section numbers. */
   --font-body-stack:
     var(--font-general-sans, "General Sans"), ui-sans-serif, system-ui,
     -apple-system, "Segoe UI", sans-serif;
-  --font-serif-stack: var(--font-fraunces, "Fraunces"), georgia, serif;
+  --font-display-stack:
+    var(--font-display, "Bricolage Grotesque"), ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono-stack:
     var(--font-martian-mono, "Martian Mono"), ui-monospace, "Cascadia Mono",
     monospace;

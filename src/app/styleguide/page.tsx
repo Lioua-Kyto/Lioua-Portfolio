@@ -25,7 +25,7 @@ export default function StyleguidePage() {
     <main className="shell space-y-20 py-24">
       <header>
         <Label index="00">Styleguide — design system, v3</Label>
-        <h1 className="type-serif mt-4 text-headline font-semibold">
+        <h1 className="type-display mt-4 text-headline font-semibold">
           Three voices on paper
         </h1>
       </header>
@@ -34,9 +34,9 @@ export default function StyleguidePage() {
         <div className="hairline pt-4">
           <Label index="01">Type scale</Label>
         </div>
-        <p className="type-serif text-display font-semibold">Display Aa</p>
-        <p className="type-serif text-headline font-semibold">Headline Aa</p>
-        <p className="type-serif text-title font-medium">Title Aa</p>
+        <p className="type-display text-display font-semibold">Display Aa</p>
+        <p className="type-display text-headline font-semibold">Headline Aa</p>
+        <p className="type-display text-title font-medium">Title Aa</p>
         <p className="max-w-[52ch] text-lede">
           Lede — the opening voice of a section, set in the grotesk body face at
           a generous size.

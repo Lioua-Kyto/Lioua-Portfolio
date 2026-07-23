@@ -18,7 +18,7 @@ export function Toolkit() {
         <MaskText
           as="h3"
           text={sections.toolkit.heading}
-          className="type-serif block max-w-[16ch] text-headline font-medium"
+          className="type-display block max-w-[16ch] text-headline font-medium"
         />
         <p data-reveal className="max-w-[38ch] font-mono text-label text-slate">
           {sections.toolkit.lede}
@@ -42,7 +42,7 @@ export function Toolkit() {
               </span>
             </div>
 
-            <h4 className="type-serif mt-4 text-title font-medium">
+            <h4 className="type-display mt-4 text-title font-medium">
               {group.group}
             </h4>
 

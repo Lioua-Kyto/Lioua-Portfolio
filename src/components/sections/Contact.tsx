@@ -18,7 +18,7 @@ export function Contact() {
           <MaskText
             as="h3"
             text={sections.contact.heading}
-            className="type-serif block max-w-[14ch] text-headline font-medium"
+            className="type-display block max-w-[14ch] text-headline font-medium"
           />
           <ul className="mt-10 max-w-md" data-reveal>
             <li className="hairline">

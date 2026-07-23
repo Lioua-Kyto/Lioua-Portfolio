@@ -15,7 +15,7 @@ export function Principles() {
         <MaskText
           as="h3"
           text={sections.principles.heading}
-          className="type-serif block text-headline font-medium"
+          className="type-display block text-headline font-medium"
         />
         <p data-reveal className="mt-4 text-base text-slate">
           {sections.principles.lede}
@@ -27,7 +27,7 @@ export function Principles() {
             <MaskText
               as="h4"
               text={principle.title}
-              className="type-serif block text-title font-medium"
+              className="type-display block text-title font-medium"
             />
             <p data-reveal className="mt-4 text-base text-slate">
               {principle.body}

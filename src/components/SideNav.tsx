@@ -90,7 +90,7 @@ export function SideNav() {
         <a
           data-rail-slot="name"
           href="#intro"
-          className="type-serif block text-title leading-none font-semibold text-accent-deep"
+          className="type-display block text-title leading-none font-semibold text-accent-deep"
         >
           {content.intro.name.split(" ")[0]}
         </a>
@@ -114,7 +114,7 @@ export function SideNav() {
       >
         {content.intro.proofs.slice(0, 2).map((proof) => (
           <div key={proof.label} className="flex items-baseline gap-2">
-            <dd className="type-serif text-base font-semibold whitespace-nowrap text-accent-deep">
+            <dd className="type-display text-base font-semibold whitespace-nowrap text-accent-deep">
               {proof.value}
             </dd>
             <dt className="font-mono text-fine text-slate">{proof.label}</dt>

@@ -19,7 +19,7 @@ const stagger = (index: number) => ({ "--i": index }) as CSSProperties;
  */
 export function Intro() {
   const { intro, about, skills } = content;
-  const [firstName] = intro.name.split(" ");
+  const firstName = intro.name.split(" ")[0] ?? intro.name;
 
   return (
     <section
@@ -27,27 +27,30 @@ export function Intro() {
       aria-label="Intro"
       className="relative flex min-h-svh flex-col justify-between overflow-hidden pt-[4vh] pb-8"
     >
-      {/* The name is set as live text, not artwork: it is the h1, the LCP
-          element, and the thing a search result shows. An SVG would let it sit
-          flush to both margins at every width, but costs selectable text, a
-          real heading, and font-synced rendering — not a trade worth making
-          for a few pixels of tracking. */}
-      <div data-hero="title" className="pointer-events-none relative z-20">
+      {/* The name runs nearly edge to edge and sits BEHIND the portrait: the
+          cutout's shoulders and head occlude the middle letters, the heynesh
+          move. Live text, not artwork — it stays the h1 and the LCP element.
+          Each letter is its own span so it can fall from the top on load, big
+          to small across the word, and settle to a uniform size. */}
+      <div
+        data-hero="title"
+        className="pointer-events-none relative z-[5] px-[clamp(1rem,3vw,3rem)]"
+      >
         <h1
           aria-label={intro.name}
-          className="type-serif shell text-name font-semibold text-accent-deep"
+          className="type-display -ml-[0.04em] flex text-name leading-[0.78] font-semibold text-accent-deep"
         >
-          {/* Barely any bottom padding: the mask only needs to clear
-              descenders and this name has none, so the usual allowance is
-              dead height the pinned hero cannot afford. */}
-          <span
-            aria-hidden="true"
-            className="block overflow-hidden pb-[0.02em]"
-          >
-            <span data-title-in className="block will-change-transform">
-              {firstName}
+          {firstName.split("").map((letter, index) => (
+            <span
+              key={`${letter}-${String(index)}`}
+              aria-hidden="true"
+              data-title-letter
+              style={{ "--i": index } as CSSProperties}
+              className="inline-block will-change-transform"
+            >
+              {letter}
             </span>
-          </span>
+          ))}
         </h1>
       </div>
 
@@ -78,7 +81,7 @@ export function Intro() {
               style={stagger(index)}
               className="rounded-xs bg-accent px-3.5 py-2"
             >
-              <dd className="type-serif text-lede font-semibold whitespace-nowrap text-ink">
+              <dd className="type-display text-lede font-semibold whitespace-nowrap text-ink">
                 {proof.value}
               </dd>
               <dt className="font-mono text-fine text-ink/70">{proof.label}</dt>
@@ -101,7 +104,7 @@ export function Intro() {
             <p className="mt-2 text-lede">{intro.line}</p>
             <p className="mt-4 flex flex-wrap gap-2">
               <a
-                href="#products"
+                href="#work"
                 className="transition-micro rounded-xs bg-ink px-3.5 py-2 font-mono text-label text-paper transition-colors hover:bg-signal"
               >
                 see the work
@@ -116,21 +119,21 @@ export function Intro() {
           </div>
         </div>
 
-        <ul data-hero="capabilities" className="glass rounded-sm px-4 py-3">
-          {skills.capabilities.slice(0, 5).map((capability, index) => (
-            <li
-              key={capability.claim}
-              data-hero-in
-              style={stagger(index)}
-              className="flex items-baseline gap-2.5 py-0.5 font-mono text-label text-slate"
-            >
-              <span aria-hidden="true" className="text-accent-deep">
-                ▸
-              </span>
-              {capability.claim}
-            </li>
-          ))}
-        </ul>
+        <div data-hero="capabilities">
+          <ul data-hero-in className="glass rounded-sm px-4 py-3">
+            {skills.capabilities.slice(0, 5).map((capability) => (
+              <li
+                key={capability.claim}
+                className="flex items-baseline gap-2.5 py-0.5 font-mono text-label text-slate"
+              >
+                <span aria-hidden="true" className="text-accent-deep">
+                  ▸
+                </span>
+                {capability.claim}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <p data-hero="tagline" className="relative z-20 shell mt-5">

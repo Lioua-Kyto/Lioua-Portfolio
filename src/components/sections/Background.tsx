@@ -18,7 +18,7 @@ export function Background() {
           <MaskText
             as="h3"
             text={sections.background.heading}
-            className="type-serif block max-w-[14ch] text-headline font-medium"
+            className="type-display block max-w-[14ch] text-headline font-medium"
           />
           <p data-reveal className="mt-5 max-w-[38ch] text-base text-slate">
             {sections.background.lede}
@@ -41,10 +41,13 @@ export function Background() {
                 key={beat.year}
                 data-timeline-node
                 data-reveal
-                className="py-7 first:pt-0"
+                className="py-8 first:pt-0"
               >
                 <Label className="text-signal">{beat.year}</Label>
-                <p className="mt-2 text-base">{beat.text}</p>
+                <h3 className="type-display mt-2 text-title leading-tight font-semibold">
+                  {beat.title}
+                </h3>
+                <p className="mt-2 text-base text-slate">{beat.text}</p>
               </li>
             ))}
           </ol>

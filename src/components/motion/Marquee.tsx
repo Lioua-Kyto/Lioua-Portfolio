@@ -54,7 +54,7 @@ export function Marquee({ items }: { items: readonly string[] }) {
             {items.map((item) => (
               <li
                 key={`${String(copy)}-${item}`}
-                className="type-serif flex items-center gap-8 pr-8 text-title font-medium text-slate/70"
+                className="type-display flex items-center gap-8 pr-8 text-title font-medium text-slate/70"
               >
                 {item}
                 <span className="text-signal" aria-hidden="true">

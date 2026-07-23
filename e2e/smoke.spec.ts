@@ -33,8 +33,7 @@ const SECTION_IDS = [
   "intro",
   "background",
   "principles",
-  "experience",
-  "products",
+  "work",
   "toolkit",
   "contact",
 ];
@@ -67,7 +66,7 @@ test("the site has no top header — the routes live under the name", async ({
   // The primary nav sits inside the hero, beneath the giant name.
   const nav = page.locator('#intro nav[aria-label="Primary"]');
   await expect(nav).toBeAttached();
-  await expect(nav.getByRole("link")).toHaveCount(6);
+  await expect(nav.getByRole("link")).toHaveCount(5);
 
   const [nameBottom, navTop] = await page.evaluate(() => {
     const h1 = document.querySelector("h1");
@@ -92,118 +91,37 @@ test("smooth scroll runs regardless of the OS motion setting", async ({
   await expect(page.locator("html")).toHaveClass(/lenis/);
 });
 
-test("the hero entrance lands the title first, then the rest", async ({
+test("the hero name sits behind the portrait, its letters settling in", async ({
   page,
 }) => {
-  await page.goto("/", { waitUntil: "commit" });
-
-  const titleOffset = async () =>
-    page.evaluate(() => {
-      const word = document.querySelector("[data-title-in]");
-      if (!word) return null;
-      const m = new DOMMatrixReadOnly(getComputedStyle(word).transform);
-      return m.m42;
-    });
-
-  // It rises into place from below its mask, and gets there.
-  await expect.poll(titleOffset, { timeout: 8000 }).toBeLessThan(1);
-
-  // Everything else has arrived by the end of the entrance.
-  for (const key of ["nav", "stats", "lede", "capabilities", "tagline"]) {
-    await expect
-      .poll(
-        () =>
-          page.evaluate((k) => {
-            const el = document.querySelector(
-              `[data-hero="${k}"] [data-hero-in]`,
-            );
-            return el ? parseFloat(getComputedStyle(el).opacity) : 0;
-          }, key),
-        { timeout: 8000 },
-      )
-      .toBeGreaterThan(0.9);
-  }
-});
-
-test("the title leads the entrance — the rest follow behind it", async ({
-  page,
-}) => {
-  // Record the entrance from inside the page, on rAF, starting before any app
-  // script runs. Polling from the test process cannot reliably catch a
-  // sub-100ms window; this captures the whole sequence and asserts its order.
-  await page.addInitScript(() => {
-    const w = window as unknown as { __firstMove: Record<string, number> };
-    w.__firstMove = {};
-    let armed = false;
-    let start = 0;
-    const tick = () => {
-      const word = document.querySelector("[data-title-in]");
-      const y = word
-        ? new DOMMatrixReadOnly(getComputedStyle(word).transform).m42
-        : 0;
-
-      // Before hydration the elements sit at their natural CSS values, which
-      // look identical to "finished". Only start the clock once GSAP has
-      // pushed the title down behind its mask — that is the entrance arming.
-      if (!armed) {
-        if (y > 20) {
-          armed = true;
-          start = performance.now();
-        }
-        requestAnimationFrame(tick);
-        return;
-      }
-
-      const record = (key: string, settled: boolean) => {
-        if (settled && !(key in w.__firstMove)) {
-          w.__firstMove[key] = performance.now() - start;
-        }
-      };
-      record("title", y < 4);
-      for (const key of ["nav", "stats", "lede", "capabilities", "tagline"]) {
-        const el = document.querySelector(
-          `[data-hero="${key}"] [data-hero-in]`,
-        );
-        if (el) record(key, parseFloat(getComputedStyle(el).opacity) > 0.98);
-      }
-      const portrait = document.querySelector("[data-portrait]");
-      if (portrait)
-        record(
-          "portrait",
-          parseFloat(getComputedStyle(portrait).opacity) > 0.98,
-        );
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-
   await page.goto("/");
-  await page.waitForTimeout(3200);
+  // The name is split into one span per letter for the fall-in.
+  await expect(page.locator("[data-title-letter]")).toHaveCount(5);
 
-  const marks = await page.evaluate(
-    () =>
-      (window as unknown as { __firstMove: Record<string, number> })
-        .__firstMove,
-  );
+  // z-order is the heynesh move: the portrait layer paints over the name.
+  const z = await page.evaluate(() => {
+    const name = document.querySelector('[data-hero="title"]');
+    const portrait = document.querySelector("[data-portrait]");
+    const layer = portrait?.parentElement?.parentElement ?? null;
+    return {
+      name: Number(getComputedStyle(name as Element).zIndex),
+      portrait: Number(getComputedStyle(layer as Element).zIndex),
+    };
+  });
+  expect(z.portrait).toBeGreaterThan(z.name);
 
-  // Everything arrived...
-  for (const key of [
-    "title",
-    "nav",
-    "stats",
-    "lede",
-    "capabilities",
-    "tagline",
-  ]) {
-    expect(marks[key], `${key} never settled`).toBeDefined();
-  }
-  // ...and the title got there before the supporting matter did.
-  const title = marks.title ?? 0;
-  for (const key of ["stats", "lede", "capabilities", "tagline"]) {
-    expect(marks[key], `${key} should settle after the title`).toBeGreaterThan(
-      title,
-    );
-  }
+  // After the entrance the letters rest at full size with no residual transform.
+  await page.waitForTimeout(3400);
+  const settled = await page.evaluate(() => {
+    const first = document.querySelector("[data-title-letter]");
+    if (!first) return null;
+    return {
+      opacity: Number(getComputedStyle(first).opacity),
+      transform: getComputedStyle(first).transform,
+    };
+  });
+  expect(settled?.opacity).toBeGreaterThan(0.98);
+  expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(settled?.transform);
 });
 
 test("the hero pins, disperses its parts, and hands off to the rail", async ({
@@ -253,49 +171,51 @@ test("the hero pins, disperses its parts, and hands off to the rail", async ({
     .toBeGreaterThan(0.9);
 });
 
-test("the projects rail pins and travels sideways, then releases", async ({
+test("work shows one project at a time and advances on scroll", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const trackX = () =>
-    page.evaluate(() => {
-      const track = document.querySelector("[data-rail-track]");
-      if (!track) return 0;
-      return new DOMMatrixReadOnly(getComputedStyle(track).transform).m41;
-    });
 
-  // Ride down to where the products section takes the screen.
-  const productsTop = async () =>
+  // Ride down until the Work section takes the screen.
+  await wheelUntil(
+    page,
+    () =>
+      page.evaluate(() => {
+        const w = document.querySelector("#work");
+        return !!w && w.getBoundingClientRect().top <= 2;
+      }),
+    { step: 600, max: 90 },
+  );
+  await page.waitForTimeout(400);
+
+  const visibleCount = () =>
     page.evaluate(
       () =>
-        document.querySelector("#products")?.getBoundingClientRect().top ?? 1e6,
+        [...document.querySelectorAll("[data-work-card]")].filter(
+          (c) => parseFloat(getComputedStyle(c).opacity) > 0.5,
+        ).length,
     );
-  const reached = await wheelUntil(
-    page,
-    async () => (await productsTop()) <= 2,
-    { step: 600, max: 60 },
-  );
-  expect(reached).toBe(true);
-  const start = await trackX();
+  const activeIndex = () => () =>
+    page.evaluate(() => {
+      const cards = [...document.querySelectorAll("[data-work-card]")];
+      const shown = cards.find(
+        (c) => parseFloat(getComputedStyle(c).opacity) > 0.5,
+      );
+      return shown?.getAttribute("data-index") ?? null;
+    });
 
-  // Scrolling inside the pin pulls the track left rather than moving the page.
-  await wheelUntil(page, async () => (await trackX()) < start - 50, {
-    step: 400,
-    max: 12,
+  // Exactly one project is on screen to begin with.
+  expect(await visibleCount()).toBe(1);
+  const first = await activeIndex();
+
+  // Scrolling inside the pin advances to a different project — still one shown.
+  await wheelUntil(page, async () => (await activeIndex()) !== first, {
+    step: 350,
+    max: 24,
   });
-  expect(await trackX()).toBeLessThan(start - 50);
-
-  // And it releases: the section after the rail becomes reachable.
-  const released = await wheelUntil(
-    page,
-    async () =>
-      page.evaluate(() => {
-        const t = document.querySelector("#toolkit");
-        return !!t && t.getBoundingClientRect().top < window.innerHeight;
-      }),
-    { step: 600, max: 40 },
-  );
-  expect(released).toBe(true);
+  expect(await activeIndex()).not.toBe(first);
+  expect(await visibleCount()).toBe(1);
 });
 
 test("the section navigation highlights the section you are in", async ({
@@ -306,7 +226,7 @@ test("the section navigation highlights the section you are in", async ({
     page,
     () =>
       page
-        .locator('[data-rail-link="experience"][data-active="true"]')
+        .locator('[data-rail-link="work"][data-active="true"]')
         .count()
         .then((n) => n === 1),
     { step: 600, max: 40 },

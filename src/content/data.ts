@@ -27,27 +27,33 @@ export const rawContent: z.input<typeof contentSchema> = {
       "Full-stack delivery",
     ],
   },
-  // TODO(author): confirm the first beat's framing and all dates (§3.01).
+  // TODO(author): dates are from your résumé — confirm the years, and reword
+  // any beat that doesn't sound like you saying it out loud.
   timeline: [
     {
-      year: "Early",
-      text: "Started computer science and discovered the part I actually loved: building things people could use, not just passing exams about them.",
+      year: "2021",
+      title: "Where it clicked",
+      text: "I started computer science and found the part I couldn't put down — building the thing people use, not passing the exam about it. No master plan. Just that.",
     },
     {
       year: "2022",
-      text: "Began the CS diploma — dual-study, half classroom, half real placement. Finished ranked 1st in cohort with a 14.79/20 GPA, which I'm told is good.",
+      title: "Head down, top of the class",
+      text: "The CS diploma, dual-study: half classroom, half real placement. I finished ranked first in my cohort at 14.79/20 — but it was the placement half that taught me what “it works on my machine” actually costs.",
     },
     {
       year: "2024",
-      text: "Faderco apprenticeship — my first production work. Built their HR recruitment portal solo over 10 months: 50+ candidates a cycle, the company's first remote interviews, and a lasting respect for the word 'production'.",
+      title: "First taste of production",
+      text: "Ten months at Faderco, solo, building the HR portal that retired their spreadsheets. First time the word “production” meant something. I shipped their first remote interviews and stopped candidates driving four hours for a chair and a handshake.",
     },
     {
       year: "2025",
-      text: "Learned Flutter properly by building BrewPhoria end to end — offline-first cart, atomic checkout, a loyalty ledger, and an AI barista that mostly does what it's told.",
+      title: "Learning Flutter the hard way",
+      text: "I taught myself Flutter by building BrewPhoria end to end — offline-first cart, atomic checkout, a loyalty ledger, and an AI barista that mostly does what it's told. Nothing teaches a framework like shipping in it.",
     },
     {
       year: "Dec 2025",
-      text: "Rezervitoo — first major freelance client. Backend architect on a real multi-provider booking platform. First real client, first real panic; 100+ endpoints later, still shipping.",
+      title: "First real client, first real panic",
+      text: "Rezervitoo. Backend architect on a live multi-provider booking platform — real money, real users, no senior to hide behind. 100+ endpoints later, still shipping.",
     },
   ],
   about: {
@@ -60,151 +66,108 @@ export const rawContent: z.input<typeof contentSchema> = {
   // that sounds like someone else wrote it about you.
   sections: {
     background: {
-      heading: "The long way round.",
-      lede: "No bootcamp, no shortcut. A diploma, a placement, and a long list of things that broke before they worked.",
+      heading: "How I got here.",
+      lede: "Five years, no shortcut — the version with the 2am deploys and the “why is it slow now” left in.",
     },
     principles: {
-      heading: "Opinions I'll defend.",
-      lede: "Three things production taught me the expensive way. They show up in every codebase I touch.",
+      heading: "Things I'll argue about.",
+      lede: "Opinions production beat into me. They show up in every repo I touch.",
     },
-    experience: {
-      heading: "Work that shipped.",
-      lede: "Two teams, two different problems, one habit — get it in front of real users and let production tell the truth.",
-    },
-    products: {
-      heading: "Built end to end.",
-      lede: "Sole developer on each of these. Schema to deploy, with nobody to hand the hard parts to.",
+    work: {
+      heading: "Things I've shipped.",
+      lede: "Client work and things I built to teach myself. Sole developer on nearly all of it — schema to deploy, nobody to hand the hard parts to.",
     },
     toolkit: {
       heading: "What I reach for.",
-      lede: "Not everything I've touched — the tools I'd choose again, grouped by the problem they solve.",
+      lede: "Not everything I've touched — the tools I'd pick again, grouped by the problem they solve.",
     },
     contact: {
       heading: "Let's build something.",
-      lede: "Open to backend and full-stack work. Tell me what's breaking and I'll tell you how I'd approach it.",
+      lede: "Open to backend and full-stack work. Tell me what's breaking; I'll tell you how I'd come at it.",
     },
   },
-  // TODO(author): confirm these are your real beliefs, reword freely (§3.02).
+  // TODO(author): confirm these are your real beliefs, reword freely.
   principles: [
     {
       title: "The server is the source of truth.",
-      body: "Clients lie — not maliciously, just constantly. Prices, stock, permissions: recompute everything server-side and let the client be a pretty view of the truth.",
+      body: "Clients lie — not on purpose, just constantly. Prices, stock, permissions: recompute it all server-side and let the client be a pretty view of the truth.",
     },
     {
       title: "Real-time by default.",
-      body: "If data changes and someone has to refresh to see it, that's a bug with extra steps. A WebSocket is cheaper than a confused user.",
+      body: "If something changes and a user has to refresh to see it, that's a bug with extra steps. A WebSocket is cheaper than a confused user.",
     },
     {
       title: "Shipped beats perfect.",
       body: "A deployed feature teaches more in a week than a perfect branch does in a month. Docker it, ship it, watch it, fix it.",
     },
   ],
-  experience: [
+  // 03 — Work: client engagements and the products I built to teach myself,
+  // in one list. Sole developer on nearly all of it. Voice over spec sheet —
+  // the hook is the thing said out loud; the detail earns it.
+  work: [
     {
-      company: "Rezervitoo",
-      role: "Backend Architect & Admin Frontend Developer",
-      engagement: "Freelance",
-      period: "Dec 2025 – Present",
-      framing:
-        "Backend + admin panel: sole owner · mobile + website: collaborator",
-      story: [
-        "Rezervitoo is a multi-provider travel and booking platform — hotels, hostels, agencies, and hosts on one backend — and the backend is mine, end to end.",
-        "That means 100+ endpoints across 7 domains, Swagger-documented, RBAC on every route: the kind of surface area where naming things badly punishes you for months.",
-        "Repeat requests dropped from 176ms to 38ms once Redis and TanStack Query started agreeing with each other. Notifications go out in real time over Channels and FCM, behind a custom JWT WebSocket middleware.",
-        "Four provider types wanted four schemas. They got one polymorphic model instead — 60% less onboarding surface, and the site speaks Arabic, English, and French with the layout mirroring properly, not just the words.",
-      ],
-      pull: {
-        label: "repeat-request latency, redis warm",
+      slug: "rezervitoo",
+      title: "Rezervitoo",
+      kind: "client",
+      context: "Freelance · backend architect",
+      period: "Dec 2025 — now",
+      hook: "First real client. First real panic. 100+ endpoints later, still shipping.",
+      summary:
+        "A live multi-provider booking platform — hotels, hostels, agencies, hosts — on one backend that's mine end to end.",
+      stack: "Django · DRF · PostgreSQL · Redis · Channels · TanStack Query",
+      metric: {
         value: "176ms → 38ms",
+        label: "repeat requests, once Redis and the query cache agreed",
       },
+      highlights: [
+        "Four provider types wanted four schemas. They got one polymorphic model instead — about 60% less onboarding surface.",
+        "Real-time notifications over Channels and FCM, behind a custom JWT WebSocket middleware.",
+        "Arabic, English, and French — the layout mirrors properly, not just the words.",
+      ],
       access: "code private — client work",
-      readouts: [
-        { label: "endpoints", value: "100+ across 7 domains" },
-        { label: "t_repeat", value: "38ms ← 176ms · redis warm" },
-        {
-          label: "schemas",
-          value:
-            "4 provider types → 1 polymorphic model · −60% onboarding surface",
-        },
-      ],
-      architecture: [
-        "topology: docker compose + nginx + cloudflare ssl (strict)",
-        "endpoint tree: 7 domains — auth, users, listings, bookings, reviews, reports, notifications · rbac suffixes (role: admin|provider)",
-        "notifications: django channels (asgi) + fcm + custom jwt websocket middleware",
-        "schema: 4 accommodation types unified under one polymorphic model",
-        "cache: redis + tanstack query client sync — 176ms → 38ms on repeat requests",
-        "i18n: ar/en/fr · full rtl/ltr mirroring · django-modeltranslation + css logical properties",
-      ],
-      endpointDomains: [
-        "auth",
-        "users",
-        "listings",
-        "bookings",
-        "reviews",
-        "reports",
-        "notifications",
-      ],
-      todos: ["TODO(author): admin panel captures"],
+      links: { live: null, source: null },
+      todos: ["TODO(author): admin-panel captures"],
     },
     {
-      company: "Faderco",
-      role: "Full Stack Developer",
-      engagement: "Apprenticeship (dual-study)",
-      period: "Jan 2024 – Apr 2025",
-      framing: "Sole owner, requirements → production, 10 months",
-      story: [
-        "An internal HR recruitment portal that retired the spreadsheets — candidate intake through offer, 50+ candidates a cycle. My first production system, built solo over 10 months from requirements gathering to deploy.",
-        "The company sits somewhere isolated, so I shipped their first remote interviewing with WebRTC — candidates stopped traveling up to 4 hours round-trip for an interview.",
-        "Real-time notifications replaced manual follow-up, and a worker evaluation module replaced paper, saving HR 2+ hours of typing per cycle.",
-      ],
-      pull: {
-        label: "candidates per cycle, spreadsheets retired",
-        value: "50+",
+      slug: "faderco",
+      title: "Faderco HR Portal",
+      kind: "apprenticeship",
+      context: "Apprenticeship · solo, 10 months",
+      period: "2024 — 2025",
+      hook: "My first production system. Built it alone, from “what do you need” to “it's live.”",
+      summary:
+        "An internal HR portal that retired the spreadsheets — candidate intake through offer, 50+ a cycle.",
+      stack: "Django · React · PostgreSQL · WebRTC · Google OAuth2",
+      metric: {
+        value: "4h → 0",
+        label: "candidate round-trip per interview, once WebRTC shipped",
       },
+      highlights: [
+        "Shipped their first remote interviewing with WebRTC — candidates stopped driving up to four hours each way.",
+        "A worker-evaluation module replaced paper and saved HR two hours of typing a cycle.",
+      ],
       access: "internal tool — code stays with Faderco",
-      readouts: [
-        { label: "candidates", value: "50+ per cycle · zero spreadsheets" },
-        { label: "travel_saved", value: "up to 4h per interview · webrtc" },
-        { label: "ownership", value: "solo · 10 months · req → prod" },
-      ],
-      architecture: [
-        "rbac: 3+ roles × django permissions + google oauth2 — data privacy over sensitive hr records",
-        "pipeline: interview/evaluation state machine — intake → screen → interview → evaluate → offer",
-        "timeline: 10-month solo lifecycle — requirements → production, zero prior internal tooling",
-      ],
-      timeline: [
-        "2024-01 init: requirements gathering with hr stakeholders",
-        "2024-04 feat: candidate pipeline — intake → offer, spreadsheets retired",
-        "2024-07 feat: remote interviews — webrtc + streamapi",
-        "2024-09 feat: live notifications — hr + candidates, in-app",
-        "2024-11 feat: worker evaluation module — paper workflows replaced",
-        "2025-01 feat: rbac — 3+ roles × django permissions + google oauth2",
-        "2025-04 release: production deploy — full pipeline live",
-      ],
+      links: { live: null, source: null },
       todos: [],
     },
-  ],
-  projects: [
     {
       slug: "brewphoria",
       title: "BrewPhoria",
-      stack: "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis",
-      year: null,
-      roleLine: "sole developer",
+      kind: "product",
+      context: "Personal product · solo",
+      period: "2025",
+      hook: "I didn't know Flutter. So I built a whole coffee app in it.",
       summary:
-        "Cross-platform coffee-ordering app — Flutter client on a layered Node.js/Express/TypeScript API.",
+        "Cross-platform coffee ordering — a Flutter client on a layered Node/Express/TypeScript API.",
+      stack:
+        "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis · Gemini",
+      metric: null,
       highlights: [
-        "Offline-first guest cart (Hive) merging conflict-free on sign-in — surviving cold starts via a pending-merge flag.",
-        "Tiered loyalty programme: earn multipliers, 100 pts = $1 redemption, backed by an append-only ledger.",
-        "AI barista (Gemini, tool-augmented) that resolves product tags to real catalogue items.",
+        "Offline-first guest cart that merges conflict-free the moment you sign in — it survives cold starts.",
+        "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
+        "An AI barista (Gemini, tool-augmented) that resolves “something sweet and cold” to real menu items.",
       ],
-      architecture: [
-        "atomic checkout: order create + stock decrement + cart clear + loyalty move in one prisma transaction · all pricing recomputed server-side (client untrusted)",
-        "api surface: 40+ endpoints across 11 domains",
-        "cache: redis per-query keys + pattern-based invalidation on writes",
-        "loyalty: append-only ledger schema",
-      ],
-      repoLabel: "public repo — link on its way",
+      access: "public repo — link on its way",
       links: { live: null, source: null },
       todos: [
         "TODO(author): screens",
@@ -214,21 +177,22 @@ export const rawContent: z.input<typeof contentSchema> = {
     {
       slug: "fitguild",
       title: "FitGuild",
-      stack: "Django · React · PostgreSQL · Stripe",
-      year: null,
-      roleLine: "sole developer",
+      kind: "product",
+      context: "Personal product · solo",
+      period: "2024",
+      hook: "A full storefront with zero third-party commerce dependencies — because I wanted to know how.",
       summary:
-        "E-commerce platform with a complete commerce feature set and zero third-party commerce dependencies.",
+        "E-commerce end to end — variants, cart, wishlist, orders, reviews — a Django API through a React front.",
+      stack: "Django · React · PostgreSQL · Stripe · Channels",
+      metric: {
+        value: "< 2s",
+        label: "catalog loads, measured on Core Web Vitals",
+      },
       highlights: [
-        "Product variants, SKUs, cart, wishlist, order history, and reviews — REST API through React UI.",
-        "Sub-2s catalog loads confirmed via Core Web Vitals profiling.",
+        "The full Stripe post-purchase loop lives server-side: payment → order transitions → inventory.",
+        "Order status pushes over WebSockets instead of polling.",
       ],
-      architecture: [
-        "stripe webhooks: full post-purchase event loop server-side — payment → order transitions → inventory decrement",
-        "cache: multi-layer nginx caching",
-        "realtime: channels asgi order-status push over persistent websockets, replacing polling",
-      ],
-      repoLabel: "live site — repo private",
+      access: "live site — repo private",
       links: { live: null, source: null },
       todos: [
         "TODO(author): live URL + captures (catalog, variants, order-status mid-update)",
@@ -237,26 +201,22 @@ export const rawContent: z.input<typeof contentSchema> = {
     },
     {
       slug: "cognitive-training",
-      title: "Cognitive Training Platform",
-      stack: "Django · React · PostgreSQL",
-      year: null,
-      roleLine: "sole developer",
+      title: "Cognitive Training",
+      kind: "product",
+      context: "Personal product · solo",
+      period: "2024",
+      hook: "Fourteen little games, one big excuse to build real-time systems.",
       summary:
-        "Gamified cognitive platform — 7 categories, 14 browser games, dynamic difficulty, XP progression, multi-dimensional ranking.",
+        "A gamified cognitive platform — 7 categories, 14 browser games, XP, and multi-dimensional ranking.",
+      stack: "Django · React · PostgreSQL · Channels",
+      metric: null,
       highlights: [
-        "14 interactive browser-based games across 7 categories with dynamic difficulty scaling.",
-        "XP progression and a multi-dimensional ranking system.",
+        "Real-time multiplayer over Channels — global chat, private messages, live leaderboards.",
+        "Scoring blends accuracy, streak, and response time into per-category progression.",
       ],
-      architecture: [
-        "realtime multiplayer: channels websockets — global chat, private messaging, live leaderboards",
-        "scoring: accuracy × streak × response time → per-category analytics and progression insights",
-      ],
-      repoLabel: "repo private",
+      access: "repo private",
       links: { live: null, source: null },
-      todos: [
-        "TODO(author): captures (game mid-play, leaderboard, analytics)",
-        "TODO(author): source link — repo currently private",
-      ],
+      todos: ["TODO(author): captures (game mid-play, leaderboard, analytics)"],
     },
   ],
   skills: {
