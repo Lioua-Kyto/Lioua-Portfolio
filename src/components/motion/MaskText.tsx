@@ -2,7 +2,7 @@
 
 import { useRef, type ElementType } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { gsap } from "@/lib/motion/gsap";
 import { dur, ease, stagger } from "@/lib/motion/tokens";
 
 /**
@@ -49,6 +49,23 @@ export function MaskText({
             ? { trigger: root, start: "top 88%" }
             : undefined,
         });
+      });
+
+      // Reduced motion: no rise from behind the mask — a plain opacity fade.
+      media.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.fromTo(
+          root,
+          { autoAlpha: 0 },
+          {
+            autoAlpha: 1,
+            duration: dur.micro,
+            ease: "none",
+            delay,
+            scrollTrigger: scroll
+              ? { trigger: root, start: "top 92%" }
+              : undefined,
+          },
+        );
       });
     },
     { scope: ref },

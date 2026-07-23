@@ -55,6 +55,30 @@ export function RotatingWords({
           );
         }
       });
+
+      // Reduced motion: the words still cycle, but crossfade in place — no
+      // vertical travel.
+      media.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(items, { autoAlpha: 0, yPercent: 0 });
+        gsap.set(first, { autoAlpha: 1 });
+        const tl = gsap.timeline({ repeat: -1 });
+        for (let index = 0; index < items.length; index++) {
+          const item = items[index];
+          const next = items[(index + 1) % items.length];
+          if (!item || !next) continue;
+          tl.to(item, {
+            autoAlpha: 0,
+            duration: SWAP_S,
+            ease: "none",
+            delay: HOLD_S,
+          }).fromTo(
+            next,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: SWAP_S, ease: "none" },
+            "<",
+          );
+        }
+      });
     },
     { scope: ref },
   );

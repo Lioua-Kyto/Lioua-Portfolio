@@ -81,16 +81,25 @@ test("unknown routes render the 404", async ({ page }) => {
 test.describe("reduced motion", () => {
   test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-  test("shows all content with nothing hidden by motion", async ({ page }) => {
+  test("fades content in with no movement and no smooth scroll", async ({
+    page,
+  }) => {
     await page.goto("/");
-    // A below-fold reveal element is visible immediately — the reduced branch
-    // never hides anything (motion spec §6).
-    await expect(
-      page.getByText(/first real client, first real panic/i),
-    ).toBeVisible();
+    // The hero is never hidden, and no Lenis smooth scroll is attached.
     await expect(page.getByRole("heading", { level: 1 })).toHaveCSS(
       "opacity",
       "1",
     );
+    await expect(page.locator("html")).not.toHaveClass(/lenis/);
+
+    // Below-fold content fades in on approach — opacity only, never a
+    // transform (motion spec §6: no travel under reduced motion).
+    const beat = page.getByText(/first real client, first real panic/i);
+    await beat.scrollIntoViewIfNeeded();
+    await expect(beat).toBeVisible();
+    const transform = await beat.evaluate(
+      (el) => getComputedStyle(el).transform,
+    );
+    expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(transform);
   });
 });

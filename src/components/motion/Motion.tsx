@@ -94,6 +94,35 @@ export function Motion({ children }: { children: ReactNode }) {
           if (portrait) portrait.style.willChange = "";
         };
       });
+
+      // Reduced motion: no movement, parallax, or blur — but a gentle
+      // opacity-only fade so the page still feels alive rather than dead.
+      // Opacity transitions don't trigger vestibular responses (§6).
+      media.add("(prefers-reduced-motion: reduce)", () => {
+        const targets = root.querySelectorAll("[data-reveal]");
+        if (targets.length === 0) return;
+        gsap.set(targets, { autoAlpha: 0 });
+        ScrollTrigger.batch("[data-reveal]", {
+          start: "top 92%",
+          onEnter: (batch) => {
+            gsap.to(batch, {
+              autoAlpha: 1,
+              duration: dur.micro,
+              ease: "none",
+              stagger: 0.04,
+              overwrite: true,
+            });
+          },
+        });
+        ScrollTrigger.create({
+          trigger: document.documentElement,
+          start: () => ScrollTrigger.maxScroll(window) - 1,
+          once: true,
+          onEnter: () => {
+            gsap.to(targets, { autoAlpha: 1, duration: dur.micro });
+          },
+        });
+      });
     },
     { scope },
   );
