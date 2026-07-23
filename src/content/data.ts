@@ -56,6 +56,34 @@ export const rawContent: z.input<typeof contentSchema> = {
     education:
       "Diploma, CS — ranked 1st in cohort · GPA 14.79/20 · dual-study, 2.5y placement",
   },
+  // TODO(author): this is the site's voice — read it aloud and cut anything
+  // that sounds like someone else wrote it about you.
+  sections: {
+    background: {
+      heading: "The long way round.",
+      lede: "No bootcamp, no shortcut. A diploma, a placement, and a long list of things that broke before they worked.",
+    },
+    principles: {
+      heading: "Opinions I'll defend.",
+      lede: "Three things production taught me the expensive way. They show up in every codebase I touch.",
+    },
+    experience: {
+      heading: "Work that shipped.",
+      lede: "Two teams, two different problems, one habit — get it in front of real users and let production tell the truth.",
+    },
+    products: {
+      heading: "Built end to end.",
+      lede: "Sole developer on each of these. Schema to deploy, with nobody to hand the hard parts to.",
+    },
+    toolkit: {
+      heading: "What I reach for.",
+      lede: "Not everything I've touched — the tools I'd choose again, grouped by the problem they solve.",
+    },
+    contact: {
+      heading: "Let's build something.",
+      lede: "Open to backend and full-stack work. Tell me what's breaking and I'll tell you how I'd approach it.",
+    },
+  },
   // TODO(author): confirm these are your real beliefs, reword freely (§3.02).
   principles: [
     {

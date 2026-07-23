@@ -1,28 +1,45 @@
 "use client";
 
 import { useGSAP } from "@gsap/react";
-import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
-import { disperse, dur, ease, pin, scrub, stagger } from "@/lib/motion/tokens";
+import { gsap } from "@/lib/motion/gsap";
+import { disperse, pin, scrub } from "@/lib/motion/tokens";
 
-/** Base travel for the dispersal, scaled per group by the `disperse` tokens. */
-const TRAVEL_X = -220;
-const TRAVEL_Y = -140;
+/**
+ * Hero groups that have a counterpart in the rail travel to it; the rest are
+ * not represented there, so they simply leave.
+ */
+const RELOCATES: Record<string, string> = {
+  title: "name",
+  nav: "nav",
+  stats: "stats",
+  lede: "claim",
+};
+
+interface Move {
+  el: HTMLElement;
+  x: number;
+  y: number;
+  scale: number;
+}
 
 /**
  * The hero's two-act choreography.
  *
- * Act one, on load: the giant name rises alone from behind its mask, and only
- * once it is settling do the routes, proof numbers, claim, capabilities, and
- * footnote arrive — each from its own direction, on its own delay.
+ * Act one, on load: the name rises alone from behind its mask, the portrait
+ * resolves in behind it, and only then does the supporting matter arrive, each
+ * group from its own direction on its own delay.
  *
- * Act two, on scroll: the hero pins and those same elements disperse toward
- * the left rail at different speeds (`disperse`), while the rail fades up to
- * receive them. One scrubbed timeline drives both halves, so the chrome reads
- * as relocating rather than swapping, and reverses exactly on scroll-back.
+ * Act two, on scroll: the hero pins, and every group that the rail also holds
+ * is carried to its slot there and cross-faded into it, so the chrome visibly
+ * relocates rather than vanishing and reappearing. Groups with no counterpart
+ * disperse at their own speed instead.
  *
- * Below the rail's breakpoint there is nothing to relocate into, so the hero
- * simply travels away like any other section. Renders no markup — it is a
- * controller for elements its siblings own.
+ * Both acts are built at mount. They can coexist because they animate
+ * different nodes — the entrance drives the inner `data-hero-in`, the scroll
+ * drives the outer `data-hero` — which matters structurally: building a pin
+ * later than its neighbours leaves every trigger measured before it holding
+ * stale positions, which is what made the projects scene fire over the
+ * experience section and strand the triggers after it.
  */
 export function HeroScene() {
   useGSAP(() => {
@@ -30,172 +47,143 @@ export function HeroScene() {
     if (!hero) return;
 
     const group = (key: string) =>
-      gsap.utils.toArray<HTMLElement>(`[data-hero="${key}"]`);
+      document.querySelector<HTMLElement>(`[data-hero="${key}"]`);
 
-    // ---- Act one: the entrance. The title lands first, alone. ----
-    // Hide everything up front, pre-paint. A timeline only applies a tween's
-    // start values when the playhead reaches it, so without this the
-    // supporting matter would sit fully visible for the length of the title's
-    // rise and then blink out to fade back in.
-    const words = gsap.utils.toArray<HTMLElement>("[data-hero-word]");
-    gsap.set(words, { yPercent: 112 });
-    gsap.set(group("nav"), { y: 20, autoAlpha: 0 });
-    gsap.set(group("stats"), { x: -48, autoAlpha: 0 });
-    gsap.set(group("lede"), { y: 44, autoAlpha: 0 });
-    gsap.set(group("capabilities"), { x: 48, autoAlpha: 0 });
-    gsap.set(group("tagline"), { autoAlpha: 0 });
+    // Act one, the entrance, is pure CSS (see globals.css) so it plays at
+    // first paint instead of waiting on hydration — the portrait is the
+    // largest element on the page, and gating it on the bundle put the whole
+    // of LCP behind script evaluation.
+    //
+    // ---- Act two: pin, relocate, disperse. Only where the rail exists. ----
+    const mm = gsap.matchMedia();
 
-    let mm: ReturnType<typeof gsap.matchMedia> | null = null;
+    mm.add("(min-width: 1024px)", () => {
+      const rail = document.querySelector<HTMLElement>("[data-rail]");
+      const railItems = gsap.utils.toArray<HTMLElement>("[data-rail-item]");
 
-    // Every step is a fromTo with explicit endpoints: a bare `from` re-reads
-    // the element's current position as its destination, so a second effect
-    // pass (StrictMode, fast refresh) would capture the offset start state and
-    // strand the element there.
-    gsap
-      .timeline({
-        // Act two is built only once act one has landed. A scrubbed timeline
-        // re-renders progress 0 on every ScrollTrigger.refresh(), stamping its
-        // start values (autoAlpha: 1) back onto the very elements the entrance
-        // is trying to hold hidden — so the two cannot coexist. Deferring the
-        // build is the only way to keep the entrance's staging intact.
-        onComplete: () => {
-          mm = buildDispersal();
-          ScrollTrigger.refresh();
-        },
-      })
-      .fromTo(
-        words,
-        { yPercent: 112 },
-        {
-          yPercent: 0,
-          duration: dur.title,
-          ease: ease.title,
-          stagger: stagger.hero,
-        },
-      )
-      .fromTo(
-        group("nav"),
-        { y: 20, autoAlpha: 0 },
-        {
-          y: 0,
-          autoAlpha: 1,
-          duration: dur.reveal,
-          ease: ease.out,
-          stagger: 0.06,
-        },
-        "-=0.95",
-      )
-      .fromTo(
-        group("stats"),
-        { x: -48, autoAlpha: 0 },
-        {
-          x: 0,
-          autoAlpha: 1,
-          duration: dur.reveal,
-          ease: ease.out,
-          stagger: 0.09,
-        },
-        "<0.12",
-      )
-      .fromTo(
-        group("lede"),
-        { y: 44, autoAlpha: 0 },
-        { y: 0, autoAlpha: 1, duration: dur.slow, ease: ease.out },
-        "<0.1",
-      )
-      .fromTo(
-        group("capabilities"),
-        { x: 48, autoAlpha: 0 },
-        {
-          x: 0,
-          autoAlpha: 1,
-          duration: dur.reveal,
-          ease: ease.out,
-          stagger: 0.07,
-        },
-        "<0.08",
-      )
-      .fromTo(
-        group("tagline"),
-        { autoAlpha: 0 },
-        { autoAlpha: 1, duration: dur.slow, ease: "none" },
-        "<0.35",
-      );
-
-    // ---- Act two: the pinned dispersal. Only where the rail exists. ----
-    function buildDispersal() {
-      const media = gsap.matchMedia();
-
-      media.add("(min-width: 1024px)", () => {
-        const rail = document.querySelector<HTMLElement>("[data-rail]");
-        const railItems = gsap.utils.toArray<HTMLElement>("[data-rail-item]");
-
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: hero,
-            start: "top top",
-            end: () => `+=${String(window.innerHeight * pin.hero)}`,
-            pin: true,
-            scrub: scrub.hero,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        // Explicit fromTo from the settled state: each group leaves at its own
-        // multiple of the base travel, so the set disperses at different
-        // speeds instead of sliding away as one slab.
-        for (const [key, speed] of Object.entries(disperse)) {
-          tl.fromTo(
-            group(key),
-            { x: 0, y: 0, autoAlpha: 1, scale: 1 },
-            {
-              x: TRAVEL_X * speed,
-              y: TRAVEL_Y * speed,
-              autoAlpha: 0,
-              scale: 0.94,
-              ease: "none",
-              stagger: 0.02,
-            },
-            0,
+      // Where each relocating group has to land. Measured with transforms
+      // cleared, and re-measured whenever ScrollTrigger recalculates, so a
+      // resize does not leave the group aiming at a stale slot.
+      let moves: Move[] = [];
+      const measure = () => {
+        const next: Move[] = [];
+        for (const [key, slotName] of Object.entries(RELOCATES)) {
+          const el = group(key);
+          const slot = document.querySelector<HTMLElement>(
+            `[data-rail-slot="${slotName}"]`,
           );
+          if (!el || !slot) continue;
+          gsap.set(el, { clearProps: "transform" });
+          const elRect = el.getBoundingClientRect();
+          const heroRect = hero.getBoundingClientRect();
+          const slotRect = slot.getBoundingClientRect();
+          if (elRect.width === 0 || slotRect.width === 0) continue;
+          next.push({
+            el,
+            // The hero is pinned with its top at the viewport top, so an
+            // element's offset inside the hero is its on-screen position for
+            // the whole of this timeline.
+            x: slotRect.left - (elRect.left - heroRect.left),
+            y: slotRect.top - (elRect.top - heroRect.top),
+            scale: Math.min(1, slotRect.width / elRect.width),
+          });
         }
+        moves = next;
+      };
+      measure();
 
-        // The rail arrives to catch them, a beat after they set off.
-        if (rail) {
-          tl.fromTo(
-            rail,
-            { autoAlpha: 0, x: -28 },
-            { autoAlpha: 1, x: 0, ease: "none" },
-            0.45,
-          ).fromTo(
-            railItems,
-            { autoAlpha: 0, x: -18 },
-            { autoAlpha: 1, x: 0, ease: "none", stagger: 0.08 },
-            0.5,
-          );
-        }
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: hero,
+          start: "top top",
+          end: () => `+=${String(window.innerHeight * pin.hero)}`,
+          pin: true,
+          scrub: scrub.hero,
+          invalidateOnRefresh: true,
+          // The hero pin sits above every other pin on the page and must be
+          // recalculated before them, or their start positions are computed
+          // against a document height that does not include this pin's spacer.
+          refreshPriority: 10,
+          onRefreshInit: measure,
+        },
       });
 
-      media.add("(max-width: 1023.98px)", () => {
-        gsap.to(gsap.utils.toArray<HTMLElement>("[data-hero]"), {
-          yPercent: -18,
-          autoAlpha: 0,
-          ease: "none",
-          stagger: 0.03,
-          scrollTrigger: {
-            trigger: hero,
-            start: "top top",
-            end: "bottom 40%",
-            scrub: scrub.portrait,
+      for (const key of Object.keys(RELOCATES)) {
+        const el = group(key);
+        if (!el) continue;
+        const move = () => moves.find((m) => m.el === el);
+        tl.fromTo(
+          el,
+          { x: 0, y: 0, scale: 1, transformOrigin: "left top" },
+          {
+            x: () => move()?.x ?? 0,
+            y: () => move()?.y ?? 0,
+            scale: () => move()?.scale ?? 1,
+            ease: "none",
           },
-        });
-      });
+          0,
+        );
+        // It stays solid for most of the flight and clears just before the
+        // rail lights up. Overlapping the two fades shows both copies at once
+        // and reads as a duplicate rather than a handover.
+        tl.to(el, { autoAlpha: 0, ease: "none", duration: 0.18 }, 0.62);
+      }
 
-      return media;
-    }
+      for (const [key, speed] of Object.entries(disperse)) {
+        if (key in RELOCATES) continue;
+        const el = group(key);
+        if (!el) continue;
+        tl.fromTo(
+          el,
+          { x: 0, y: 0, autoAlpha: 1 },
+          {
+            x: -220 * speed,
+            y: -140 * speed,
+            autoAlpha: 0,
+            ease: "none",
+          },
+          0,
+        );
+      }
+
+      if (rail) {
+        tl.fromTo(
+          rail,
+          { autoAlpha: 0 },
+          { autoAlpha: 1, ease: "none", duration: 0.18 },
+          0.82,
+        ).fromTo(
+          railItems,
+          { autoAlpha: 0, x: -10 },
+          {
+            autoAlpha: 1,
+            x: 0,
+            ease: "none",
+            duration: 0.16,
+            stagger: 0.03,
+          },
+          0.84,
+        );
+      }
+    });
+
+    mm.add("(max-width: 1023.98px)", () => {
+      gsap.to(gsap.utils.toArray<HTMLElement>("[data-hero]"), {
+        yPercent: -18,
+        autoAlpha: 0,
+        ease: "none",
+        stagger: 0.03,
+        scrollTrigger: {
+          trigger: hero,
+          start: "top top",
+          end: "bottom 40%",
+          scrub: scrub.portrait,
+        },
+      });
+    });
 
     return () => {
-      mm?.revert();
+      mm.revert();
     };
   });
 

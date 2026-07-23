@@ -9,7 +9,7 @@ import { ContactForm } from "./ContactForm";
  * the real routes. No pricing tables, no services menu.
  */
 export function Contact() {
-  const { contact } = content;
+  const { contact, sections } = content;
 
   return (
     <Section id="contact" index="06" label="Contact">
@@ -17,7 +17,7 @@ export function Contact() {
         <div>
           <MaskText
             as="h3"
-            text="Let's build something."
+            text={sections.contact.heading}
             className="type-serif block max-w-[14ch] text-headline font-medium"
           />
           <ul className="mt-10 max-w-md" data-reveal>

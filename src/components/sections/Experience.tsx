@@ -9,16 +9,26 @@ import { MaskText } from "@/components/motion/MaskText";
  * honest code-access labels.
  */
 export function Experience() {
-  const { experience } = content;
+  const { experience, sections } = content;
 
   return (
     <Section id="experience" index="03" label="Experience">
-      <div className="mt-14 space-y-24">
+      <div className="mt-10 max-w-[46ch]">
+        <MaskText
+          as="h3"
+          text={sections.experience.heading}
+          className="type-serif block text-headline font-medium"
+        />
+        <p data-reveal className="mt-4 text-base text-slate">
+          {sections.experience.lede}
+        </p>
+      </div>
+      <div className="mt-16 space-y-24">
         {experience.map((entry) => (
           <article key={entry.company}>
             <div className="flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2">
               <MaskText
-                as="h3"
+                as="h4"
                 text={entry.company}
                 className="type-serif block text-headline font-medium"
               />

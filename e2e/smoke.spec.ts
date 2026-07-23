@@ -99,7 +99,7 @@ test("the hero entrance lands the title first, then the rest", async ({
 
   const titleOffset = async () =>
     page.evaluate(() => {
-      const word = document.querySelector("[data-hero-word]");
+      const word = document.querySelector("[data-title-in]");
       if (!word) return null;
       const m = new DOMMatrixReadOnly(getComputedStyle(word).transform);
       return m.m42;
@@ -114,7 +114,9 @@ test("the hero entrance lands the title first, then the rest", async ({
       .poll(
         () =>
           page.evaluate((k) => {
-            const el = document.querySelector(`[data-hero="${k}"]`);
+            const el = document.querySelector(
+              `[data-hero="${k}"] [data-hero-in]`,
+            );
             return el ? parseFloat(getComputedStyle(el).opacity) : 0;
           }, key),
         { timeout: 8000 },
@@ -135,7 +137,7 @@ test("the title leads the entrance — the rest follow behind it", async ({
     let armed = false;
     let start = 0;
     const tick = () => {
-      const word = document.querySelector("[data-hero-word]");
+      const word = document.querySelector("[data-title-in]");
       const y = word
         ? new DOMMatrixReadOnly(getComputedStyle(word).transform).m42
         : 0;
@@ -159,9 +161,17 @@ test("the title leads the entrance — the rest follow behind it", async ({
       };
       record("title", y < 4);
       for (const key of ["nav", "stats", "lede", "capabilities", "tagline"]) {
-        const el = document.querySelector(`[data-hero="${key}"]`);
+        const el = document.querySelector(
+          `[data-hero="${key}"] [data-hero-in]`,
+        );
         if (el) record(key, parseFloat(getComputedStyle(el).opacity) > 0.98);
       }
+      const portrait = document.querySelector("[data-portrait]");
+      if (portrait)
+        record(
+          "portrait",
+          parseFloat(getComputedStyle(portrait).opacity) > 0.98,
+        );
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -342,6 +352,98 @@ test("the hero fits the viewport at laptop and desktop heights", async ({
       `tagline off screen at ${String(w)}x${String(h)}`,
     ).toBe(true);
   }
+});
+
+test("sections stay in order through a full scroll, and reveals keep working", async ({
+  page,
+}) => {
+  // Regression: the hero pin used to be built after its neighbours, leaving
+  // every later trigger measured against a document height that did not yet
+  // include its spacer. Products fired over experience, and the triggers past
+  // it never recovered.
+  await page.goto("/");
+  await page.waitForTimeout(2800);
+
+  const tops = async () =>
+    page.evaluate((ids) => {
+      const out: Record<string, number> = {};
+      for (const id of ids) {
+        const el = document.querySelector(`#${id}`);
+        out[id] = el ? Math.round(el.getBoundingClientRect().top) : NaN;
+      }
+      return out;
+    }, SECTION_IDS);
+
+  // Ride the whole page. At no point may a later section sit above an
+  // earlier one on screen.
+  for (let i = 0; i < 90; i++) {
+    const t = await tops();
+    for (let k = 1; k < SECTION_IDS.length; k++) {
+      const prev = SECTION_IDS[k - 1] ?? "";
+      const cur = SECTION_IDS[k] ?? "";
+      expect(
+        (t[cur] ?? 0) - (t[prev] ?? 0),
+        `${cur} rose above ${prev} while scrolling`,
+      ).toBeGreaterThan(-2);
+    }
+    const done = await page.evaluate(
+      () =>
+        window.scrollY >=
+        document.documentElement.scrollHeight - window.innerHeight - 4,
+    );
+    if (done) break;
+    await page.mouse.wheel(0, 500);
+    await page.waitForTimeout(90);
+  }
+
+  // Motion still works at the far end of the page: the contact heading is
+  // revealed, not stranded hidden by a trigger that never fired.
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const el = document.querySelector("#contact form");
+          return el ? parseFloat(getComputedStyle(el).opacity) : 0;
+        }),
+      { timeout: 8000 },
+    )
+    .toBeGreaterThan(0.9);
+});
+
+test("a rail link lands its section at the top and lights that route", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.waitForTimeout(2800);
+  // Get past the hero so the rail is interactive.
+  await wheelUntil(
+    page,
+    () =>
+      page
+        .locator("aside[aria-label='Section navigation']")
+        .evaluate((el) => parseFloat(getComputedStyle(el).opacity) > 0.9),
+    { step: 500, max: 30 },
+  );
+
+  await page.locator('[data-rail-link="background"]').click();
+  await page.waitForTimeout(1800);
+
+  const top = await page.evaluate(
+    () =>
+      document.querySelector("#background")?.getBoundingClientRect().top ?? 999,
+  );
+  expect(
+    Math.abs(top),
+    "section did not land at the top of the screen",
+  ).toBeLessThan(8);
+
+  // And the route that was clicked is the one marked current.
+  await expect(
+    page.locator('[data-rail-link][data-active="true"]'),
+  ).toHaveCount(1);
+  await expect(
+    page.locator('[data-rail-link="background"][data-active="true"]'),
+  ).toHaveCount(1);
 });
 
 test("no scrollbar chrome is rendered", async ({ page }) => {

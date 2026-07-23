@@ -6,6 +6,12 @@ import { z } from "zod";
  * validated at module load; components never hardcode content.
  */
 
+/** A section's opening: the line that carries it, and the line under it. */
+export const sectionCopySchema = z.object({
+  heading: z.string().min(1),
+  lede: z.string().min(1),
+});
+
 /** Mono instrument readout, e.g. `t_repeat: 38ms ← 176ms · redis warm`. */
 export const readoutSchema = z.object({
   label: z.string().min(1),
@@ -92,6 +98,18 @@ export const contentSchema = z.object({
     languages: z.string().min(1),
     education: z.string().min(1),
   }),
+  /**
+   * The line each section opens with. Kept here rather than in the components
+   * so the site's voice can be read and revised in one sitting.
+   */
+  sections: z.object({
+    background: sectionCopySchema,
+    principles: sectionCopySchema,
+    experience: sectionCopySchema,
+    products: sectionCopySchema,
+    toolkit: sectionCopySchema,
+    contact: sectionCopySchema,
+  }),
   /** 02 — How I build (§3.02): 2–3 genuine principles, human voice. */
   principles: z
     .array(z.object({ title: z.string().min(1), body: z.string().min(1) }))
@@ -121,6 +139,7 @@ export const contentSchema = z.object({
   }),
 });
 
+export type SectionCopy = z.infer<typeof sectionCopySchema>;
 export type Readout = z.infer<typeof readoutSchema>;
 export type ExperienceEntry = z.infer<typeof experienceEntrySchema>;
 export type Project = z.infer<typeof projectSchema>;

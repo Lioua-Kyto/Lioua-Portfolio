@@ -24,9 +24,13 @@
 
   /* Fluid editorial type scale — ratio ~1.25 desktop / ~1.2 mobile. */
   --text-*: initial;
-  /* The hero's giant name — sized to span the viewport behind the portrait.
-     Bounded by height as well as width: the hero is pinned, so anything that
-     does not fit the viewport is never reachable by scrolling. */
+  /* The given name, set to run nearly the full measure. Five glyphs at this
+     face average ~0.52em of advance, so ~30vw of type spans ~85vw of page.
+     Height-bounded too: the hero is pinned, so whatever does not fit the
+     viewport can never be scrolled into view. */
+  --text-name: clamp(4rem, min(36vw, 50vh), 30rem);
+  --text-name--line-height: 0.82;
+  --text-name--letter-spacing: -0.035em;
   --text-giant: clamp(3rem, min(13vw, 19vh), 11rem);
   --text-giant--line-height: 0.84;
   --text-giant--letter-spacing: -0.03em;
@@ -73,6 +77,27 @@
   font-optical-sizing: auto;
 }
 
+/* Frosted panel. On a paper ground glass reads as vellum laid over the page:
+   the tint is paper rather than white, the blur is wide enough to abstract the
+   portrait behind it, and the top inner highlight gives the sheet an edge so
+   it sits above the page instead of dissolving into it. */
+@utility glass {
+  background-color: color-mix(in oklab, var(--paper) 62%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid color-mix(in oklab, var(--ink) 9%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 60%, transparent),
+    0 14px 40px -22px color-mix(in oklab, var(--ink) 45%, transparent);
+}
+
+/* Where backdrop-filter is unavailable the tint alone must carry legibility. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background-color: color-mix(in oklab, var(--paper) 92%, transparent);
+  }
+}
+
 /* Structural hairline rule (row separation — not decoration). */
 @utility hairline {
   border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
@@ -86,7 +111,9 @@
 
 @layer base {
   html {
-    scroll-padding-top: 5rem;
+    /* Anchor targets land flush with the top of the screen; `AnchorScroll`
+       drives the jump through Lenis so no reserved gutter is wanted. */
+    scroll-padding-top: 0;
     /* No scrollbar chrome — the rail and the motion carry the sense of
        position. Scrolling itself is untouched (Lenis smooths, never hijacks),
        and keyboard/wheel/touch all still work. */
@@ -98,19 +125,126 @@
     scrollbar-width: none;
   }
 
-  /* The hero's supporting matter is staged hidden so it arrives after the
-     name rather than flashing in at first paint and blinking out when GSAP
-     arms. Scoped to `scripting: enabled` so that without JS — where nothing
-     would ever fade it back in — it simply renders normally. The name itself
-     is deliberately excluded: it is the LCP element and only ever moves. */
-  @media (scripting: enabled) {
-    [data-hero="nav"],
-    [data-hero="stats"],
-    [data-hero="lede"],
-    [data-hero="capabilities"],
-    [data-hero="tagline"] {
+  /* ---- The hero entrance ----
+     Driven by CSS, not by the scroll library, and deliberately so. Running it
+     in JS means nothing appears until hydration finishes, and the portrait is
+     the largest element on the page — so the whole of Largest Contentful
+     Paint ends up waiting on the bundle. As keyframes it plays from first
+     paint, needs no JavaScript at all, and still reaches the same places in
+     the same order. GSAP keeps the scroll half, which animates the outer
+     `data-hero` nodes; these touch only the inner ones, so the two never
+     write to the same property. */
+
+  [data-title-in] {
+    animation: hero-title 1.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* The portrait resolves in behind the name, once the name is on its way.
+     The hold before it is kept short on purpose: this is the largest element
+     on the page, so every millisecond it spends at zero opacity is a
+     millisecond added to Largest Contentful Paint. It reads as arriving after
+     the name because it also takes a full second to sharpen. */
+  [data-portrait] {
+    animation: hero-portrait 1.1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Each group travels from its own side, over its own duration, so the set
+     assembles rather than appearing all at once. */
+  [data-hero="nav"] [data-hero-in] {
+    animation: hero-up 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(0.72s + var(--i, 0) * 0.05s);
+  }
+
+  [data-hero="stats"] [data-hero-in] {
+    animation: hero-left 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(0.84s + var(--i, 0) * 0.08s);
+  }
+
+  [data-hero="lede"] [data-hero-in] {
+    animation: hero-up-far 1.05s 0.96s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  [data-hero="capabilities"] [data-hero-in] {
+    animation: hero-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(1.04s + var(--i, 0) * 0.06s);
+  }
+
+  [data-hero="tagline"] [data-hero-in] {
+    animation: hero-fade 1.1s 1.32s ease-out both;
+  }
+
+  @keyframes hero-title {
+    from {
+      transform: translateY(112%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-portrait {
+    from {
       opacity: 0;
-      visibility: hidden;
+      transform: scale(1.05);
+      filter: blur(12px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes hero-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-up-far {
+    from {
+      opacity: 0;
+      transform: translateY(44px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-left {
+    from {
+      opacity: 0;
+      transform: translateX(-48px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes hero-right {
+    from {
+      opacity: 0;
+      transform: translateX(48px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 

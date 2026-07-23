@@ -2,6 +2,7 @@ import { content } from "@/content";
 import { SideNav } from "@/components/SideNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Motion } from "@/components/motion/Motion";
+import { AnchorScroll } from "@/components/providers/AnchorScroll";
 import { HeroScene } from "@/components/hero/HeroScene";
 import { PortraitBackdrop } from "@/components/hero/PortraitBackdrop";
 import { Marquee } from "@/components/motion/Marquee";
@@ -23,6 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="relative">
+      <AnchorScroll />
       <PortraitBackdrop />
       <SideNav />
       <HeroScene />

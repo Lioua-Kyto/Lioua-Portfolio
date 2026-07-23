@@ -6,27 +6,27 @@ import { gsap } from "@/lib/motion/gsap";
 import { pin, scrub } from "@/lib/motion/tokens";
 
 /**
- * The portrait as a fixed backdrop: crisp and full-height while the hero owns
- * the screen, then blurring and receding across the hero's pinned run — and
- * staying there, softly, behind every following section. Scrubbed to scroll,
- * so it reverses exactly on the way back. It sits behind all content and is
- * purely decorative, so it never intercepts pointer events or the a11y tree.
+ * The portrait as a fixed backdrop: it resolves in behind the name on load,
+ * holds the first screen at full clarity, then softens and recedes across the
+ * hero's pinned run and stays there, faintly, behind every later section.
+ *
+ * Two nested nodes, for the same reason the hero groups are split: the scroll
+ * scrub owns the outer layer while the entrance owns the image itself, so
+ * neither overwrites the other's opacity and both can be built at mount.
  */
 export function PortraitBackdrop() {
   useGSAP(() => {
-    const image = document.querySelector<HTMLElement>("[data-portrait]");
+    const layer = document.querySelector<HTMLElement>("[data-portrait-layer]");
     const hero = document.querySelector<HTMLElement>("#intro");
-    if (!image || !hero) return;
+    if (!layer || !hero) return;
 
-    image.style.willChange = "transform, filter, opacity";
+    layer.style.willChange = "transform, filter, opacity";
 
     const mm = gsap.matchMedia();
 
-    // The blur runs the length of the hero's pin, so the portrait softens in
-    // step with the elements dispersing over it.
     mm.add("(min-width: 1024px)", () => {
       gsap.fromTo(
-        image,
+        layer,
         { filter: "blur(0px)", opacity: 1, scale: 1, yPercent: 0 },
         {
           filter: "blur(26px)",
@@ -42,6 +42,7 @@ export function PortraitBackdrop() {
             end: () => `+=${String(window.innerHeight * pin.hero)}`,
             scrub: scrub.portrait,
             invalidateOnRefresh: true,
+            refreshPriority: 10,
           },
         },
       );
@@ -49,7 +50,7 @@ export function PortraitBackdrop() {
 
     mm.add("(max-width: 1023.98px)", () => {
       gsap.fromTo(
-        image,
+        layer,
         { filter: "blur(0px)", opacity: 1, scale: 1 },
         {
           filter: "blur(22px)",
@@ -68,25 +69,37 @@ export function PortraitBackdrop() {
 
     return () => {
       mm.revert();
-      image.style.willChange = "";
+      layer.style.willChange = "";
     };
   });
 
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 flex items-end justify-center overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
-      <Image
-        data-portrait
-        src="/img/portrait.webp"
-        alt=""
-        width={1400}
-        height={1050}
-        priority
-        sizes="(max-width: 768px) 190vw, 110vw"
-        className="h-[80vh] w-auto max-w-none object-contain sm:h-[96vh]"
-      />
+      <div
+        data-portrait-layer
+        className="flex h-full w-full items-end justify-center"
+      >
+        <Image
+          data-portrait
+          src="/img/portrait.webp"
+          alt=""
+          // The source is 1280x960; declaring anything larger asks Next to
+          // upscale it, which is what softened the face.
+          width={1280}
+          height={960}
+          priority
+          fetchPriority="high"
+          // Cutting this to 82 saved 20KB and moved LCP by nothing at all —
+          // the delay is request timing and first paint, not bytes — so the
+          // face is kept at full quality.
+          quality={90}
+          sizes="(max-width: 768px) 150vw, 90vw"
+          className="h-[80vh] w-auto max-w-none object-contain sm:h-[96vh]"
+        />
+      </div>
     </div>
   );
 }

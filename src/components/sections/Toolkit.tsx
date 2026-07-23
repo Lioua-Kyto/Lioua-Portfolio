@@ -10,17 +10,18 @@ import { MaskText } from "@/components/motion/MaskText";
  */
 export function Toolkit() {
   const { inventory } = content.skills;
+  const { sections } = content;
 
   return (
     <Section id="toolkit" index="05" label="Toolkit">
       <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
         <MaskText
           as="h3"
-          text="The stack under the hood."
+          text={sections.toolkit.heading}
           className="type-serif block max-w-[16ch] text-headline font-medium"
         />
         <p data-reveal className="max-w-[38ch] font-mono text-label text-slate">
-          Nine working groups, carried from first sketch to shipped system.
+          {sections.toolkit.lede}
         </p>
       </div>
 

@@ -1,48 +1,63 @@
+import type { CSSProperties } from "react";
 import { content } from "@/content";
 import { NAV } from "@/components/nav";
 import { RotatingWords } from "@/components/motion/RotatingWords";
 
+/** Position in a group, read by the entrance keyframes as a delay multiplier. */
+const stagger = (index: number) => ({ "--i": index }) as CSSProperties;
+
 /**
- * 00 — Intro: the giant name spanning the viewport, the section routes sitting
- * directly beneath it, and the supporting matter arranged left and right of
- * the portrait backdrop. Every group carries a `data-hero` key so `HeroScene`
- * can bring it in on its own delay and send it out at its own speed.
+ * 00 — Intro: the given name at full width, the section routes directly
+ * beneath it, and the supporting matter flanking the portrait.
+ *
+ * Every group is two nested elements on purpose. The outer `data-hero` node is
+ * the scroll layer: it carries the group to its place in the rail. The inner
+ * `data-hero-in` node is the entrance layer. Splitting them lets both
+ * animations exist from first paint without overwriting each other's opacity —
+ * which is what forces the scroll choreography to be built late, and a
+ * late-built pin corrupts every ScrollTrigger measured before it.
  */
 export function Intro() {
   const { intro, about, skills } = content;
-  const [firstName, ...restName] = intro.name.split(" ");
+  const [firstName] = intro.name.split(" ");
 
   return (
     <section
       id="intro"
       aria-label="Intro"
-      className="relative flex min-h-svh flex-col justify-between overflow-hidden pt-[6vh] pb-8"
+      className="relative flex min-h-svh flex-col justify-between overflow-hidden pt-[4vh] pb-8"
     >
-      {/* The giant name — the graphic plate, over the portrait layer. */}
+      {/* The name is set as live text, not artwork: it is the h1, the LCP
+          element, and the thing a search result shows. An SVG would let it sit
+          flush to both margins at every width, but costs selectable text, a
+          real heading, and font-synced rendering — not a trade worth making
+          for a few pixels of tracking. */}
       <div data-hero="title" className="pointer-events-none relative z-20">
         <h1
           aria-label={intro.name}
-          className="type-serif shell text-giant font-semibold text-accent-deep"
+          className="type-serif shell text-name font-semibold text-accent-deep"
         >
-          {[firstName ?? "", restName.join(" ")].map((line) => (
-            <span
-              key={line}
-              aria-hidden="true"
-              className="block overflow-hidden pb-[0.08em]"
-            >
-              <span data-hero-word className="block will-change-transform">
-                {line}
-              </span>
+          {/* Barely any bottom padding: the mask only needs to clear
+              descenders and this name has none, so the usual allowance is
+              dead height the pinned hero cannot afford. */}
+          <span
+            aria-hidden="true"
+            className="block overflow-hidden pb-[0.02em]"
+          >
+            <span data-title-in className="block will-change-transform">
+              {firstName}
             </span>
-          ))}
+          </span>
         </h1>
       </div>
 
-      {/* The routes live under the name — they travel to the rail on scroll. */}
-      <nav aria-label="Primary" className="relative z-20 mt-6">
-        <ul className="shell flex flex-wrap items-baseline gap-x-6 gap-y-2">
-          {NAV.map((item) => (
-            <li key={item.href} data-hero="nav">
+      <nav aria-label="Primary" className="relative z-20 mt-5">
+        <ul
+          data-hero="nav"
+          className="shell flex flex-wrap items-baseline gap-x-6 gap-y-2"
+        >
+          {NAV.map((item, index) => (
+            <li key={item.href} data-hero-in style={stagger(index)}>
               <a
                 href={item.href}
                 className="transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
@@ -54,19 +69,13 @@ export function Intro() {
         </ul>
       </nav>
 
-      {/* The portrait stands in the middle column, so the matter around it
-          flanks rather than covers it — and the two text blocks that do sit
-          over it carry a translucent paper panel, since the suit behind them
-          is nearly as dark as the ink. */}
       <div className="relative z-20 shell mt-auto grid grid-cols-1 items-end gap-5 pt-8 lg:grid-cols-[minmax(0,19rem)_1fr_minmax(0,19rem)] lg:gap-6">
-        {/* Left — the proof numbers. */}
-        {/* Value and label share a line: stacked, three of these cost enough
-            height to push the claim below the fold on a laptop screen. */}
-        <dl className="grid grid-cols-3 gap-2 lg:grid-cols-1">
-          {intro.proofs.map((proof) => (
+        <dl data-hero="stats" className="grid grid-cols-3 gap-2 lg:grid-cols-1">
+          {intro.proofs.map((proof, index) => (
             <div
               key={proof.label}
-              data-hero="stats"
+              data-hero-in
+              style={stagger(index)}
               className="rounded-xs bg-accent px-3.5 py-2"
             >
               <dd className="type-serif text-lede font-semibold whitespace-nowrap text-ink">
@@ -78,41 +87,41 @@ export function Intro() {
         </dl>
 
         {/* The claim takes the centre, over the portrait — the wide column is
-            the only one that holds it without wrapping into a tall block. */}
-        <div
-          data-hero="lede"
-          className="max-w-[34ch] rounded-xs bg-paper/85 p-4 backdrop-blur-sm lg:justify-self-center"
-        >
-          <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-label text-slate">
-            <span>{intro.role}</span>
-            <span aria-hidden="true" className="text-signal">
-              /
-            </span>
-            <RotatingWords words={intro.roleWords} className="text-ink" />
-          </p>
-          <p className="mt-2 text-lede">{intro.line}</p>
-          <p className="mt-4 flex flex-wrap gap-2">
-            <a
-              href="#products"
-              className="transition-micro rounded-xs bg-ink px-3.5 py-2 font-mono text-label text-paper transition-colors hover:bg-signal"
-            >
-              see the work
-            </a>
-            <a
-              href="#contact"
-              className="transition-micro rounded-xs border border-ink/25 px-3.5 py-2 font-mono text-label text-ink transition-colors hover:border-ink/50"
-            >
-              get in touch
-            </a>
-          </p>
+            the only one that holds it without wrapping into a tall block, and
+            the frosted panel keeps ink legible against the suit behind it. */}
+        <div data-hero="lede" className="lg:justify-self-center">
+          <div data-hero-in className="glass max-w-[34ch] rounded-sm px-5 py-4">
+            <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-label text-slate">
+              <span>{intro.role}</span>
+              <span aria-hidden="true" className="text-signal">
+                /
+              </span>
+              <RotatingWords words={intro.roleWords} className="text-ink" />
+            </p>
+            <p className="mt-2 text-lede">{intro.line}</p>
+            <p className="mt-4 flex flex-wrap gap-2">
+              <a
+                href="#products"
+                className="transition-micro rounded-xs bg-ink px-3.5 py-2 font-mono text-label text-paper transition-colors hover:bg-signal"
+              >
+                see the work
+              </a>
+              <a
+                href="#contact"
+                className="transition-micro rounded-xs border border-ink/25 px-3.5 py-2 font-mono text-label text-ink transition-colors hover:border-ink/50"
+              >
+                start a conversation
+              </a>
+            </p>
+          </div>
         </div>
 
-        {/* Right — what that actually means in practice. */}
-        <ul className="rounded-xs bg-paper/85 p-3 backdrop-blur-sm">
-          {skills.capabilities.slice(0, 5).map((capability) => (
+        <ul data-hero="capabilities" className="glass rounded-sm px-4 py-3">
+          {skills.capabilities.slice(0, 5).map((capability, index) => (
             <li
               key={capability.claim}
-              data-hero="capabilities"
+              data-hero-in
+              style={stagger(index)}
               className="flex items-baseline gap-2.5 py-0.5 font-mono text-label text-slate"
             >
               <span aria-hidden="true" className="text-accent-deep">
@@ -124,11 +133,10 @@ export function Intro() {
         </ul>
       </div>
 
-      <p
-        data-hero="tagline"
-        className="relative z-20 shell mt-10 font-mono text-fine text-slate"
-      >
-        {about.location}
+      <p data-hero="tagline" className="relative z-20 shell mt-5">
+        <span data-hero-in className="font-mono text-fine text-slate">
+          {about.location}
+        </span>
       </p>
     </section>
   );

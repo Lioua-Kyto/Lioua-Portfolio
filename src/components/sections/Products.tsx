@@ -88,6 +88,8 @@ function ProjectCard({
  * drives the travel and measures the distance.
  */
 export function Products() {
+  const { sections } = content;
+
   return (
     <section
       id="products"
@@ -101,7 +103,7 @@ export function Products() {
         </h2>
         <MaskText
           as="p"
-          text="Things I built end to end."
+          text={sections.products.heading}
           className="type-serif mt-6 block max-w-[18ch] text-headline font-medium"
         />
       </div>
