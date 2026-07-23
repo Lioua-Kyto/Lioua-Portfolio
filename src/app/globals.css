@@ -24,8 +24,10 @@
 
   /* Fluid editorial type scale — ratio ~1.25 desktop / ~1.2 mobile. */
   --text-*: initial;
-  /* The hero's giant name — sized to span the viewport behind the portrait. */
-  --text-giant: clamp(3.5rem, 14vw, 12rem);
+  /* The hero's giant name — sized to span the viewport behind the portrait.
+     Bounded by height as well as width: the hero is pinned, so anything that
+     does not fit the viewport is never reachable by scrolling. */
+  --text-giant: clamp(3rem, min(13vw, 19vh), 11rem);
   --text-giant--line-height: 0.84;
   --text-giant--letter-spacing: -0.03em;
   --text-display: clamp(2.875rem, 8.5vw, 7.5rem);

@@ -30,7 +30,9 @@ export function PortraitBackdrop() {
         { filter: "blur(0px)", opacity: 1, scale: 1, yPercent: 0 },
         {
           filter: "blur(26px)",
-          opacity: 0.16,
+          // Faint enough to read as paper texture behind the sections rather
+          // than a figure competing with the body copy.
+          opacity: 0.09,
           scale: 1.12,
           yPercent: -4,
           ease: "none",
@@ -51,7 +53,7 @@ export function PortraitBackdrop() {
         { filter: "blur(0px)", opacity: 1, scale: 1 },
         {
           filter: "blur(22px)",
-          opacity: 0.16,
+          opacity: 0.09,
           scale: 1.1,
           ease: "none",
           scrollTrigger: {

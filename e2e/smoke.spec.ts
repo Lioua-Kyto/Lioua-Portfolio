@@ -304,6 +304,46 @@ test("the section navigation highlights the section you are in", async ({
   expect(active).toBe(true);
 });
 
+test("the hero fits the viewport at laptop and desktop heights", async ({
+  page,
+}) => {
+  // The hero is pinned, so anything taller than the viewport can never be
+  // scrolled into view — it is simply lost.
+  for (const [w, h] of [
+    [1366, 768],
+    [1440, 900],
+    [1920, 1080],
+  ] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.goto("/");
+    await page.waitForTimeout(3200);
+
+    const overflow = await page.evaluate(() => {
+      const hero = document.querySelector("#intro");
+      if (!hero) return 0;
+      return Math.round(
+        hero.getBoundingClientRect().height - window.innerHeight,
+      );
+    });
+    expect(
+      overflow,
+      `hero overflows at ${String(w)}x${String(h)}`,
+    ).toBeLessThanOrEqual(1);
+
+    // And the last thing in — the footnote — is actually on screen.
+    const taglineVisible = await page.evaluate(() => {
+      const el = document.querySelector('[data-hero="tagline"]');
+      if (!el) return false;
+      const r = el.getBoundingClientRect();
+      return r.bottom <= window.innerHeight + 1 && r.top >= 0;
+    });
+    expect(
+      taglineVisible,
+      `tagline off screen at ${String(w)}x${String(h)}`,
+    ).toBe(true);
+  }
+});
+
 test("no scrollbar chrome is rendered", async ({ page }) => {
   await page.goto("/");
   const gutter = await page.evaluate(

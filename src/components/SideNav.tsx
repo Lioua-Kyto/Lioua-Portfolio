@@ -17,7 +17,19 @@ import { NAV } from "@/components/nav";
  */
 export function SideNav() {
   useGSAP(() => {
-    const links = document.querySelectorAll<HTMLElement>("[data-rail-link]");
+    const links = [
+      ...document.querySelectorAll<HTMLElement>("[data-rail-link]"),
+    ];
+
+    // Exactly one route is current. Sections overlap around the 55% line —
+    // and a pinned section holds it for its whole run — so each trigger
+    // claims the highlight outright rather than toggling its own on and off,
+    // which would leave two lit at once.
+    const claim = (id: string) => {
+      for (const link of links) {
+        link.dataset.active = link.dataset.railLink === id ? "true" : "false";
+      }
+    };
 
     for (const link of links) {
       const id = link.dataset.railLink;
@@ -25,16 +37,15 @@ export function SideNav() {
       const section = document.querySelector<HTMLElement>(`#${id}`);
       if (!section) continue;
 
-      const setActive = (active: boolean) => {
-        link.dataset.active = active ? "true" : "false";
-      };
-
       ScrollTrigger.create({
         trigger: section,
         start: "top 55%",
         end: "bottom 55%",
-        onToggle: (self) => {
-          setActive(self.isActive);
+        onEnter: () => {
+          claim(id);
+        },
+        onEnterBack: () => {
+          claim(id);
         },
       });
     }
@@ -60,30 +71,30 @@ export function SideNav() {
 
       <p
         data-rail-item
-        className="mt-2 rounded-xs border border-ink/12 bg-surface/70 p-3 text-fine text-slate"
+        className="mt-2 rounded-xs border border-ink/12 bg-surface p-3 text-label leading-snug text-slate"
       >
         {content.intro.line}
       </p>
 
+      {/* One per row: 224px of rail is too narrow to set these side by side
+          without the longer figure breaking across four lines. */}
       <dl
         data-rail-item
-        className="mt-2 grid grid-cols-2 gap-3 rounded-xs border border-ink/12 bg-surface/70 p-3"
+        className="mt-2 space-y-2 rounded-xs border border-ink/12 bg-surface p-3"
       >
         {content.intro.proofs.slice(0, 2).map((proof) => (
-          <div key={proof.label}>
-            <dd className="type-serif text-base font-semibold text-accent-deep">
+          <div key={proof.label} className="flex items-baseline gap-2">
+            <dd className="type-serif text-base font-semibold whitespace-nowrap text-accent-deep">
               {proof.value}
             </dd>
-            <dt className="mt-0.5 font-mono text-fine text-slate">
-              {proof.label}
-            </dt>
+            <dt className="font-mono text-fine text-slate">{proof.label}</dt>
           </div>
         ))}
       </dl>
 
       <nav
         data-rail-item
-        className="mt-2 rounded-xs border border-ink/12 bg-surface/70 p-2"
+        className="mt-2 rounded-xs border border-ink/12 bg-surface p-2"
       >
         <ul className="space-y-0.5">
           {NAV.map((item) => (
