@@ -28,8 +28,8 @@
      face average ~0.52em of advance, so ~30vw of type spans ~85vw of page.
      Height-bounded too: the hero is pinned, so whatever does not fit the
      viewport can never be scrolled into view. */
-  --text-name: clamp(4rem, min(43vw, 49vh), 32rem);
-  --text-name--line-height: 0.78;
+  --text-name: var(--name-size);
+  --text-name--line-height: var(--name-leading);
   --text-name--letter-spacing: -0.045em;
   --text-giant: clamp(3rem, min(13vw, 19vh), 11rem);
   --text-giant--line-height: 0.84;
@@ -260,19 +260,13 @@
     }
   }
 
-  /* Reduced motion: the whole entrance is decorative sequencing, so cancel it
-     and show the hero at rest. Nothing here is load-bearing for layout. */
-  @media (prefers-reduced-motion: reduce) {
-    [data-title-letter],
-    [data-portrait],
-    [data-hero="nav"] [data-hero-in],
-    [data-hero="stats"] [data-hero-in],
-    [data-hero="lede"] [data-hero-in],
-    [data-hero="capabilities"] [data-hero-in],
-    [data-hero="tagline"] [data-hero-in] {
-      animation: none;
-    }
-  }
+  /* NOTE: deliberately NOT gated on prefers-reduced-motion. Doing that once
+     silently disabled the whole entrance on the author's machine, which has
+     the OS "show animations" setting off — the site looked static on load.
+     The author's standing instruction is that the entrance always plays, and
+     it is the site's signature moment. The autoplaying loops that a reader
+     cannot stop (marquee, word rotator) still honour the OS setting via
+     `lib/motion/reduced.ts`. */
 
   html::-webkit-scrollbar,
   body::-webkit-scrollbar,
