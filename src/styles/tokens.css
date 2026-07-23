@@ -10,7 +10,15 @@
   --surface: #ebe7dc; /* raised mats / image frames */
   --ink: #14140f; /* near-black text */
   --slate: #6b6559; /* secondary/muted text (AA on paper) */
-  --signal: #a63c26; /* the one restrained accent — links, one highlight per view */
+  /* Accent derived from the portrait: the suit is ~89% hue 235° (royal
+     blue), so the complement lands at ~55°, pulled warm to ~45° to also
+     harmonize with the skin/belt tones (15–25°) and the warm paper.
+     --accent is for large fills only (contrast ~1.6:1); --signal is the
+     darkened form that stays AA on paper for links and small text. */
+  --accent: #f5b027; /* vivid gold — solid fills, with ink text on top */
+  --accent-deep: #b37d08; /* giant/large accent type on paper (3:1, AA large) */
+  --accent-soft: #fbe3a8; /* tinted wash for surfaces */
+  --signal: #8a5a06; /* small accent text + links (4.5:1, AA normal) */
   --ok: #3f7a50; /* form states only */
   --err: #b23830; /* form states only */
 

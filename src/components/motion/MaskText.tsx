@@ -46,7 +46,12 @@ export function MaskText({
           stagger: stagger.words,
           delay,
           scrollTrigger: scroll
-            ? { trigger: root, start: "top 88%" }
+            ? {
+                trigger: root,
+                start: "top 88%",
+                // Reversible: scrolling back drops the words behind the mask.
+                toggleActions: "play none none reverse",
+              }
             : undefined,
         });
       });
@@ -62,7 +67,11 @@ export function MaskText({
             ease: "none",
             delay,
             scrollTrigger: scroll
-              ? { trigger: root, start: "top 92%" }
+              ? {
+                  trigger: root,
+                  start: "top 92%",
+                  toggleActions: "play none none reverse",
+                }
               : undefined,
           },
         );

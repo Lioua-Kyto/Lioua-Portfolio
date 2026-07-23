@@ -15,9 +15,10 @@ test("the six numbered sections render as one semantic document", async ({
 }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Lioua Zeddam/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Lioua Zeddam",
-  );
+  // The giant name splits into masked lines; aria-label carries the full name.
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Lioua Zeddam" }),
+  ).toBeAttached();
   await expect(page.getByRole("main")).toBeVisible();
   for (const id of SECTION_IDS) {
     await expect(page.locator(`#${id}`)).toBeAttached();
@@ -38,15 +39,15 @@ test("gsap hero timeline settles and survives route changes cleanly", async ({
 
   await page.goto("/no-such-route");
   await page.getByRole("link", { name: "→ back to the start" }).click();
-  const heading = page.getByRole("heading", { level: 1 });
-  await expect(heading).toHaveText("Lioua Zeddam");
+  const heading = page.getByRole("heading", { level: 1, name: "Lioua Zeddam" });
+  await expect(heading).toBeAttached();
   await expect(heading).toHaveCSS("opacity", "1");
   await page.goBack();
   await expect(
     page.getByRole("heading", { level: 1, name: "404" }),
   ).toBeVisible();
   await page.goForward();
-  await expect(heading).toHaveText("Lioua Zeddam");
+  await expect(heading).toBeAttached();
   await expect(heading).toHaveCSS("opacity", "1");
   expect(errors).toEqual([]);
 });
@@ -58,6 +59,31 @@ test("section reveals start hidden and play in on scroll", async ({ page }) => {
   await expect(beat).toBeHidden();
   await beat.scrollIntoViewIfNeeded();
   await expect(beat).toBeVisible();
+});
+
+test("the side rail displaces in past the hero and reverses back", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.waitForTimeout(600);
+  // CSS locator, not getByRole: while hidden the rail leaves the a11y tree.
+  const rail = page.locator('aside[aria-label="Section navigation"]');
+  const opacity = async () =>
+    Number(await rail.evaluate((el) => getComputedStyle(el).opacity));
+
+  // Hidden while the hero owns the screen.
+  expect(await opacity()).toBeLessThan(0.1);
+
+  await page.evaluate(() => {
+    document.querySelector("#experience")?.scrollIntoView();
+  });
+  await expect.poll(opacity, { timeout: 5000 }).toBeGreaterThan(0.9);
+
+  // Reversible: back at the hero it retreats again (no reload needed).
+  await page.evaluate(() => {
+    document.querySelector("#intro")?.scrollIntoView();
+  });
+  await expect.poll(opacity, { timeout: 5000 }).toBeLessThan(0.1);
 });
 
 test("the contact form is present and labeled", async ({ page }) => {

@@ -20,7 +20,12 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} aria-label={label} className="py-[clamp(6rem,14vh,10rem)]">
+    // lg:pl-60 clears the fixed side rail, which only appears past the hero.
+    <section
+      id={id}
+      aria-label={label}
+      className="py-[clamp(6rem,14vh,10rem)] lg:pl-60"
+    >
       <div className="shell">
         {/* The mono label doubles as the section's h2 so the document reads
             h1 → h2 → h3 with no skipped levels. */}

@@ -6,15 +6,15 @@ import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { dur, ease, stagger, scrub } from "@/lib/motion/tokens";
 
 /**
- * The site's motion controller (V3 motion spec §2–4, §6). One `useGSAP`
- * scope covers the whole page; a single `matchMedia` authors the reduced
- * branch (nothing hidden, nothing moves) alongside the full branch:
- *   - hero timeline, once on mount (headline y-only so it never opacity-gates
- *     LCP; supporting elements rise + fade, staggered in reading order);
- *   - section reveals — the workhorse — batched with a stagger, played once,
- *     with a terminal flush so nothing below the last trigger stays hidden;
- *   - the portrait blur, scrubbed to scroll.
- * Children stay server-rendered; only this scope div is client.
+ * The site's motion controller. One `useGSAP` scope covers the page; a single
+ * `matchMedia` authors both branches (full motion / reduced). Everything is
+ * REVERSIBLE — scrolling back plays each reveal backwards, so nothing needs a
+ * reload to see again.
+ *   - the giant hero name rises from behind its mask on mount;
+ *   - supporting hero elements rise + fade beneath it;
+ *   - section reveals batch in on enter and back out on leave-back;
+ *   - the hero portrait blurs and scales as the hero scrolls away (scrubbed,
+ *     so it's inherently reversible).
  */
 export function Motion({ children }: { children: ReactNode }) {
   const scope = useRef<HTMLDivElement>(null);
@@ -25,65 +25,79 @@ export function Motion({ children }: { children: ReactNode }) {
       if (!root) return;
 
       const media = gsap.matchMedia();
+
       media.add("(prefers-reduced-motion: no-preference)", () => {
-        // Hero supporting elements rise + fade under the mask-revealing name.
+        // Giant name — mask reveal on mount.
+        gsap.from("[data-hero-word]", {
+          yPercent: 108,
+          duration: dur.slow,
+          ease: ease.out,
+          stagger: 0.09,
+        });
+
+        // Hero supporting elements rise + fade under the name.
         gsap.from("[data-hero-el]", {
           y: 28,
           autoAlpha: 0,
           duration: dur.reveal,
           ease: ease.out,
           stagger: stagger.hero,
-          delay: 0.35,
+          delay: 0.4,
         });
 
-        // Section reveals — the workhorse. Hide, then batch-reveal on enter;
-        // a max-scroll trigger flushes anything the 82% line can't reach.
-        const pending = new Set<Element>(
-          root.querySelectorAll("[data-reveal]"),
-        );
-        if (pending.size > 0) {
-          gsap.set([...pending], { y: 44, autoAlpha: 0 });
-          const reveal = (batch: readonly Element[]) => {
-            for (const el of batch) pending.delete(el);
-            gsap.to(batch, {
-              y: 0,
-              autoAlpha: 1,
-              duration: dur.reveal,
-              ease: ease.out,
-              stagger: stagger.tight,
-              overwrite: true,
-            });
-          };
+        // Section reveals — reversible: in on enter, out on leave-back.
+        const targets = root.querySelectorAll("[data-reveal]");
+        if (targets.length > 0) {
+          gsap.set(targets, { y: 44, autoAlpha: 0 });
           ScrollTrigger.batch("[data-reveal]", {
-            start: "top 82%",
-            onEnter: reveal,
+            start: "top 90%",
+            onEnter: (batch) => {
+              gsap.to(batch, {
+                y: 0,
+                autoAlpha: 1,
+                duration: dur.reveal,
+                ease: ease.out,
+                stagger: stagger.tight,
+                overwrite: true,
+              });
+            },
+            onLeaveBack: (batch) => {
+              gsap.to(batch, {
+                y: 44,
+                autoAlpha: 0,
+                duration: dur.micro,
+                ease: ease.out,
+                overwrite: true,
+              });
+            },
           });
+          // Anything the 90% line can never reach (page bottom) still shows.
           ScrollTrigger.create({
             trigger: document.documentElement,
             start: () => ScrollTrigger.maxScroll(window) - 1,
-            once: true,
             onEnter: () => {
-              reveal([...pending]);
+              gsap.to(targets, { y: 0, autoAlpha: 1, duration: dur.reveal });
             },
           });
         }
 
-        // Portrait blur — scrubbed. blur is GPU-heavy, so will-change is set
-        // for the life of the scrub and cleared on teardown (§6).
+        // Hero portrait softens as the hero scrolls away (scrubbed = reversible).
         const portrait = root.querySelector<HTMLElement>("[data-portrait]");
-        if (portrait) {
+        const hero = root.querySelector<HTMLElement>("#intro");
+        if (portrait && hero) {
           portrait.style.willChange = "transform, filter";
           gsap.fromTo(
             portrait,
-            { filter: "blur(0px)", scale: 1 },
+            { filter: "blur(0px)", scale: 1, yPercent: 0 },
             {
-              filter: "blur(6px)",
-              scale: 1.06,
+              filter: "blur(7px)",
+              scale: 1.07,
+              yPercent: 6,
               ease: "none",
               scrollTrigger: {
-                trigger: portrait,
-                start: "top 80%",
-                end: "bottom 30%",
+                trigger: hero,
+                start: "top top",
+                end: "bottom top",
                 scrub: scrub.portrait,
               },
             },
@@ -113,11 +127,18 @@ export function Motion({ children }: { children: ReactNode }) {
               overwrite: true,
             });
           },
+          onLeaveBack: (batch) => {
+            gsap.to(batch, {
+              autoAlpha: 0,
+              duration: dur.micro,
+              ease: "none",
+              overwrite: true,
+            });
+          },
         });
         ScrollTrigger.create({
           trigger: document.documentElement,
           start: () => ScrollTrigger.maxScroll(window) - 1,
-          once: true,
           onEnter: () => {
             gsap.to(targets, { autoAlpha: 1, duration: dur.micro });
           },
