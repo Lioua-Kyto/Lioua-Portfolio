@@ -10,6 +10,7 @@ import {
 import Lenis from "lenis";
 import { ScrollTrigger } from "@/lib/motion/gsap";
 import { ticker } from "@/lib/motion/ticker";
+import { useMotionEnabled } from "@/lib/motion/preference";
 
 interface SmoothScrollContextValue {
   /** The single Lenis instance, or null before mount / under reduced motion. */
@@ -28,13 +29,14 @@ const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(
  * Lenis is created — native scroll only.
  */
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
+  const motionEnabled = useMotionEnabled();
   const lenisRef = useRef<Lenis | null>(null);
   const valueRef = useRef<SmoothScrollContextValue>({
     getLenis: () => lenisRef.current,
   });
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!motionEnabled) return;
     // Luxe momentum glide — a low lerp gives the weighted, heynesh-grade
     // feel where scroll settles rather than snaps.
     const lenis = new Lenis({
@@ -54,7 +56,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [motionEnabled]);
 
   return (
     <SmoothScrollContext.Provider value={valueRef.current}>

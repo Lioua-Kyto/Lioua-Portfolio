@@ -3,45 +3,44 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
+import { useMotionEnabled } from "@/lib/motion/preference";
 
 /**
- * A slow textural marquee (V3 motion spec §4) — one band of discipline
- * phrases looping between sections, easing to near-stop on hover. Two copies
- * of the track make the `-50%` loop seamless; reduced motion leaves it static.
- * Purely decorative, so `aria-hidden`.
+ * A slow textural marquee — one band of discipline phrases looping between
+ * sections, easing to near-stop on hover. Two copies of the track make the
+ * `-50%` loop seamless; with motion off it stays still. Decorative, so hidden
+ * from assistive tech.
  */
 export function Marquee({ items }: { items: readonly string[] }) {
   const scope = useRef<HTMLDivElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useGSAP(
     () => {
       const root = scope.current;
       const track = root?.querySelector<HTMLElement>("[data-marquee-track]");
-      if (!root || !track) return;
+      if (!root || !track || !motionEnabled) return;
 
-      const media = gsap.matchMedia();
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        const tween = gsap.to(track, {
-          xPercent: -50,
-          duration: 40,
-          ease: "none",
-          repeat: -1,
-        });
-        const slow = () => {
-          gsap.to(tween, { timeScale: 0.12, duration: 0.4 });
-        };
-        const resume = () => {
-          gsap.to(tween, { timeScale: 1, duration: 0.4 });
-        };
-        root.addEventListener("pointerenter", slow);
-        root.addEventListener("pointerleave", resume);
-        return () => {
-          root.removeEventListener("pointerenter", slow);
-          root.removeEventListener("pointerleave", resume);
-        };
+      const tween = gsap.to(track, {
+        xPercent: -50,
+        duration: 40,
+        ease: "none",
+        repeat: -1,
       });
+      const slow = () => {
+        gsap.to(tween, { timeScale: 0.12, duration: 0.4 });
+      };
+      const resume = () => {
+        gsap.to(tween, { timeScale: 1, duration: 0.4 });
+      };
+      root.addEventListener("pointerenter", slow);
+      root.addEventListener("pointerleave", resume);
+      return () => {
+        root.removeEventListener("pointerenter", slow);
+        root.removeEventListener("pointerleave", resume);
+      };
     },
-    { scope },
+    { scope, dependencies: [motionEnabled] },
   );
 
   return (

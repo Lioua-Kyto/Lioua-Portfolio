@@ -3,16 +3,17 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
+import { useMotionEnabled } from "@/lib/motion/preference";
 import { ease } from "@/lib/motion/tokens";
 
 const HOLD_S = 1.9;
 const SWAP_S = 0.55;
 
 /**
- * The hero's rotating descriptor (heynesh signature): a stack of honest role
- * words cycling with a vertical slide + fade, one every ~2.4s, looping. All
- * words occupy one grid cell; only transforms/opacity animate. Reduced motion
- * shows the first word, static. The full list is the accessible label.
+ * The hero's rotating descriptor: a stack of honest role words cycling with a
+ * vertical slide + fade, one every ~2.4s, looping. All words occupy one grid
+ * cell; only transforms/opacity animate. With motion off they crossfade in
+ * place instead. The full list is the accessible label.
  */
 export function RotatingWords({
   words,
@@ -22,6 +23,7 @@ export function RotatingWords({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useGSAP(
     () => {
@@ -31,56 +33,35 @@ export function RotatingWords({
       const first = items[0];
       if (!first || items.length < 2) return;
 
-      const media = gsap.matchMedia();
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.set(items, { yPercent: 100, autoAlpha: 0 });
-        gsap.set(first, { yPercent: 0, autoAlpha: 1 });
+      const travel = motionEnabled;
+      gsap.set(items, { yPercent: travel ? 100 : 0, autoAlpha: 0 });
+      gsap.set(first, { yPercent: 0, autoAlpha: 1 });
 
-        const tl = gsap.timeline({ repeat: -1 });
-        for (let index = 0; index < items.length; index++) {
-          const item = items[index];
-          const next = items[(index + 1) % items.length];
-          if (!item || !next) continue;
-          tl.to(item, {
-            yPercent: -100,
-            autoAlpha: 0,
+      const tl = gsap.timeline({ repeat: -1 });
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        const next = items[(index + 1) % items.length];
+        if (!item || !next) continue;
+        tl.to(item, {
+          yPercent: travel ? -100 : 0,
+          autoAlpha: 0,
+          duration: SWAP_S,
+          ease: travel ? ease.inOut : "none",
+          delay: HOLD_S,
+        }).fromTo(
+          next,
+          { yPercent: travel ? 100 : 0, autoAlpha: 0 },
+          {
+            yPercent: 0,
+            autoAlpha: 1,
             duration: SWAP_S,
-            ease: ease.inOut,
-            delay: HOLD_S,
-          }).fromTo(
-            next,
-            { yPercent: 100, autoAlpha: 0 },
-            { yPercent: 0, autoAlpha: 1, duration: SWAP_S, ease: ease.inOut },
-            "<",
-          );
-        }
-      });
-
-      // Reduced motion: the words still cycle, but crossfade in place — no
-      // vertical travel.
-      media.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(items, { autoAlpha: 0, yPercent: 0 });
-        gsap.set(first, { autoAlpha: 1 });
-        const tl = gsap.timeline({ repeat: -1 });
-        for (let index = 0; index < items.length; index++) {
-          const item = items[index];
-          const next = items[(index + 1) % items.length];
-          if (!item || !next) continue;
-          tl.to(item, {
-            autoAlpha: 0,
-            duration: SWAP_S,
-            ease: "none",
-            delay: HOLD_S,
-          }).fromTo(
-            next,
-            { autoAlpha: 0 },
-            { autoAlpha: 1, duration: SWAP_S, ease: "none" },
-            "<",
-          );
-        }
-      });
+            ease: travel ? ease.inOut : "none",
+          },
+          "<",
+        );
+      }
     },
-    { scope: ref },
+    { scope: ref, dependencies: [motionEnabled] },
   );
 
   return (

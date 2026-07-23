@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SideNav } from "@/components/SideNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Motion } from "@/components/motion/Motion";
+import { PortraitBackdrop } from "@/components/hero/PortraitBackdrop";
 import { Marquee } from "@/components/motion/Marquee";
 import { Intro } from "@/components/sections/Intro";
 import { Background } from "@/components/sections/Background";
@@ -22,6 +23,7 @@ export default function HomePage() {
 
   return (
     <div className="relative">
+      <PortraitBackdrop />
       <SiteHeader />
       <SideNav />
       <Motion>

@@ -1,5 +1,6 @@
 import { content } from "@/content";
 import { NAV } from "@/components/nav";
+import { MotionToggle } from "@/components/motion/MotionToggle";
 
 const TOP_ROUTES = ["#background", "#experience", "#contact"];
 
@@ -20,6 +21,9 @@ export function SiteHeader() {
         </a>
         <nav aria-label="Primary">
           <ul className="flex items-baseline gap-5 sm:gap-6">
+            <li>
+              <MotionToggle />
+            </li>
             {NAV.filter((item) => TOP_ROUTES.includes(item.href)).map(
               (item) => (
                 <li key={item.href}>

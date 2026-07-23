@@ -1,13 +1,12 @@
-import Image from "next/image";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
 import { RotatingWords } from "@/components/motion/RotatingWords";
 
 /**
- * 00 — Intro: the giant name in accent gold with the portrait cutout layered
- * in front, floating proof cards, and the honest one-liner. The name is set
- * in --accent-deep so the large type still clears 3:1 on paper; the vivid
- * gold is reserved for solid fills with ink on top.
+ * 00 — Intro: the giant name in accent gold over the portrait backdrop, with
+ * the honest one-liner and proof cards. Everything here is marked
+ * `data-hero-exit` so it travels up and fades as the hero scrolls away,
+ * leaving the softened portrait behind it.
  */
 export function Intro() {
   const { intro } = content;
@@ -19,8 +18,11 @@ export function Intro() {
       aria-label="Intro"
       className="relative flex min-h-svh flex-col overflow-hidden"
     >
-      {/* Giant name — the graphic backdrop. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[17vh] z-0">
+      {/* Giant name — the graphic backdrop, over the portrait layer. */}
+      <div
+        data-hero-exit
+        className="pointer-events-none absolute inset-x-0 top-[17vh] z-20"
+      >
         <h1
           aria-label={intro.name}
           className="type-serif shell text-giant font-semibold text-accent-deep"
@@ -39,28 +41,13 @@ export function Intro() {
         </h1>
       </div>
 
-      {/* Portrait — layered over the name, blurs away on scroll. */}
-      <div
-        data-portrait
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center"
-      >
-        <Image
-          src="/img/portrait.webp"
-          alt=""
-          aria-hidden="true"
-          width={1400}
-          height={1050}
-          priority
-          sizes="(max-width: 768px) 150vw, 90vw"
-          className="h-[62vh] w-auto max-w-none object-contain sm:h-[72vh]"
-        />
-      </div>
-
-      {/* Chrome + copy sit above the portrait. */}
       <div className="relative z-20 shell flex grow flex-col pt-28 pb-12">
         <Label index="00">Intro</Label>
 
-        <div className="mt-auto grid gap-8 md:grid-cols-2 md:items-end">
+        <div
+          data-hero-exit
+          className="mt-auto grid gap-8 md:grid-cols-2 md:items-end"
+        >
           <div data-hero-el className="max-w-[34ch]">
             <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-label text-slate">
               <span>{intro.role}</span>

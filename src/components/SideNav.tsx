@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
+import { useMotionEnabled } from "@/lib/motion/preference";
 import { dur, ease } from "@/lib/motion/tokens";
 import { content } from "@/content";
 import { NAV } from "@/components/nav";
@@ -17,6 +18,7 @@ import { NAV } from "@/components/nav";
  */
 export function SideNav() {
   const scope = useRef<HTMLElement>(null);
+  const motionEnabled = useMotionEnabled();
 
   useGSAP(
     () => {
@@ -25,57 +27,40 @@ export function SideNav() {
       const hero = document.querySelector("#intro");
       if (!hero) return;
 
-      const media = gsap.matchMedia();
+      const items = root.querySelectorAll("[data-rail-item]");
+      const travel = motionEnabled;
 
-      media.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.set(root, { autoAlpha: 0, x: -24 });
-        const items = root.querySelectorAll("[data-rail-item]");
-        gsap.set(items, { autoAlpha: 0, x: -14 });
+      gsap.set(root, { autoAlpha: 0, x: travel ? -24 : 0 });
+      gsap.set(items, { autoAlpha: 0, x: travel ? -14 : 0 });
 
-        const show = gsap
-          .timeline({ paused: true })
-          .to(root, {
+      const show = gsap
+        .timeline({ paused: true })
+        .to(root, {
+          autoAlpha: 1,
+          x: 0,
+          duration: travel ? dur.reveal : dur.micro,
+          ease: travel ? ease.out : "none",
+        })
+        .to(
+          items,
+          {
             autoAlpha: 1,
             x: 0,
-            duration: dur.reveal,
-            ease: ease.out,
-          })
-          .to(
-            items,
-            {
-              autoAlpha: 1,
-              x: 0,
-              duration: dur.reveal,
-              ease: ease.out,
-              stagger: 0.05,
-            },
-            "-=0.7",
-          );
-
-        ScrollTrigger.create({
-          trigger: hero,
-          start: "bottom 60%",
-          onEnter: () => show.play(),
-          onLeaveBack: () => show.reverse(),
-        });
-      });
-
-      // Reduced motion: crossfade only, no travel.
-      media.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(root, { autoAlpha: 0 });
-        ScrollTrigger.create({
-          trigger: hero,
-          start: "bottom 60%",
-          onEnter: () => {
-            gsap.to(root, { autoAlpha: 1, duration: dur.micro });
+            duration: travel ? dur.reveal : dur.micro,
+            ease: travel ? ease.out : "none",
+            stagger: travel ? 0.05 : 0,
           },
-          onLeaveBack: () => {
-            gsap.to(root, { autoAlpha: 0, duration: dur.micro });
-          },
-        });
+          travel ? "-=0.7" : "<",
+        );
+
+      ScrollTrigger.create({
+        trigger: hero,
+        start: "bottom 60%",
+        onEnter: () => show.play(),
+        onLeaveBack: () => show.reverse(),
       });
     },
-    { scope },
+    { scope, dependencies: [motionEnabled] },
   );
 
   return (
