@@ -14,7 +14,15 @@ test-results/
 # misc
 *.tsbuildinfo
 .DS_Store
+Thumbs.db
 *.rar
+*.log
+npm-debug.log*
+
+# deploy / editor
+.vercel/
+.idea/
+.vscode/
 
 # source footage from the abandoned video concept (kept on disk, not in git)
 assets/

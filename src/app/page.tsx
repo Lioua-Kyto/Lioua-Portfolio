@@ -1,8 +1,8 @@
 import { content } from "@/content";
-import { SiteHeader } from "@/components/SiteHeader";
 import { SideNav } from "@/components/SideNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Motion } from "@/components/motion/Motion";
+import { HeroScene } from "@/components/hero/HeroScene";
 import { PortraitBackdrop } from "@/components/hero/PortraitBackdrop";
 import { Marquee } from "@/components/motion/Marquee";
 import { Intro } from "@/components/sections/Intro";
@@ -14,9 +14,9 @@ import { Toolkit } from "@/components/sections/Toolkit";
 import { Contact } from "@/components/sections/Contact";
 
 /**
- * The site: six numbered editorial sections on one calm scroll, wrapped in
- * the GSAP motion controller. The top chrome relocates into the fixed side
- * rail once the hero leaves.
+ * The site: six numbered editorial sections on one calm scroll. The hero owns
+ * the first screen and, as it pins and disperses, hands its chrome to the
+ * fixed side rail.
  */
 export default function HomePage() {
   const marqueeItems = content.skills.capabilities.map((c) => c.claim);
@@ -24,8 +24,8 @@ export default function HomePage() {
   return (
     <div className="relative">
       <PortraitBackdrop />
-      <SiteHeader />
       <SideNav />
+      <HeroScene />
       <Motion>
         <main>
           <Intro />

@@ -3,23 +3,22 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
-import { useMotionEnabled } from "@/lib/motion/preference";
+import { prefersReducedMotion } from "@/lib/motion/reduced";
 
 /**
  * A slow textural marquee — one band of discipline phrases looping between
  * sections, easing to near-stop on hover. Two copies of the track make the
- * `-50%` loop seamless; with motion off it stays still. Decorative, so hidden
- * from assistive tech.
+ * `-50%` loop seamless. This one autoplays, so it is the rare piece that stays
+ * still under prefers-reduced-motion. Decorative, so hidden from assistive tech.
  */
 export function Marquee({ items }: { items: readonly string[] }) {
   const scope = useRef<HTMLDivElement>(null);
-  const motionEnabled = useMotionEnabled();
 
   useGSAP(
     () => {
       const root = scope.current;
       const track = root?.querySelector<HTMLElement>("[data-marquee-track]");
-      if (!root || !track || !motionEnabled) return;
+      if (!root || !track || prefersReducedMotion()) return;
 
       const tween = gsap.to(track, {
         xPercent: -50,
@@ -40,7 +39,7 @@ export function Marquee({ items }: { items: readonly string[] }) {
         root.removeEventListener("pointerleave", resume);
       };
     },
-    { scope, dependencies: [motionEnabled] },
+    { scope },
   );
 
   return (

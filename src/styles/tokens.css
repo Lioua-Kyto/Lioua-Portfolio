@@ -16,7 +16,7 @@
      --accent is for large fills only (contrast ~1.6:1); --signal is the
      darkened form that stays AA on paper for links and small text. */
   --accent: #f5b027; /* vivid gold — solid fills, with ink text on top */
-  --accent-deep: #b37d08; /* giant/large accent type on paper (3:1, AA large) */
+  --accent-deep: #b75c2d; /* giant/large accent type on paper (3:1, AA large) */
   --accent-soft: #fbe3a8; /* tinted wash for surfaces */
   --signal: #8a5a06; /* small accent text + links (4.5:1, AA normal) */
   --ok: #3f7a50; /* form states only */

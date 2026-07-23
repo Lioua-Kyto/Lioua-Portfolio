@@ -1,6 +1,5 @@
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
-import { MotionToggle } from "@/components/motion/MotionToggle";
 
 /** One-line editorial footer — colophon voice, no link farm. */
 export function SiteFooter() {
@@ -9,10 +8,7 @@ export function SiteFooter() {
       <Label>
         © {new Date().getFullYear()} {content.intro.name}
       </Label>
-      <span className="flex items-baseline gap-6">
-        <Label>{content.about.location.toLowerCase()}</Label>
-        <MotionToggle />
-      </span>
+      <Label>{content.about.location.toLowerCase()}</Label>
     </footer>
   );
 }

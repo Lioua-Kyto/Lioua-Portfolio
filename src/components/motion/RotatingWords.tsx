@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
-import { useMotionEnabled } from "@/lib/motion/preference";
+import { prefersReducedMotion } from "@/lib/motion/reduced";
 import { ease } from "@/lib/motion/tokens";
 
 const HOLD_S = 1.9;
@@ -23,7 +23,6 @@ export function RotatingWords({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const motionEnabled = useMotionEnabled();
 
   useGSAP(
     () => {
@@ -33,7 +32,7 @@ export function RotatingWords({
       const first = items[0];
       if (!first || items.length < 2) return;
 
-      const travel = motionEnabled;
+      const travel = !prefersReducedMotion();
       gsap.set(items, { yPercent: travel ? 100 : 0, autoAlpha: 0 });
       gsap.set(first, { yPercent: 0, autoAlpha: 1 });
 
@@ -61,7 +60,7 @@ export function RotatingWords({
         );
       }
     },
-    { scope: ref, dependencies: [motionEnabled] },
+    { scope: ref },
   );
 
   return (

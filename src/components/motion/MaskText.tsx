@@ -3,7 +3,6 @@
 import { Fragment, useRef, type ElementType } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
-import { useMotionEnabled } from "@/lib/motion/preference";
 import { dur, ease, stagger } from "@/lib/motion/tokens";
 
 /**
@@ -11,8 +10,8 @@ import { dur, ease, stagger } from "@/lib/motion/tokens";
  * and rises up from behind it, cascading on a word stagger when the heading
  * scrolls into view — and dropping back behind the line on the way up, so it
  * replays without a reload. `useGSAP` runs pre-paint, so the hidden state
- * applies before the first frame with no flash. With motion off it's a plain
- * fade. The full string stays the accessible name; the split spans are hidden.
+ * applies before the first frame with no flash. The full string stays the
+ * accessible name; the split spans are hidden.
  */
 export function MaskText({
   text,
@@ -29,7 +28,6 @@ export function MaskText({
   scroll?: boolean;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const motionEnabled = useMotionEnabled();
   const Tag = as ?? "span";
   const words = text.split(" ");
 
@@ -38,28 +36,6 @@ export function MaskText({
       const root = ref.current;
       if (!root) return;
       const inners = root.querySelectorAll("[data-mask-inner]");
-
-      if (!motionEnabled) {
-        gsap.set(inners, { clearProps: "transform" });
-        gsap.fromTo(
-          root,
-          { autoAlpha: 0 },
-          {
-            autoAlpha: 1,
-            duration: dur.micro,
-            ease: "none",
-            delay,
-            scrollTrigger: scroll
-              ? {
-                  trigger: root,
-                  start: "top 92%",
-                  toggleActions: "play none none reverse",
-                }
-              : undefined,
-          },
-        );
-        return;
-      }
 
       gsap.set(inners, { yPercent: 118 });
       gsap.to(inners, {
@@ -78,7 +54,7 @@ export function MaskText({
           : undefined,
       });
     },
-    { scope: ref, dependencies: [motionEnabled] },
+    { scope: ref },
   );
 
   return (

@@ -85,6 +85,39 @@
 @layer base {
   html {
     scroll-padding-top: 5rem;
+    /* No scrollbar chrome — the rail and the motion carry the sense of
+       position. Scrolling itself is untouched (Lenis smooths, never hijacks),
+       and keyboard/wheel/touch all still work. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  [data-rail-viewport] {
+    scrollbar-width: none;
+  }
+
+  /* The hero's supporting matter is staged hidden so it arrives after the
+     name rather than flashing in at first paint and blinking out when GSAP
+     arms. Scoped to `scripting: enabled` so that without JS — where nothing
+     would ever fade it back in — it simply renders normally. The name itself
+     is deliberately excluded: it is the LCP element and only ever moves. */
+  @media (scripting: enabled) {
+    [data-hero="nav"],
+    [data-hero="stats"],
+    [data-hero="lede"],
+    [data-hero="capabilities"],
+    [data-hero="tagline"] {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  [data-rail-viewport]::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
   }
 
   body {

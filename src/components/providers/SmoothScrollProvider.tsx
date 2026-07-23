@@ -10,10 +10,9 @@ import {
 import Lenis from "lenis";
 import { ScrollTrigger } from "@/lib/motion/gsap";
 import { ticker } from "@/lib/motion/ticker";
-import { useMotionEnabled } from "@/lib/motion/preference";
 
 interface SmoothScrollContextValue {
-  /** The single Lenis instance, or null before mount / under reduced motion. */
+  /** The single Lenis instance, or null before mount. */
   getLenis: () => Lenis | null;
 }
 
@@ -25,18 +24,16 @@ const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(
  * Owns the site's one Lenis instance, driven by the shared Ticker — one rAF
  * loop total (V3 motion spec §1). Lenis scroll feeds `ScrollTrigger.update()`
  * so scrubs/triggers track the smoothed position. Mounted once in the root
- * layout; children stay server-rendered. Under prefers-reduced-motion no
- * Lenis is created — native scroll only.
+ * layout; children stay server-rendered. Lenis smooths the native scroll —
+ * it never hijacks it — so it stays on for everyone.
  */
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
-  const motionEnabled = useMotionEnabled();
   const lenisRef = useRef<Lenis | null>(null);
   const valueRef = useRef<SmoothScrollContextValue>({
     getLenis: () => lenisRef.current,
   });
 
   useEffect(() => {
-    if (!motionEnabled) return;
     // Luxe momentum glide — a low lerp gives the weighted, heynesh-grade
     // feel where scroll settles rather than snaps.
     const lenis = new Lenis({
@@ -56,7 +53,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [motionEnabled]);
+  }, []);
 
   return (
     <SmoothScrollContext.Provider value={valueRef.current}>
