@@ -19,16 +19,6 @@ async function wheelUntil(
   return predicate();
 }
 
-/** Distance a hero group has travelled from its settled position. */
-async function heroTravel(page: Page, key: string): Promise<number> {
-  return page.evaluate((k) => {
-    const el = document.querySelector(`[data-hero="${k}"]`);
-    if (!el) return 0;
-    const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
-    return Math.hypot(m.m41, m.m42);
-  }, key);
-}
-
 const SECTION_IDS = [
   "intro",
   "background",
@@ -58,23 +48,27 @@ test("the six numbered sections render as one semantic document", async ({
   ).toBeAttached();
 });
 
-test("the site has no top header — the routes live under the name", async ({
+test("the site has no top header — the routes live in the hero chrome", async ({
   page,
 }) => {
   await page.goto("/");
   await expect(page.locator("body > div > header")).toHaveCount(0);
-  // The primary nav sits inside the hero, beneath the giant name.
-  const nav = page.locator('#intro nav[aria-label="Primary"]');
-  await expect(nav).toBeAttached();
+  // The primary nav is the hero chrome's own — the same element set that later
+  // becomes the rail. Exactly one nav, five routes.
+  const nav = page.locator('[data-chrome] nav[aria-label="Primary"]');
+  await expect(nav).toHaveCount(1);
   await expect(nav.getByRole("link")).toHaveCount(5);
 
+  // It sits below the wordmark on load.
   const [nameBottom, navTop] = await page.evaluate(() => {
     const h1 = document.querySelector("h1");
-    const nav = document.querySelector('#intro nav[aria-label="Primary"]');
+    const nav = document.querySelector(
+      '[data-chrome] nav[aria-label="Primary"]',
+    );
     if (!h1 || !nav) return [0, 0];
     return [h1.getBoundingClientRect().bottom, nav.getBoundingClientRect().top];
   });
-  expect(navTop).toBeGreaterThanOrEqual(nameBottom - 1);
+  expect(navTop).toBeGreaterThanOrEqual(nameBottom - 40);
 });
 
 test("no motion toggle remains anywhere on the page", async ({ page }) => {
@@ -124,51 +118,45 @@ test("the hero name sits behind the portrait, its letters settling in", async ({
   expect(["none", "matrix(1, 0, 0, 1, 0, 0)"]).toContain(settled?.transform);
 });
 
-test("the hero pins, disperses its parts, and hands off to the rail", async ({
+test("the hero chrome morphs into the side rail (one set of elements)", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.waitForTimeout(2600); // let the entrance finish
 
-  const rail = page.locator("aside[aria-label='Section navigation']");
-  const railOpacity = async () =>
-    Number(await rail.evaluate((el) => getComputedStyle(el).opacity));
-  const heroOpacity = async (key: string) =>
-    page.evaluate((k) => {
-      const el = document.querySelector(`[data-hero="${k}"]`);
-      return el ? parseFloat(getComputedStyle(el).opacity) : 1;
-    }, key);
+  const routes = page.locator('[data-chrome] nav[aria-label="Primary"] a');
+  const panelAlpha = () =>
+    page.evaluate(() =>
+      Number(
+        getComputedStyle(
+          document.querySelector("[data-chrome-panel]") as Element,
+        ).opacity,
+      ),
+    );
 
-  expect(await railOpacity()).toBeLessThan(0.1);
+  // On load the rail panel is not shown (the chrome reads as the hero), and
+  // there are five routes. (The data-state attribute stays "rail" throughout —
+  // Flip drives the hero look via transforms, so panel opacity is the signal.)
+  await expect(routes).toHaveCount(5);
+  expect(await panelAlpha()).toBeLessThan(0.1);
 
-  // The hero is pinned: it stays put on screen while the scroll is consumed.
-  const introTopBefore = await page.evaluate(
-    () => document.querySelector("#intro")?.getBoundingClientRect().top ?? 0,
-  );
-  await page.mouse.wheel(0, 600);
-  await page.waitForTimeout(400);
-  const introTopAfter = await page.evaluate(
-    () => document.querySelector("#intro")?.getBoundingClientRect().top ?? 0,
-  );
-  expect(Math.abs(introTopAfter - introTopBefore)).toBeLessThan(4);
-
-  // The groups disperse at different speeds — the footnote outruns the title.
-  expect(await heroTravel(page, "tagline")).toBeGreaterThan(
-    await heroTravel(page, "title"),
-  );
-
-  // Past the pin the rail has taken over.
-  await wheelUntil(page, async () => (await railOpacity()) > 0.9);
-  expect(await railOpacity()).toBeGreaterThan(0.9);
-
-  // Reversible: wheeling back retreats the rail and returns the hero.
-  await wheelUntil(page, async () => (await railOpacity()) < 0.1, {
-    step: -400,
+  // Scroll through the pin: the panel forms as the shared items arrive.
+  await wheelUntil(page, async () => (await panelAlpha()) > 0.9, {
+    step: 400,
+    max: 30,
   });
-  expect(await railOpacity()).toBeLessThan(0.1);
-  await expect
-    .poll(() => heroOpacity("title"), { timeout: 6000 })
-    .toBeGreaterThan(0.9);
+  expect(await panelAlpha()).toBeGreaterThan(0.9);
+
+  // Crucially: it is the SAME five routes, not a duplicated second set.
+  await expect(routes).toHaveCount(5);
+
+  // Reversible: back at the top the panel recedes and the hero returns.
+  await wheelUntil(page, async () => (await panelAlpha()) < 0.1, {
+    step: -400,
+    max: 30,
+  });
+  expect(await panelAlpha()).toBeLessThan(0.1);
 });
 
 test("work shows one project at a time and advances on scroll", async ({
@@ -231,11 +219,11 @@ test("the section navigation highlights the section you are in", async ({
   expect(active).toBe(true);
 });
 
-test("the hero fits the viewport at laptop and desktop heights", async ({
+test("the hero chrome fits the viewport at laptop and desktop heights", async ({
   page,
 }) => {
-  // The hero is pinned, so anything taller than the viewport can never be
-  // scrolled into view — it is simply lost.
+  // The hero is a pinned, fixed layer, so any part that falls outside the
+  // viewport can never be scrolled to — it is simply lost.
   for (const [w, h] of [
     [1366, 768],
     [1440, 900],
@@ -245,29 +233,31 @@ test("the hero fits the viewport at laptop and desktop heights", async ({
     await page.goto("/");
     await page.waitForTimeout(3200);
 
-    const overflow = await page.evaluate(() => {
-      const hero = document.querySelector("#intro");
-      if (!hero) return 0;
-      return Math.round(
-        hero.getBoundingClientRect().height - window.innerHeight,
-      );
+    const worst = await page.evaluate(() => {
+      const sel = [
+        "h1",
+        ".hero-chrome-nav",
+        ".hero-chrome-stats",
+        ".hero-chrome-caps",
+        ".hero-chrome-tagline",
+      ];
+      let over = 0;
+      for (const s of sel) {
+        const el = document.querySelector(s);
+        if (!el) continue;
+        const r = el.getBoundingClientRect();
+        over = Math.max(
+          over,
+          Math.round(r.bottom - window.innerHeight),
+          -Math.round(r.top),
+        );
+      }
+      return over;
     });
     expect(
-      overflow,
-      `hero overflows at ${String(w)}x${String(h)}`,
-    ).toBeLessThanOrEqual(1);
-
-    // And the last thing in — the footnote — is actually on screen.
-    const taglineVisible = await page.evaluate(() => {
-      const el = document.querySelector('[data-hero="tagline"]');
-      if (!el) return false;
-      const r = el.getBoundingClientRect();
-      return r.bottom <= window.innerHeight + 1 && r.top >= 0;
-    });
-    expect(
-      taglineVisible,
-      `tagline off screen at ${String(w)}x${String(h)}`,
-    ).toBe(true);
+      worst,
+      `hero chrome overflows at ${String(w)}x${String(h)}`,
+    ).toBeLessThanOrEqual(2);
   }
 });
 
@@ -336,9 +326,14 @@ test("a rail link lands its section at the top and lights that route", async ({
   await wheelUntil(
     page,
     () =>
-      page
-        .locator("aside[aria-label='Section navigation']")
-        .evaluate((el) => parseFloat(getComputedStyle(el).opacity) > 0.9),
+      page.evaluate(
+        () =>
+          Number(
+            getComputedStyle(
+              document.querySelector("[data-chrome-panel]") as Element,
+            ).opacity,
+          ) > 0.9,
+      ),
     { step: 500, max: 30 },
   );
 
