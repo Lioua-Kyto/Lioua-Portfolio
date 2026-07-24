@@ -122,6 +122,20 @@ export function HeroChrome() {
 
     mm.add("(min-width: 1024px)", () => {
       let flip: gsap.core.Timeline | null = null;
+      const mark = document.querySelector<HTMLElement>(".hero-chrome-mark");
+      // Where the giant wordmark should slide+shrink to: the rail's name mark.
+      let wordTo = { x: 0, y: 0, scale: 0.14 };
+      const measureWord = () => {
+        if (!wordmark || !mark) return;
+        gsap.set(wordmark, { clearProps: "transform" });
+        const w = wordmark.getBoundingClientRect();
+        const m = mark.getBoundingClientRect();
+        wordTo = {
+          x: m.left - w.left,
+          y: m.top - w.top,
+          scale: gsap.utils.clamp(0.08, 0.2, (m.width / (w.width || 1)) * 1.4),
+        };
+      };
 
       const build = () => {
         flip?.kill();
@@ -131,12 +145,16 @@ export function HeroChrome() {
           props: "gap,padding,borderRadius,fontSize,textAlign",
         });
         root.dataset.state = "rail";
+        // No `absolute: true`: every chrome item is already position:absolute,
+        // so Flip animates pure transforms — which scrub cleanly in reverse.
+        // With absolute mode the elements were left mispositioned when scrolled
+        // back to the hero.
         flip = Flip.from(state, {
-          absolute: true,
           scale: false,
           paused: true,
           nested: true,
         });
+        measureWord();
       };
       build();
       gsap.set([...railOnly, panel].filter(Boolean), { autoAlpha: 0 });
@@ -169,9 +187,15 @@ export function HeroChrome() {
             autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.45),
           });
           if (wordmark) {
+            // The wordmark slides and shrinks toward the rail's name mark, so
+            // the title relocates into the sidebar rather than just fading.
+            const e = gsap.utils.clamp(0, 1, p / 0.72);
             gsap.set(wordmark, {
-              yPercent: -14 * p,
-              autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.55),
+              transformOrigin: "left top",
+              x: wordTo.x * e,
+              y: wordTo.y * e,
+              scale: gsap.utils.interpolate(1, wordTo.scale, e),
+              autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.78),
             });
           }
           resolveRoute();
@@ -210,11 +234,11 @@ export function HeroChrome() {
           travelling inside it rather than over open page. */}
       <div data-chrome-panel className="hero-chrome-panel glass rounded-md" />
 
-      {/* Rail-only header: the full name mark + role. */}
+      {/* Rail-only header: the full name mark (caps) + role. */}
       <div data-chrome-rail className="hero-chrome-mark">
         <a
           href="#intro"
-          className="type-display block text-lede leading-[1.05] font-extrabold text-accent"
+          className="type-display block text-lede leading-[1.05] font-extrabold tracking-tight text-accent uppercase"
         >
           {content.intro.name}
         </a>
@@ -228,17 +252,16 @@ export function HeroChrome() {
         {content.intro.philosophy}
       </p>
 
-      {/* Shared: the proof numbers. Gold in both states, compact on the rail. */}
+      {/* Shared: the proof numbers. The accent is spent only on the value and
+          a thin left rule — the card itself stays paper, so the amber reads as
+          an accent, not a fill. */}
       <dl data-chrome-flip className="hero-chrome-stats">
         {content.intro.proofs.map((proof) => (
-          <div
-            key={proof.label}
-            className="hero-chrome-stat rounded-xs bg-accent"
-          >
-            <dd className="type-display font-semibold whitespace-nowrap text-ink">
+          <div key={proof.label} className="hero-chrome-stat">
+            <dd className="type-display font-semibold whitespace-nowrap text-accent">
               {proof.value}
             </dd>
-            <dt className="font-mono text-fine text-ink/70">{proof.label}</dt>
+            <dt className="font-mono text-fine text-slate">{proof.label}</dt>
           </div>
         ))}
       </dl>

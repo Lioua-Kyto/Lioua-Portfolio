@@ -92,7 +92,7 @@ test("the hero name sits behind the portrait, its letters settling in", async ({
   // The name is split into one span per letter for the fall-in.
   await expect(page.locator("[data-title-letter]")).toHaveCount(5);
 
-  // z-order is the heynesh move: the portrait layer paints over the name.
+  // z-order is the move: the portrait layer paints over the name.
   const z = await page.evaluate(() => {
     const name = document.querySelector('[data-hero="title"]');
     const portrait = document.querySelector("[data-portrait]");

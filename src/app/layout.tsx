@@ -74,6 +74,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       lang="en"
       className={`${display.variable} ${martianMono.variable} ${generalSans.variable}`}
     >
+      <head>
+        {/* Set before first paint so a reload never restores a mid-page
+            scroll — the site always opens at the top of the hero. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "history.scrollRestoration='manual';",
+          }}
+        />
+      </head>
       <body>
         <script
           type="application/ld+json"
