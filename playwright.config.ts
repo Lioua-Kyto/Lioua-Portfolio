@@ -17,7 +17,7 @@ export default defineConfig({
   ],
   webServer: {
     // Always test the production bundle: `next dev` over a prod `.next`
-    // serves stale chunks and silently breaks hydration (see DECISIONS.md).
+    // serves stale chunks and silently break hydration.
     // CI builds as its own pipeline step; local runs build here.
     command: process.env.CI
       ? "npm run start"
