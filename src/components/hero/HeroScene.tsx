@@ -12,7 +12,6 @@ const RELOCATES: Record<string, string> = {
   title: "name",
   nav: "nav",
   stats: "stats",
-  lede: "claim",
 };
 
 interface Move {

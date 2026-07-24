@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { content } from "@/content";
 import { NAV } from "@/components/nav";
-import { RotatingWords } from "@/components/motion/RotatingWords";
 
 /** Position in a group, read by the entrance keyframes as a delay multiplier. */
 const stagger = (index: number) => ({ "--i": index }) as CSSProperties;
@@ -40,26 +39,39 @@ export function Intro() {
         style={{ height: "calc(var(--name-size) * var(--name-leading))" }}
       />
 
-      <nav aria-label="Primary" className="relative z-20 mt-5">
-        <ul
-          data-hero="nav"
-          className="shell flex flex-wrap items-baseline gap-x-6 gap-y-2"
-        >
-          {NAV.map((item, index) => (
-            <li key={item.href} data-hero-in style={stagger(index)}>
-              <a
-                href={item.href}
-                className="transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {/* Routes sit under the name; the positioning line sits under the routes
+          — both kept on the left half, clear of the portrait, so plain ink is
+          legible and no frosted card is needed. */}
+      <div className="relative z-20 shell mt-5 max-w-[34ch]">
+        <nav aria-label="Primary">
+          <ul
+            data-hero="nav"
+            className="flex flex-wrap items-baseline gap-x-6 gap-y-2"
+          >
+            {NAV.map((item, index) => (
+              <li key={item.href} data-hero-in style={stagger(index)}>
+                <a
+                  href={item.href}
+                  className="transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <p data-hero="role" className="mt-2.5">
+          <span data-hero-in className="text-base text-ink">
+            {intro.line}
+          </span>
+        </p>
+      </div>
 
-      <div className="relative z-20 shell mt-auto grid grid-cols-1 items-end gap-5 pt-8 lg:grid-cols-[minmax(0,19rem)_1fr_minmax(0,19rem)] lg:gap-6">
-        <dl data-hero="stats" className="grid grid-cols-3 gap-2 lg:grid-cols-1">
+      <div className="relative z-20 shell mt-auto flex items-end justify-between gap-8 pt-4">
+        <dl
+          data-hero="stats"
+          className="grid w-full max-w-[19rem] grid-cols-3 gap-2 lg:grid-cols-1"
+        >
           {intro.proofs.map((proof, index) => (
             <div
               key={proof.label}
@@ -75,46 +87,13 @@ export function Intro() {
           ))}
         </dl>
 
-        {/* The claim takes the centre, over the portrait — the wide column is
-            the only one that holds it without wrapping into a tall block, and
-            the frosted panel keeps ink legible against the suit behind it. */}
-        <div data-hero="lede" className="lg:justify-self-center">
-          <div data-hero-in className="glass max-w-[34ch] rounded-sm px-5 py-4">
-            <p className="flex flex-wrap items-baseline gap-x-3 font-mono text-label text-slate">
-              <span>{intro.role}</span>
-              <span aria-hidden="true" className="text-signal">
-                /
-              </span>
-              <RotatingWords words={intro.roleWords} className="text-ink" />
-            </p>
-            <p className="mt-2 text-lede">{intro.line}</p>
-            <p className="mt-4 flex flex-wrap gap-2">
-              <a
-                href="#work"
-                className="transition-micro rounded-xs bg-ink px-3.5 py-2 font-mono text-label text-paper transition-colors hover:bg-signal"
-              >
-                see the work
-              </a>
-              <a
-                href="#contact"
-                className="transition-micro rounded-xs border border-ink/25 px-3.5 py-2 font-mono text-label text-ink transition-colors hover:border-ink/50"
-              >
-                start a conversation
-              </a>
-            </p>
-          </div>
-        </div>
-
-        <div data-hero="capabilities">
-          <ul data-hero-in className="glass rounded-sm px-4 py-3">
+        <div data-hero="capabilities" className="hidden lg:block">
+          <ul data-hero-in className="space-y-0.5 text-right">
             {skills.capabilities.slice(0, 5).map((capability) => (
               <li
                 key={capability.claim}
-                className="flex items-baseline gap-2.5 py-0.5 font-mono text-label text-slate"
+                className="font-mono text-label text-slate"
               >
-                <span aria-hidden="true" className="text-accent-deep">
-                  ▸
-                </span>
                 {capability.claim}
               </li>
             ))}
@@ -122,7 +101,7 @@ export function Intro() {
         </div>
       </div>
 
-      <p data-hero="tagline" className="relative z-20 shell mt-5">
+      <p data-hero="tagline" className="relative z-20 shell mt-3">
         <span data-hero-in className="font-mono text-fine text-slate">
           {about.location}
         </span>

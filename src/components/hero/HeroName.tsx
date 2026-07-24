@@ -27,7 +27,7 @@ export function HeroName() {
           wordmark always spans the measure instead of leaving a ragged gap. */}
       <h1
         aria-label={intro.name}
-        className="type-display flex w-full justify-between text-name leading-[0.78] font-semibold text-accent uppercase"
+        className="type-display flex w-full justify-between text-name leading-[0.78] font-extrabold text-accent uppercase"
       >
         {firstName.split("").map((letter, index) => (
           <span

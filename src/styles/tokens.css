@@ -44,7 +44,7 @@
   /* The wordmark's size. Declared here rather than only in the type scale
      because the hero also has to reserve exactly this much height in flow
      while the name itself is painted from a separate fixed layer. */
-  --name-size: clamp(4rem, min(43vw, 49vh), 32rem);
+  --name-size: clamp(3.5rem, min(43vw, 39vh), 32rem);
   --name-leading: 0.78;
 
   /* Geometry — 2px everywhere, zero exceptions. */

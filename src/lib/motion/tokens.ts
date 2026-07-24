@@ -65,7 +65,7 @@ export const disperse = {
   title: 0.42,
   nav: 0.68,
   stats: 1,
-  lede: 0.84,
+  role: 0.84,
   capabilities: 1.15,
   tagline: 1.35,
 } as const;

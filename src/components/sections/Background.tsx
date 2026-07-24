@@ -1,57 +1,62 @@
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
-import { Label } from "@/components/primitives/Label";
 import { MaskText } from "@/components/motion/MaskText";
 import { TimelinePath } from "@/components/motion/TimelinePath";
 
 /**
- * 01 — Background: the route so far, drawn. Each beat arrives in turn and the
- * thread between them is traced as you scroll.
+ * 01 — Background: the route so far, as a set of cards threaded by a line that
+ * draws itself as you scroll, a dot lighting at each beat. The cards alternate
+ * a small indent so the thread has to weave between them.
  */
 export function Background() {
   const { timeline, about, sections } = content;
 
   return (
     <Section id="background" index="01" label="Background">
-      <div className="mt-10 grid gap-x-16 gap-y-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <MaskText
-            as="h3"
-            text={sections.background.heading}
-            className="type-display block max-w-[14ch] text-headline font-medium"
-          />
-          <p data-reveal className="mt-5 max-w-[38ch] text-base text-slate">
-            {sections.background.lede}
-          </p>
-          <div
-            data-reveal
-            className="mt-8 space-y-1 font-mono text-label text-slate"
-          >
-            <p>{about.location}</p>
-            <p>{about.languages}</p>
-            <p className="pt-3 text-ink">{about.education}</p>
-          </div>
+      <div className="mt-8 max-w-[52ch]">
+        <MaskText
+          as="h3"
+          text={sections.background.heading}
+          className="type-display block text-display leading-[0.95] font-semibold"
+        />
+        <p data-reveal className="mt-4 max-w-[42ch] text-base text-slate">
+          {sections.background.lede}
+        </p>
+        <div
+          data-reveal
+          className="mt-5 flex flex-wrap gap-x-6 gap-y-1 font-mono text-fine text-slate"
+        >
+          <span>{about.location}</span>
+          <span>{about.languages}</span>
         </div>
+      </div>
 
-        <div data-timeline className="relative">
-          <TimelinePath count={timeline.length} />
-          <ol className="max-w-[62ch] sm:pl-[18%]">
-            {timeline.map((beat) => (
-              <li
-                key={beat.year}
-                data-timeline-node
-                data-reveal
-                className="py-8 first:pt-0"
-              >
-                <Label className="text-signal">{beat.year}</Label>
-                <h3 className="type-display mt-2 text-title leading-tight font-semibold">
+      {/* The thread runs down a lane on the left; the cards sit to its right,
+          each with a dot where the line touches it. */}
+      <div data-timeline className="relative mt-16 pl-10 sm:pl-[4.5rem]">
+        <TimelinePath count={timeline.length} />
+        <ol className="space-y-8 sm:space-y-14">
+          {timeline.map((beat, index) => (
+            <li
+              key={beat.year}
+              data-timeline-node
+              data-reveal
+              className={
+                index % 2 === 1 ? "sm:ml-[8%] lg:ml-[14%]" : "sm:mr-[8%]"
+              }
+            >
+              <article className="max-w-[44ch] rounded-md border border-ink/10 bg-surface/60 p-6 sm:p-7">
+                <span className="type-display block text-[clamp(1.75rem,4vw,2.75rem)] leading-none font-extrabold whitespace-nowrap text-accent">
+                  {beat.year}
+                </span>
+                <h4 className="type-display mt-3 text-title leading-tight font-semibold">
                   {beat.title}
-                </h3>
-                <p className="mt-2 text-base text-slate">{beat.text}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
+                </h4>
+                <p className="mt-3 text-base text-slate">{beat.text}</p>
+              </article>
+            </li>
+          ))}
+        </ol>
       </div>
     </Section>
   );
