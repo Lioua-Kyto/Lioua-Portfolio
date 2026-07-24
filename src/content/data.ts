@@ -351,8 +351,8 @@ export const rawContent: z.input<typeof contentSchema> = {
   },
   contact: {
     closing: "200 OK — let's build.",
-    // Résumé + author account use liwaa-; the v1 brief's liouazeddam@ was a
-    // typo. Flagged in TASKS.md for confirmation.
+    // The résumé and the author's account both use the liwaa- address; an
+    // earlier liouazeddam@ spelling was a typo.
     email: "liwaazeddam@gmail.com",
     linkedin: "linkedin.com/in/lioua",
     github: "github.com/Lioua-Kyto",
