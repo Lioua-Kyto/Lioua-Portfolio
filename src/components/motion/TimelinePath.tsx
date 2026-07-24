@@ -6,13 +6,11 @@ import { gsap } from "@/lib/motion/gsap";
 import { scrub } from "@/lib/motion/tokens";
 
 /**
- * The thread running through the journey: a curved line drawn between the
- * beats as you scroll, with a marker lighting at each one as the line reaches
- * it. Geometry is measured from the beats themselves rather than hard-coded,
- * so the path stays attached to the text at any width or copy length.
- *
- * Decorative — the beats are a real ordered list on their own, and this is
- * hidden from assistive tech.
+ * The thread running through the journey — a line drawn down a lane on the
+ * left of the cards, weaving toward each one, with a dot that lights as the
+ * line reaches it. Geometry is measured from the cards themselves, so the path
+ * stays attached at any width or copy length. Decorative: the beats are a real
+ * ordered list on their own, so this is hidden from assistive tech.
  */
 export function TimelinePath({ count }: { count: number }) {
   const ref = useRef<SVGSVGElement>(null);
@@ -24,8 +22,12 @@ export function TimelinePath({ count }: { count: number }) {
       const path = svg?.querySelector<SVGPathElement>("[data-timeline-line]");
       if (!svg || !container || !path) return;
 
-      const markers = gsap.utils.toArray<SVGCircleElement>(
-        "[data-timeline-marker]",
+      const dots = gsap.utils.toArray<SVGCircleElement>(
+        "[data-timeline-dot]",
+        svg,
+      );
+      const halos = gsap.utils.toArray<SVGCircleElement>(
+        "[data-timeline-halo]",
         svg,
       );
 
@@ -41,37 +43,42 @@ export function TimelinePath({ count }: { count: number }) {
         const h = box.height;
         svg.setAttribute("viewBox", `0 0 ${String(w)} ${String(h)}`);
 
-        // The line leans left and right between beats so it reads as a route
-        // rather than a ruler.
+        // The lane sits a little in from the left; it leans gently left and
+        // right between beats so the thread reads as a route, not a ruler.
+        const laneX = Math.min(36, w * 0.06);
         const points = nodes.map((node, index) => {
           const r = node.getBoundingClientRect();
           return {
-            x: index % 2 === 0 ? w * 0.06 : w * 0.14,
-            y: r.top - box.top + Math.min(36, r.height / 2),
+            x: laneX + (index % 2 === 0 ? -8 : 10),
+            y: r.top - box.top + Math.min(40, r.height / 2),
           };
         });
 
-        let d = `M ${String(points[0]?.x ?? 0)} 0`;
+        let d = `M ${String(points[0]?.x ?? laneX)} 0`;
         for (const [index, point] of points.entries()) {
           const previous = points[index - 1] ?? { x: point.x, y: 0 };
           const midY = (previous.y + point.y) / 2;
           d += ` C ${String(previous.x)} ${String(midY)}, ${String(point.x)} ${String(midY)}, ${String(point.x)} ${String(point.y)}`;
         }
         const last = points[points.length - 1];
-        if (last)
-          d += ` C ${String(last.x)} ${String((last.y + h) / 2)}, ${String(last.x)} ${String((last.y + h) / 2)}, ${String(last.x)} ${String(h)}`;
+        if (last) {
+          const tailY = (last.y + h) / 2;
+          d += ` C ${String(last.x)} ${String(tailY)}, ${String(last.x)} ${String(tailY)}, ${String(last.x)} ${String(h)}`;
+        }
         path.setAttribute("d", d);
-        // The dash pattern has to be re-derived here, not once at setup: the
-        // beats are still hidden by their reveal when this first runs, so a
-        // length measured then is far shorter than the finished path and the
-        // stroke would repeat instead of drawing once.
+        // Re-derive the dash length here, not once at setup: the cards are
+        // still hidden by their reveal when this first runs, so a length
+        // measured then is far shorter than the finished path and the stroke
+        // would repeat instead of drawing once.
         path.style.strokeDasharray = String(path.getTotalLength());
 
-        for (const [index, marker] of markers.entries()) {
-          const point = points[index];
-          if (!point) continue;
-          marker.setAttribute("cx", String(point.x));
-          marker.setAttribute("cy", String(point.y));
+        for (const [index, point] of points.entries()) {
+          for (const set of [dots, halos]) {
+            const c = set[index];
+            if (!c) continue;
+            c.setAttribute("cx", String(point.x));
+            c.setAttribute("cy", String(point.y));
+          }
         }
       };
 
@@ -85,8 +92,8 @@ export function TimelinePath({ count }: { count: number }) {
           ease: "none",
           scrollTrigger: {
             trigger: container,
-            start: "top 75%",
-            end: "bottom 75%",
+            start: "top 70%",
+            end: "bottom 80%",
             scrub: scrub.rail,
             invalidateOnRefresh: true,
             onRefreshInit: draw,
@@ -94,23 +101,35 @@ export function TimelinePath({ count }: { count: number }) {
         },
       );
 
-      // Each marker lights as the line arrives at it.
-      for (const marker of markers) {
-        gsap.fromTo(
-          marker,
-          { scale: 0, transformOrigin: "center" },
-          {
-            scale: 1,
-            duration: 0.4,
-            ease: "back.out(2)",
-            scrollTrigger: {
-              trigger: marker,
-              start: "top 70%",
-              toggleActions: "play none none reverse",
-            },
+      // Each dot pops as the line arrives at its card, its halo pulsing out.
+      dots.forEach((dot, index) => {
+        const node = gsap.utils.toArray<HTMLElement>(
+          "[data-timeline-node]",
+          container,
+        )[index];
+        if (!node) return;
+        const halo = halos[index];
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: node,
+            start: "top 68%",
+            toggleActions: "play none none reverse",
           },
+        });
+        tl.fromTo(
+          dot,
+          { scale: 0, transformOrigin: "center" },
+          { scale: 1, duration: 0.4, ease: "back.out(2.5)" },
         );
-      }
+        if (halo) {
+          tl.fromTo(
+            halo,
+            { scale: 0.4, opacity: 0.5, transformOrigin: "center" },
+            { scale: 2.6, opacity: 0, duration: 0.7, ease: "power2.out" },
+            "<",
+          );
+        }
+      });
     },
     { scope: ref },
   );
@@ -125,19 +144,28 @@ export function TimelinePath({ count }: { count: number }) {
       <path
         data-timeline-line
         fill="none"
-        stroke="var(--accent-deep)"
-        strokeWidth="1.5"
+        stroke="var(--accent)"
+        strokeWidth="2"
         strokeLinecap="round"
-        opacity="0.55"
+        opacity="0.7"
       />
       {Array.from({ length: count }, (_, index) => (
         <circle
-          key={index}
-          data-timeline-marker
-          r="4.5"
+          key={`halo-${String(index)}`}
+          data-timeline-halo
+          r="6"
+          fill="var(--accent)"
+          opacity="0"
+        />
+      ))}
+      {Array.from({ length: count }, (_, index) => (
+        <circle
+          key={`dot-${String(index)}`}
+          data-timeline-dot
+          r="5.5"
           fill="var(--accent)"
           stroke="var(--paper)"
-          strokeWidth="2.5"
+          strokeWidth="3"
         />
       ))}
     </svg>
