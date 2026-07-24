@@ -125,8 +125,8 @@ export const contentSchema = z.object({
     email: z.email(),
     linkedin: z.string().min(1),
     github: z.string().min(1),
-    /** Rendered as text, never as a stat. */
-    phone: z.string().min(1),
+    // No phone number by design — the repo is public and a direct line is
+    // more personal data than a portfolio needs to publish.
     todos: z.array(z.string().min(1)).default([]),
   }),
 });

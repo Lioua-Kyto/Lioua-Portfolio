@@ -356,7 +356,6 @@ export const rawContent: z.input<typeof contentSchema> = {
     email: "liwaazeddam@gmail.com",
     linkedin: "linkedin.com/in/lioua",
     github: "github.com/Lioua-Kyto",
-    phone: "[redacted]",
-    todos: ["TODO(author): final resume PDF"],
+    todos: [],
   },
 };

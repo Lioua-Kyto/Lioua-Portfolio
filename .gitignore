@@ -27,6 +27,11 @@ npm-debug.log*
 # source footage from the abandoned video concept (kept on disk, not in git)
 assets/
 
+# résumé PDFs — kept on disk, deliberately never published. The repo is
+# public and a full ATS résumé carries more personal data (phone, address)
+# than a portfolio needs to hand out.
+*.pdf
+
 # third-party skill installs (symlinked into .claude/skills)
 .agents/
 .claude/skills/*
