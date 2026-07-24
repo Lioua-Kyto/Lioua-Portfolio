@@ -34,6 +34,14 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    // Always open at the top of the hero. The browser otherwise restores the
+    // previous scroll on reload, which drops you mid-page while the hero's
+    // load animation plays over whatever section you were on. `manual` is also
+    // set pre-paint by an inline script in the layout; this handles the
+    // current load and any bfcache restore.
+    history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
     // Luxe momentum glide — a low lerp gives the weighted, heynesh-grade
     // feel where scroll settles rather than snaps.
     const lenis = new Lenis({
@@ -42,13 +50,19 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       wheelMultiplier: 0.9,
     });
     lenisRef.current = lenis;
+    lenis.scrollTo(0, { immediate: true });
     lenis.on("scroll", () => {
       ScrollTrigger.update();
     });
     const unsubscribe = ticker.add((now) => {
       lenis.raf(now);
     });
+    // Re-measure once the pins exist, now that we are pinned at the top.
+    const raf = requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
     return () => {
+      cancelAnimationFrame(raf);
       unsubscribe();
       lenis.destroy();
       lenisRef.current = null;

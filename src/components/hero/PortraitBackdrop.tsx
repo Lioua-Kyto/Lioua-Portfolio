@@ -86,15 +86,13 @@ export function PortraitBackdrop() {
           data-portrait
           src="/img/portrait.webp"
           alt=""
-          // The source is 1280x960; declaring anything larger asks Next to
-          // upscale it, which is what softened the face.
-          width={1280}
-          height={960}
+          // The source (re-encoded from assets/portrait/portrait.png) is
+          // 2000x1500. Declaring the real size lets Next serve it crisp on
+          // high-DPI screens without upscaling.
+          width={2000}
+          height={1500}
           priority
           fetchPriority="high"
-          // Cutting this to 82 saved 20KB and moved LCP by nothing at all —
-          // the delay is request timing and first paint, not bytes — so the
-          // face is kept at full quality.
           quality={90}
           sizes="(max-width: 768px) 150vw, 90vw"
           className="h-[80vh] w-auto max-w-none object-contain sm:h-[96vh]"

@@ -13,7 +13,9 @@ export function Background() {
 
   return (
     <Section id="background" index="01" label="Background">
-      <div className="mt-8 max-w-[52ch]">
+      <div className="mt-8">
+        {/* The heading is not width-constrained — a narrow wrapper was forcing
+            the display-size words onto one line each. */}
         <MaskText
           as="h3"
           text={sections.background.heading}
