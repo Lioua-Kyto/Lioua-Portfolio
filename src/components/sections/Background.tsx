@@ -31,19 +31,18 @@ export function Background() {
         </div>
       </div>
 
-      {/* The thread runs down a lane on the left; the cards sit to its right,
-          each with a dot where the line touches it. */}
-      <div data-timeline className="relative mt-16 pl-10 sm:pl-[4.5rem]">
+      {/* The thread weaves down a wide lane on the left; the cards sit to its
+          right, each with a dot where the line reaches it. The lane is wide
+          enough for the line to swing without crossing under the cards. */}
+      <div data-timeline className="relative mt-16 pl-12 sm:pl-[9rem]">
         <TimelinePath count={timeline.length} />
-        <ol className="space-y-8 sm:space-y-14">
+        <ol className="space-y-10 sm:space-y-16">
           {timeline.map((beat, index) => (
             <li
               key={beat.year}
               data-timeline-node
               data-reveal
-              className={
-                index % 2 === 1 ? "sm:ml-[8%] lg:ml-[14%]" : "sm:mr-[8%]"
-              }
+              className={index % 2 === 1 ? "sm:ml-[6%] lg:ml-[10%]" : undefined}
             >
               <article className="max-w-[44ch] rounded-md border border-ink/10 bg-surface/60 p-6 sm:p-7">
                 <span className="type-display block text-[clamp(1.75rem,4vw,2.75rem)] leading-none font-extrabold whitespace-nowrap text-accent">

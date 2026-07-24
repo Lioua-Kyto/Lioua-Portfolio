@@ -284,6 +284,16 @@
     pointer-events: none;
     --pad: clamp(1.25rem, 4.5vw, 3.5rem);
     --name-bottom: calc(4vh + var(--name-size) * var(--name-leading));
+    /* eases in once the name has begun to land */
+    animation: chrome-in 0.8s 0.95s both;
+  }
+  @keyframes chrome-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   .hero-chrome a,
   .hero-chrome ul {
@@ -291,11 +301,11 @@
   }
   .hero-chrome-panel,
   .hero-chrome-mark,
-  .hero-chrome-blurb,
+  .hero-chrome-philosophy,
   .hero-chrome-cta,
+  .hero-chrome-socials,
   .hero-chrome-stats,
   .hero-chrome-nav,
-  .hero-chrome-caps,
   .hero-chrome-tagline {
     position: absolute;
   }
@@ -309,33 +319,47 @@
   }
   .hero-chrome-mark {
     left: 2.75rem;
-    top: 7vh;
+    top: 6vh;
+    width: 12rem;
   }
-  .hero-chrome-blurb {
+  .hero-chrome-socials {
+    display: flex;
+    gap: 0.9rem;
     left: 2.75rem;
-    top: 15vh;
-    width: 11rem;
+    top: 73vh;
   }
   .hero-chrome-cta {
     display: block;
     left: 2.75rem;
-    bottom: 7vh;
+    bottom: 6vh;
     width: 11rem;
     padding: 0.6rem 0.75rem;
   }
 
-  /* Hero-only items — always at their hero spot, opacity is JS-driven. */
-  .hero-chrome-caps {
-    right: var(--pad);
-    bottom: 9vh;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-    text-align: right;
-  }
+  /* Hero-only footnote — always at its hero spot, opacity JS-driven. */
   .hero-chrome-tagline {
     left: var(--pad);
     bottom: 4vh;
+  }
+
+  /* Shared: the philosophy. Hero lower-right, then into the rail. */
+  .hero-chrome-philosophy {
+    line-height: 1.45;
+  }
+  .hero-chrome[data-state="hero"] .hero-chrome-philosophy {
+    right: var(--pad);
+    bottom: 10vh;
+    width: 26ch;
+    text-align: right;
+    font-size: var(--text-base);
+  }
+  .hero-chrome[data-state="rail"] .hero-chrome-philosophy {
+    left: 2.75rem;
+    top: 17vh;
+    width: 11rem;
+    text-align: left;
+    font-size: var(--text-fine);
+    line-height: 1.5;
   }
 
   /* Shared: proofs. Gold in both states, compact on the rail. */
@@ -345,6 +369,7 @@
   }
   .hero-chrome-stat {
     display: flex;
+    flex-direction: column;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-stats {
     left: var(--pad);
@@ -352,8 +377,7 @@
     gap: 0.5rem;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-stat {
-    flex-direction: column;
-    width: 12rem;
+    width: 13rem;
     padding: 0.5rem 0.875rem;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-stat dd {
@@ -361,11 +385,10 @@
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stats {
     left: 2.75rem;
-    top: 21vh;
-    gap: 0.35rem;
+    top: 27vh;
+    gap: 0.3rem;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stat {
-    flex-direction: column;
     width: 11rem;
     gap: 0;
     padding: 0.3rem 0.6rem;
@@ -378,44 +401,42 @@
     line-height: 1.3;
   }
 
-  /* The chrome eases in as a whole once the name has begun to land — the
-     letters fall first (their own keyframes), then the routes and proofs
-     resolve. Opacity only, so the fixed positions never shift. */
-  .hero-chrome {
-    animation: chrome-in 0.8s 0.95s both;
+  /* Shared: routes. Two lists (each is `.hero-chrome-nav`) flank the portrait
+     in the hero and stack into one column on the rail. The wrapping <nav> is
+     display:contents so it is one landmark but adds no box. */
+  .hero-chrome-navwrap {
+    display: contents;
   }
-  @keyframes chrome-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /* Shared: routes. Row in the hero, column on the rail. */
-  .hero-chrome-nav-list {
+  .hero-chrome-nav {
     display: flex;
   }
-  .hero-chrome[data-state="hero"] .hero-chrome-nav {
-    left: var(--pad);
-    top: calc(var(--name-bottom) + 1.1rem);
+  .hero-chrome-link {
+    display: block;
   }
-  .hero-chrome[data-state="hero"] .hero-chrome-nav-list {
+  .hero-chrome[data-state="hero"] .hero-chrome-nav {
+    top: calc(var(--name-bottom) + 1.1rem);
     flex-direction: row;
     align-items: baseline;
     gap: 1.5rem;
   }
+  .hero-chrome[data-state="hero"] .hero-chrome-nav--left {
+    left: var(--pad);
+  }
+  .hero-chrome[data-state="hero"] .hero-chrome-nav--right {
+    right: var(--pad);
+    justify-content: flex-end;
+  }
   .hero-chrome[data-state="rail"] .hero-chrome-nav {
-    left: 2.75rem;
-    top: 49vh;
-  }
-  .hero-chrome[data-state="rail"] .hero-chrome-nav-list {
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.4rem;
   }
-  .hero-chrome-link {
-    display: block;
+  .hero-chrome[data-state="rail"] .hero-chrome-nav--left {
+    left: 2.75rem;
+    top: 53vh;
+  }
+  .hero-chrome[data-state="rail"] .hero-chrome-nav--right {
+    left: 2.75rem;
+    top: 63vh;
   }
 
   @media (min-width: 1024px) {
@@ -431,10 +452,17 @@
   @media (max-width: 1023.98px) {
     .hero-chrome-panel,
     .hero-chrome-mark,
-    .hero-chrome-blurb,
-    .hero-chrome-cta,
-    .hero-chrome-caps {
+    .hero-chrome-socials,
+    .hero-chrome-cta {
       display: none;
+    }
+    .hero-chrome-philosophy {
+      left: var(--pad);
+      right: auto;
+      bottom: 20vh;
+      width: min(30ch, 70vw);
+      text-align: left;
+      font-size: var(--text-base);
     }
     .hero-chrome-stats {
       left: var(--pad);
@@ -442,7 +470,6 @@
       gap: 0.5rem;
     }
     .hero-chrome-stat {
-      flex-direction: column;
       width: 11rem;
       padding: 0.5rem 0.875rem;
     }
@@ -451,12 +478,16 @@
     }
     .hero-chrome-nav {
       left: var(--pad);
-      top: calc(var(--name-bottom) + 1rem);
-    }
-    .hero-chrome-nav-list {
+      right: auto;
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1.25rem;
+    }
+    .hero-chrome-nav--left {
+      top: calc(var(--name-bottom) + 1rem);
+    }
+    .hero-chrome-nav--right {
+      top: calc(var(--name-bottom) + 2.9rem);
     }
   }
 

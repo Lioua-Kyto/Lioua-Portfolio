@@ -5,6 +5,7 @@ import { MaskText } from "@/components/motion/MaskText";
 import { WorkRail } from "@/components/motion/WorkRail";
 
 const KIND_LABEL: Record<WorkItem["kind"], string> = {
+  flagship: "flagship build",
   client: "client work",
   apprenticeship: "apprenticeship",
   product: "personal product",

@@ -29,7 +29,7 @@ export const workSchema = z.object({
     .min(1)
     .regex(/^[a-z0-9-]+$/),
   title: z.string().min(1),
-  kind: z.enum(["client", "apprenticeship", "product"]),
+  kind: z.enum(["flagship", "client", "apprenticeship", "product"]),
   /** Terse role/engagement line, e.g. `Freelance · backend architect`. */
   context: z.string().min(1),
   period: z.string().min(1),
@@ -63,16 +63,16 @@ export const contentSchema = z.object({
     /** Assumed domain — confirm with author. */
     domain: z.string().min(1),
   }),
-  /** 00 — Intro (v3 brief §3.00): name, role, one honest line, proof numbers. */
+  /** 00 — Intro: name, role, one honest line, a short philosophy, proofs. */
   intro: z.object({
     name: z.string().min(1),
     role: z.string().min(1),
     line: z.string().min(1),
+    /** The working philosophy — shown in the hero and carried to the rail. */
+    philosophy: z.string().min(1),
     proofs: z
       .array(z.object({ value: z.string().min(1), label: z.string().min(1) }))
       .length(3),
-    /** Rotating role-words for the Phase 3 hero (motion spec §2). */
-    roleWords: z.array(z.string().min(1)).min(3).max(4),
   }),
   /** 01 — Background: the honest year-by-year arc — the story spine. Each
       beat has a short title (the heynesh move) and a human paragraph. */
