@@ -16,44 +16,44 @@ export const rawContent: z.input<typeof contentSchema> = {
     name: "Lioua Zeddam",
     role: "Full Stack Developer",
     line: "I build the systems behind the screens.",
+    // The philosophy shown on the right of the hero and carried into the rail.
+    philosophy:
+      "I turn messy problems into systems that just work — and keep working under real load.",
+    // Framed for what they say about the work, not lifted off a résumé:
+    // breadth, performance, and real backend scale. (§5)
     proofs: [
-      { value: "100+", label: "endpoints shipped" },
-      { value: "176ms → 38ms", label: "repeat-request latency" },
-      { value: "6", label: "products built" },
-    ],
-    roleWords: [
-      "Backend architecture",
-      "Real-time systems",
-      "Full-stack delivery",
+      { value: "6", label: "products shipped end to end" },
+      { value: "~40ms", label: "cached responses — effectively instant" },
+      { value: "400+", label: "API endpoints across projects" },
     ],
   },
   // TODO(author): dates are from your résumé — confirm the years, and reword
   // any beat that doesn't sound like you saying it out loud.
   timeline: [
     {
-      year: "2021",
-      title: "Where it clicked",
-      text: "I started computer science and found the part I couldn't put down — building the thing people use, not passing the exam about it. No master plan. Just that.",
+      year: "2022",
+      title: "Not sold on it yet",
+      text: "I started the computer science degree out of momentum more than passion. It hadn't clicked. I was doing the work, not chasing it.",
     },
     {
-      year: "2022",
-      title: "Head down, top of the class",
-      text: "The CS diploma, dual-study: half classroom, half real placement. I finished ranked first in my cohort at 14.79/20 — but it was the placement half that taught me what “it works on my machine” actually costs.",
+      year: "2023",
+      title: "The year it caught",
+      text: "Somewhere in 2023 it clicked. I taught myself Python and started building things that actually did something — and couldn't put it down after that.",
     },
     {
       year: "2024",
-      title: "First taste of production",
-      text: "Ten months at Faderco, solo, building the HR portal that retired their spreadsheets. First time the word “production” meant something. I shipped their first remote interviews and stopped candidates driving four hours for a chair and a handshake.",
+      title: "Into the deep end",
+      text: "January: an apprenticeship at Faderco, starting from HTML, CSS, and JavaScript. React by September, Django soon after — and by December I was building their internal job portal for real.",
     },
     {
       year: "2025",
-      title: "Learning Flutter the hard way",
-      text: "I taught myself Flutter by building BrewPhoria end to end — offline-first cart, atomic checkout, a loyalty ledger, and an AI barista that mostly does what it's told. Nothing teaches a framework like shipping in it.",
+      title: "Graduated, then went further",
+      text: "April: graduated first in my class at 14.79 on the strength of that portal. Then I kept building — FitGuild to sharpen full-stack, Cognitive to take on harder problems, and by December, Rezervitoo: the one I'm proudest of. Polymorphic models, a real service layer, caching that made it feel instant — the architecture finally matched the ambition.",
     },
     {
-      year: "Dec 2025",
-      title: "First real client, first real panic",
-      text: "Rezervitoo. Backend architect on a live multi-provider booking platform — real money, real users, no senior to hide behind. 100+ endpoints later, still shipping.",
+      year: "2026",
+      title: "Widening the stack",
+      text: "Now: I picked up Flutter and Riverpod building BrewPhoria, added Node to stretch past my Django-and-React home base, and started going deep on AI integration. This site is the current build. Next — enough AI to call myself an AI engineer and mean it.",
     },
   ],
   about: {
@@ -108,23 +108,23 @@ export const rawContent: z.input<typeof contentSchema> = {
     {
       slug: "rezervitoo",
       title: "Rezervitoo",
-      kind: "client",
-      context: "Freelance · backend architect",
+      kind: "flagship",
+      context: "Backend architect · the project I'm proudest of",
       period: "Dec 2025 — now",
-      hook: "First real client. First real panic. 100+ endpoints later, still shipping.",
+      hook: "The one I'm proudest of. The architecture finally caught up to the ambition.",
       summary:
         "A live multi-provider booking platform — hotels, hostels, agencies, hosts — on one backend that's mine end to end.",
       stack: "Django · DRF · PostgreSQL · Redis · Channels · TanStack Query",
       metric: {
-        value: "176ms → 38ms",
-        label: "repeat requests, once Redis and the query cache agreed",
+        value: "~40ms",
+        label: "cached responses (from 176ms) — effectively instant",
       },
       highlights: [
         "Four provider types wanted four schemas. They got one polymorphic model instead — about 60% less onboarding surface.",
         "Real-time notifications over Channels and FCM, behind a custom JWT WebSocket middleware.",
         "Arabic, English, and French — the layout mirrors properly, not just the words.",
       ],
-      access: "code private — client work",
+      access: "code private — production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
     },
@@ -155,7 +155,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "BrewPhoria",
       kind: "product",
       context: "Personal product · solo",
-      period: "2025",
+      period: "2026",
       hook: "I didn't know Flutter. So I built a whole coffee app in it.",
       summary:
         "Cross-platform coffee ordering — a Flutter client on a layered Node/Express/TypeScript API.",
@@ -179,7 +179,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "FitGuild",
       kind: "product",
       context: "Personal product · solo",
-      period: "2024",
+      period: "2025",
       hook: "A full storefront with zero third-party commerce dependencies — because I wanted to know how.",
       summary:
         "E-commerce end to end — variants, cart, wishlist, orders, reviews — a Django API through a React front.",
@@ -204,7 +204,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Cognitive Training",
       kind: "product",
       context: "Personal product · solo",
-      period: "2024",
+      period: "2025",
       hook: "Fourteen little games, one big excuse to build real-time systems.",
       summary:
         "A gamified cognitive platform — 7 categories, 14 browser games, XP, and multi-dimensional ranking.",

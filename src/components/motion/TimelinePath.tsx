@@ -6,11 +6,11 @@ import { gsap } from "@/lib/motion/gsap";
 import { scrub } from "@/lib/motion/tokens";
 
 /**
- * The thread running through the journey — a line drawn down a lane on the
- * left of the cards, weaving toward each one, with a dot that lights as the
- * line reaches it. Geometry is measured from the cards themselves, so the path
- * stays attached at any width or copy length. Decorative: the beats are a real
- * ordered list on their own, so this is hidden from assistive tech.
+ * The thread running through the journey — a line that weaves down past the
+ * cards, drawing itself as you scroll, a dot lighting at each beat. Past the
+ * last beat it carries on as a dotted tail: the present, still being written.
+ * Geometry is measured from the cards, so it stays attached at any width or
+ * copy length. Decorative — the beats are a real ordered list on their own.
  */
 export function TimelinePath({ count }: { count: number }) {
   const ref = useRef<SVGSVGElement>(null);
@@ -19,8 +19,9 @@ export function TimelinePath({ count }: { count: number }) {
     () => {
       const svg = ref.current;
       const container = svg?.closest<HTMLElement>("[data-timeline]");
-      const path = svg?.querySelector<SVGPathElement>("[data-timeline-line]");
-      if (!svg || !container || !path) return;
+      const line = svg?.querySelector<SVGPathElement>("[data-timeline-line]");
+      const tail = svg?.querySelector<SVGPathElement>("[data-timeline-tail]");
+      if (!svg || !container || !line || !tail) return;
 
       const dots = gsap.utils.toArray<SVGCircleElement>(
         "[data-timeline-dot]",
@@ -43,34 +44,41 @@ export function TimelinePath({ count }: { count: number }) {
         const h = box.height;
         svg.setAttribute("viewBox", `0 0 ${String(w)} ${String(h)}`);
 
-        // The lane sits a little in from the left; it leans gently left and
-        // right between beats so the thread reads as a route, not a ruler.
-        const laneX = Math.min(36, w * 0.06);
+        // A wide weave: even beats hug the left lane, odd beats swing well to
+        // the right, so the thread reads as a route with real deviation rather
+        // than a ruler running straight down.
+        // The lane is ~9rem (144px) wide; keep the swing inside it so the
+        // thread never runs under a card.
+        const laneX = 20;
+        const amp = gsap.utils.clamp(52, 104, w * 0.09);
         const points = nodes.map((node, index) => {
           const r = node.getBoundingClientRect();
           return {
-            x: laneX + (index % 2 === 0 ? -8 : 10),
-            y: r.top - box.top + Math.min(40, r.height / 2),
+            x: laneX + (index % 2 === 0 ? 0 : amp),
+            y: r.top - box.top + Math.min(44, r.height / 2),
           };
         });
 
+        // Main thread: from the top, curving through each beat, swinging wide
+        // between them (the mid control points exaggerate the horizontal lean).
         let d = `M ${String(points[0]?.x ?? laneX)} 0`;
         for (const [index, point] of points.entries()) {
-          const previous = points[index - 1] ?? { x: point.x, y: 0 };
-          const midY = (previous.y + point.y) / 2;
-          d += ` C ${String(previous.x)} ${String(midY)}, ${String(point.x)} ${String(midY)}, ${String(point.x)} ${String(point.y)}`;
+          const prev = points[index - 1] ?? { x: point.x, y: 0 };
+          const midY = (prev.y + point.y) / 2;
+          d += ` C ${String(prev.x)} ${String(midY)}, ${String(point.x)} ${String(midY)}, ${String(point.x)} ${String(point.y)}`;
         }
-        const last = points[points.length - 1];
-        if (last) {
-          const tailY = (last.y + h) / 2;
-          d += ` C ${String(last.x)} ${String(tailY)}, ${String(last.x)} ${String(tailY)}, ${String(last.x)} ${String(h)}`;
-        }
-        path.setAttribute("d", d);
-        // Re-derive the dash length here, not once at setup: the cards are
-        // still hidden by their reveal when this first runs, so a length
-        // measured then is far shorter than the finished path and the stroke
-        // would repeat instead of drawing once.
-        path.style.strokeDasharray = String(path.getTotalLength());
+        line.setAttribute("d", d);
+        line.style.strokeDasharray = String(line.getTotalLength());
+
+        // Dotted tail: continues from the last beat down toward the bottom —
+        // the present, not yet uncovered.
+        const last = points[points.length - 1] ?? { x: laneX, y: h * 0.7 };
+        const tailEnd = h;
+        const tailMidY = (last.y + tailEnd) / 2;
+        tail.setAttribute(
+          "d",
+          `M ${String(last.x)} ${String(last.y)} C ${String(last.x + amp * 0.4)} ${String(tailMidY)}, ${String(laneX)} ${String(tailMidY)}, ${String(laneX)} ${String(tailEnd)}`,
+        );
 
         for (const [index, point] of points.entries()) {
           for (const set of [dots, halos]) {
@@ -85,8 +93,8 @@ export function TimelinePath({ count }: { count: number }) {
       draw();
 
       gsap.fromTo(
-        path,
-        { strokeDashoffset: () => path.getTotalLength() },
+        line,
+        { strokeDashoffset: () => line.getTotalLength() },
         {
           strokeDashoffset: 0,
           ease: "none",
@@ -101,7 +109,7 @@ export function TimelinePath({ count }: { count: number }) {
         },
       );
 
-      // Each dot pops as the line arrives at its card, its halo pulsing out.
+      // Each dot pops as the line arrives at its beat, its halo pulsing out.
       dots.forEach((dot, index) => {
         const node = gsap.utils.toArray<HTMLElement>(
           "[data-timeline-node]",
@@ -145,15 +153,24 @@ export function TimelinePath({ count }: { count: number }) {
         data-timeline-line
         fill="none"
         stroke="var(--accent)"
-        strokeWidth="2"
+        strokeWidth="3"
         strokeLinecap="round"
-        opacity="0.7"
+        opacity="0.75"
+      />
+      <path
+        data-timeline-tail
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="1 11"
+        opacity="0.45"
       />
       {Array.from({ length: count }, (_, index) => (
         <circle
           key={`halo-${String(index)}`}
           data-timeline-halo
-          r="6"
+          r="7"
           fill="var(--accent)"
           opacity="0"
         />
@@ -162,7 +179,7 @@ export function TimelinePath({ count }: { count: number }) {
         <circle
           key={`dot-${String(index)}`}
           data-timeline-dot
-          r="5.5"
+          r="6"
           fill="var(--accent)"
           stroke="var(--paper)"
           strokeWidth="3"

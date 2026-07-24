@@ -42,10 +42,8 @@ test("the six numbered sections render as one semantic document", async ({
     await expect(page.locator(`#${id}`)).toBeAttached();
   }
   // Real content, not filler: a proof number and a timeline beat.
-  await expect(page.getByText("176ms → 38ms").first()).toBeAttached();
-  await expect(
-    page.getByText(/first real client, first real panic/i),
-  ).toBeAttached();
+  await expect(page.getByText("400+").first()).toBeAttached();
+  await expect(page.getByText(/the year it caught/i)).toBeAttached();
 });
 
 test("the site has no top header — the routes live in the hero chrome", async ({
@@ -57,16 +55,18 @@ test("the site has no top header — the routes live in the hero chrome", async 
   // becomes the rail. Exactly one nav, five routes.
   const nav = page.locator('[data-chrome] nav[aria-label="Primary"]');
   await expect(nav).toHaveCount(1);
-  await expect(nav.getByRole("link")).toHaveCount(5);
+  await expect(nav.getByRole("link")).toHaveCount(6);
 
-  // It sits below the wordmark on load.
+  // It sits below the wordmark on load. (The nav wrapper is display:contents,
+  // so measure the actual route list.)
   const [nameBottom, navTop] = await page.evaluate(() => {
     const h1 = document.querySelector("h1");
-    const nav = document.querySelector(
-      '[data-chrome] nav[aria-label="Primary"]',
-    );
-    if (!h1 || !nav) return [0, 0];
-    return [h1.getBoundingClientRect().bottom, nav.getBoundingClientRect().top];
+    const list = document.querySelector(".hero-chrome-nav");
+    if (!h1 || !list) return [0, 0];
+    return [
+      h1.getBoundingClientRect().bottom,
+      list.getBoundingClientRect().top,
+    ];
   });
   expect(navTop).toBeGreaterThanOrEqual(nameBottom - 40);
 });
@@ -136,9 +136,9 @@ test("the hero chrome morphs into the side rail (one set of elements)", async ({
     );
 
   // On load the rail panel is not shown (the chrome reads as the hero), and
-  // there are five routes. (The data-state attribute stays "rail" throughout —
+  // there are six routes. (The data-state attribute stays "rail" throughout —
   // Flip drives the hero look via transforms, so panel opacity is the signal.)
-  await expect(routes).toHaveCount(5);
+  await expect(routes).toHaveCount(6);
   expect(await panelAlpha()).toBeLessThan(0.1);
 
   // Scroll through the pin: the panel forms as the shared items arrive.
@@ -148,8 +148,8 @@ test("the hero chrome morphs into the side rail (one set of elements)", async ({
   });
   expect(await panelAlpha()).toBeGreaterThan(0.9);
 
-  // Crucially: it is the SAME five routes, not a duplicated second set.
-  await expect(routes).toHaveCount(5);
+  // Crucially: it is the SAME six routes, not a duplicated second set.
+  await expect(routes).toHaveCount(6);
 
   // Reversible: back at the top the panel recedes and the hero returns.
   await wheelUntil(page, async () => (await panelAlpha()) < 0.1, {
@@ -368,7 +368,7 @@ test("no scrollbar chrome is rendered", async ({ page }) => {
 
 test("section reveals start hidden and play in on scroll", async ({ page }) => {
   await page.goto("/");
-  const beat = page.getByText(/first real client, first real panic/i);
+  const beat = page.getByText(/the year it caught/i);
   // Below the fold: hidden by the reveal set until scrolled into view.
   await expect(beat).toBeHidden();
   await beat.scrollIntoViewIfNeeded();
@@ -435,7 +435,7 @@ test.describe("reduced motion", () => {
     expect(await marqueeX()).toBe(first);
 
     // Content is still reachable and readable.
-    const beat = page.getByText(/first real client, first real panic/i);
+    const beat = page.getByText(/the year it caught/i);
     await beat.scrollIntoViewIfNeeded();
     await expect(beat).toBeVisible();
   });

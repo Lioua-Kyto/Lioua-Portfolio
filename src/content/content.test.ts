@@ -22,7 +22,7 @@ describe("content", () => {
 
   it("keeps the résumé's real headline metric intact (never invented)", () => {
     const rezervitoo = content.work.find((w) => w.slug === "rezervitoo");
-    expect(rezervitoo?.metric?.value).toBe("176ms → 38ms");
+    expect(rezervitoo?.metric?.value).toBe("~40ms");
   });
 
   it("uses the résumé's contact email", () => {
