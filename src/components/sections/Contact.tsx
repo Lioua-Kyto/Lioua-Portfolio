@@ -1,6 +1,5 @@
 import { content } from "@/content";
 import { Section } from "@/components/primitives/Section";
-import { Label } from "@/components/primitives/Label";
 import { MaskText } from "@/components/motion/MaskText";
 import { ContactForm } from "./ContactForm";
 
@@ -47,19 +46,11 @@ export function Contact() {
                 {contact.github}
               </a>
             </li>
-            <li className="hairline border-b border-b-ink/14 py-3">
-              <Label>{contact.phone}</Label>
-            </li>
           </ul>
-          <p className="mt-6" data-reveal>
-            <a
-              href="/lioua-zeddam-resume.pdf"
-              download
-              className="transition-micro font-mono text-label text-signal underline underline-offset-4 transition-colors hover:text-ink"
-            >
-              download résumé (pdf)
-            </a>
-          </p>
+          {/* No phone number and no résumé download: the repo is public, and
+              a direct line and a full ATS résumé are more personal data than a
+              portfolio needs to hand out. Email and the form are the routes
+              in — the résumé goes to people who ask. */}
         </div>
 
         <div data-reveal>
