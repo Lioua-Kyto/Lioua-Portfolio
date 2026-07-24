@@ -1,9 +1,8 @@
 import { content } from "@/content";
-import { SideNav } from "@/components/SideNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Motion } from "@/components/motion/Motion";
 import { AnchorScroll } from "@/components/providers/AnchorScroll";
-import { HeroScene } from "@/components/hero/HeroScene";
+import { HeroChrome } from "@/components/hero/HeroChrome";
 import { HeroName } from "@/components/hero/HeroName";
 import { PortraitBackdrop } from "@/components/hero/PortraitBackdrop";
 import { Marquee } from "@/components/motion/Marquee";
@@ -26,11 +25,10 @@ export default function HomePage() {
     <div className="relative">
       <AnchorScroll />
       {/* Painting order: the wordmark (z-5) sits under the portrait (z-10),
-          which sits under the hero's own content (z-20). */}
+          which sits under the hero chrome (z-30) that becomes the side rail. */}
       <HeroName />
       <PortraitBackdrop />
-      <SideNav />
-      <HeroScene />
+      <HeroChrome />
       <Motion>
         <main>
           <Intro />

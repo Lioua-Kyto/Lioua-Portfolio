@@ -20,7 +20,7 @@ export function HeroName() {
   return (
     <div
       data-hero="title"
-      className="pointer-events-none fixed inset-x-0 top-[4vh] z-[5] px-[clamp(1rem,3vw,3rem)]"
+      className="pointer-events-none absolute inset-x-0 top-[4vh] z-[5] px-[clamp(1rem,3vw,3rem)] lg:fixed"
     >
       {/* justify-between is what makes it truly full-bleed: the letters are
           distributed edge to edge whatever the font size resolves to, so the
