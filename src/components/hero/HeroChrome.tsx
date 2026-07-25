@@ -33,6 +33,18 @@ function LinkedinIcon() {
   );
 }
 
+function WhatsappIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-4 w-4 fill-current"
+    >
+      <path d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.46 1.34 4.97L2 22l5.28-1.38a9.9 9.9 0 0 0 4.76 1.21h.01a9.9 9.9 0 0 0 9.9-9.9A9.9 9.9 0 0 0 12.04 2Zm0 18.14a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.13.82.83-3.05-.2-.31a8.2 8.2 0 1 1 6.99 3.87Zm4.5-6.15c-.24-.12-1.45-.72-1.68-.8-.22-.08-.39-.12-.55.13-.16.24-.63.79-.78.96-.14.16-.28.18-.53.06-.24-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.24-.29.36-.43.12-.15.16-.25.24-.41.08-.17.04-.31-.02-.43-.06-.12-.55-1.34-.76-1.83-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.65.3-.22.25-.86.84-.86 2.05s.88 2.38 1 2.54c.12.17 1.73 2.65 4.2 3.71.59.26 1.04.4 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.45-.59 1.66-1.17.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28Z" />
+    </svg>
+  );
+}
+
 /**
  * The hero chrome that becomes the side rail.
  *
@@ -304,21 +316,13 @@ export function HeroChrome() {
       gsap.set([...railOnly, panel].filter(Boolean), { autoAlpha: 0 });
       gsap.set(heroOnly, { autoAlpha: 1 });
 
-      const st = ScrollTrigger.create({
-        trigger: hero,
-        start: "top top",
-        end: () => `+=${String(window.innerHeight * pin.hero)}`,
-        pin: true,
-        scrub: 0.5,
-        invalidateOnRefresh: true,
-        refreshPriority: 10,
-        onRefresh: () => {
-          build();
-          measureRoutes();
-        },
-        onUpdate: (self) => {
-          const p = self.progress;
-          tl?.progress(p);
+      // Everything the pin drives, as a pure function of progress. A refresh
+      // rebuilds the timeline from scratch, so it has to re-apply the current
+      // progress too — otherwise a refresh triggered while the rail is showing
+      // (an in-page jump does exactly that) left the shared items back in their
+      // hero positions with the rail still faded up over them.
+      const apply = (p: number) => {
+        tl?.progress(p);
 
           // The wordmark travels over p [0.04, 0.86]; at settle, swap the
           // scaled transform for the crisp real-font copy so it reads sharp.
@@ -366,6 +370,23 @@ export function HeroChrome() {
           // separately.
           root.dataset.rail = p > 0.62 ? "true" : "false";
           resolveRoute();
+        };
+
+      const st = ScrollTrigger.create({
+        trigger: hero,
+        start: "top top",
+        end: () => `+=${String(window.innerHeight * pin.hero)}`,
+        pin: true,
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        refreshPriority: 10,
+        onRefresh: (self) => {
+          build();
+          measureRoutes();
+          apply(self.progress);
+        },
+        onUpdate: (self) => {
+          apply(self.progress);
         },
       });
 
@@ -503,7 +524,7 @@ export function HeroChrome() {
           href={`https://${content.contact.github}`}
           aria-label="GitHub"
           rel="me noopener"
-          className="transition-micro text-slate transition-colors hover:text-ink"
+          className="hero-chrome-social transition-micro"
         >
           <GithubIcon />
         </a>
@@ -511,10 +532,20 @@ export function HeroChrome() {
           href={`https://${content.contact.linkedin}`}
           aria-label="LinkedIn"
           rel="me noopener"
-          className="transition-micro text-slate transition-colors hover:text-ink"
+          className="hero-chrome-social transition-micro"
         >
           <LinkedinIcon />
         </a>
+        {content.contact.whatsapp ? (
+          <a
+            href={`https://wa.me/${content.contact.whatsapp.replace(/\D/g, "")}`}
+            aria-label="WhatsApp"
+            rel="me noopener"
+            className="hero-chrome-social transition-micro"
+          >
+            <WhatsappIcon />
+          </a>
+        ) : null}
       </div>
 
       {/* Rail-only: the address, one click away. Recruiters copy it far more
@@ -542,9 +573,12 @@ export function HeroChrome() {
       <a
         data-chrome-rail
         href="#contact"
-        className="hero-chrome-cta transition-micro rounded-xs bg-ink text-center font-mono text-label text-paper transition-colors hover:bg-signal"
+        className="hero-chrome-cta transition-micro rounded-xs font-mono text-fine"
       >
-        start a conversation
+        <span>Let&apos;s talk</span>
+        <span aria-hidden="true" className="hero-chrome-cta-arrow">
+          →
+        </span>
       </a>
 
       {/* Hero-only footnote. */}

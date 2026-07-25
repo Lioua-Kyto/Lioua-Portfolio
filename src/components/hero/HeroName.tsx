@@ -20,14 +20,17 @@ export function HeroName() {
   return (
     <div
       data-hero="title"
-      className="pointer-events-none absolute inset-x-0 top-[4vh] z-[5] px-[clamp(1rem,3vw,3rem)] lg:fixed"
+      className="pointer-events-none absolute inset-x-0 top-[4vh] z-[5] px-[var(--pad)] lg:fixed"
     >
       {/* justify-between is what makes it truly full-bleed: the letters are
           distributed edge to edge whatever the font size resolves to, so the
-          wordmark always spans the measure instead of leaving a ragged gap. */}
+          wordmark always spans the measure instead of leaving a ragged gap.
+          The negative margins cancel the first and last glyphs' side bearings
+          so the ink — not the letter box — meets the gutter; width stays auto
+          so the negative margins widen the row rather than shifting it. */}
       <h1
         aria-label={intro.name}
-        className="type-display flex w-full justify-between text-name leading-[0.78] font-extrabold text-accent uppercase"
+        className="type-display -ml-[var(--name-bearing-left)] -mr-[var(--name-bearing-right)] flex justify-between text-name leading-[0.78] font-extrabold text-accent uppercase"
       >
         {firstName.split("").map((letter, index) => (
           <span

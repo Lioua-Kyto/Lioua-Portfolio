@@ -102,9 +102,16 @@ export const contentSchema = z.object({
     toolkit: sectionCopySchema,
     contact: sectionCopySchema,
   }),
-  /** 02 — How I build: 2–3 genuine principles, human voice. */
+  /** 02 — Philosophy: 2–3 genuine principles, each with its receipt. */
   principles: z
-    .array(z.object({ title: z.string().min(1), body: z.string().min(1) }))
+    .array(
+      z.object({
+        title: z.string().min(1),
+        body: z.string().min(1),
+        /** The belief cashed out on a real project — the claim's receipt. */
+        practice: z.string().min(1),
+      }),
+    )
     .min(2)
     .max(3),
   /** 03 — Work: client engagements and personal products, one merged list. */
@@ -126,7 +133,11 @@ export const contentSchema = z.object({
     linkedin: z.string().min(1),
     github: z.string().min(1),
     // No phone number by design — the repo is public and a direct line is
-    // more personal data than a portfolio needs to publish.
+    // more personal data than a portfolio needs to publish. `whatsapp` is the
+    // one deliberate exception: set it to a number you are willing to publish
+    // (ideally a WhatsApp Business line, not your personal one) and the rail
+    // grows the channel. Left unset, nothing is rendered and nothing leaks.
+    whatsapp: z.string().optional(),
     todos: z.array(z.string().min(1)).default([]),
   }),
 });
