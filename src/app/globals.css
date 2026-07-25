@@ -355,10 +355,11 @@
   .hero-chrome-philosophy {
     right: var(--pad);
     bottom: 10vh;
-    width: 26ch;
+    width: 20ch;
     text-align: right;
-    font-size: var(--text-base);
-    line-height: 1.45;
+    font-size: var(--text-title);
+    line-height: 1.25;
+    text-wrap: balance;
   }
   .hero-chrome-philosophy [data-philo-word] {
     display: inline-block;
@@ -423,6 +424,8 @@
   }
   .hero-chrome-link {
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-nav {
     left: var(--pad);

@@ -16,9 +16,9 @@ export const rawContent: z.input<typeof contentSchema> = {
     name: "Lioua Zeddam",
     role: "Full Stack Developer",
     line: "I build the systems behind the screens.",
-    // The philosophy shown on the right of the hero and carried into the rail.
+    // The hook shown lower-right in the hero — the one line that has to land.
     philosophy:
-      "I turn messy problems into systems that just work — and keep working under real load.",
+      "I ship whole products — with backends that stay fast under real load.",
     // Framed for what they say about the work, not lifted off a résumé:
     // breadth, performance, and real backend scale. (§5)
     proofs: [

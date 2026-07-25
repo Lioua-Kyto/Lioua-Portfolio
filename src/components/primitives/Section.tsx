@@ -30,7 +30,9 @@ export function Section({
         {/* The mono label doubles as the section's h2 so the document reads
             h1 → h2 → h3 with no skipped levels. */}
         <h2 className="hairline pt-4">
-          <Label index={index}>{label}</Label>
+          <Label index={index} className="uppercase tracking-[0.08em]">
+            {label}
+          </Label>
         </h2>
         {children}
       </div>
