@@ -400,7 +400,7 @@
   /* Hairlines group the rail into masthead blocks. */
   .hero-chrome-rule {
     left: 2.75rem;
-    width: 11rem;
+    width: 13rem;
     height: 1px;
     background: color-mix(in oklab, var(--ink) 12%, transparent);
   }
@@ -418,7 +418,7 @@
   .hero-chrome-email {
     left: 2.75rem;
     top: var(--r-email);
-    width: 12.4rem;
+    width: 13rem;
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -461,7 +461,10 @@
     gap: 0.5rem;
     left: 2.75rem;
     bottom: var(--r-cta-bottom);
-    width: 12.4rem;
+    /* The panel runs 1.5rem → 17rem and the rail's content starts at 2.75rem,
+       so a 13rem block leaves the same 1.25rem gutter on both sides: flush
+       left with every other module AND optically centred in the panel. */
+    width: 13rem;
     padding: 0.72rem 0.85rem;
     background: var(--ink);
     color: var(--paper);
@@ -689,6 +692,32 @@
       flex-direction: row;
       flex-wrap: wrap;
       gap: 1rem 1.25rem;
+    }
+  }
+
+  /* ---- The closing wordmark ----
+     Drawn rather than filled: the name arrives solid at the top of the page
+     and leaves as an outline at the bottom. Each letter is its own hover
+     target, so the mark lights section by section under the cursor. */
+  .footer-mark-letter {
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--ink) 22%, transparent);
+    transition:
+      -webkit-text-stroke-color var(--dur-micro) var(--ease-out),
+      filter var(--dur-micro) var(--ease-out);
+  }
+  .footer-mark-letter:hover {
+    -webkit-text-stroke-color: var(--accent);
+    filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 45%, transparent));
+  }
+  /* Where text-stroke is unavailable the mark still has to read, so it falls
+     back to a faint fill instead of vanishing. */
+  @supports not (-webkit-text-stroke: 1px black) {
+    .footer-mark-letter {
+      color: color-mix(in oklab, var(--ink) 12%, transparent);
+    }
+    .footer-mark-letter:hover {
+      color: color-mix(in oklab, var(--accent) 55%, transparent);
     }
   }
 
