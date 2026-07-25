@@ -300,7 +300,8 @@
     pointer-events: auto;
   }
   .hero-chrome-panel,
-  .hero-chrome-mark,
+  .hero-chrome-caps,
+  .hero-chrome-role,
   .hero-chrome-philosophy,
   .hero-chrome-cta,
   .hero-chrome-socials,
@@ -317,10 +318,17 @@
     height: 92vh;
     width: 15.5rem;
   }
-  .hero-chrome-mark {
+  /* The rail name. `.hero-chrome-caps` (last name) and `.hero-chrome-role` are
+     JS-positioned against the slid wordmark; these are the pre-build defaults —
+     `left`/`top` of the caps also serve as the wordmark's landing anchor. */
+  .hero-chrome-caps {
     left: 2.75rem;
     top: 6vh;
-    width: 12rem;
+    font-size: var(--text-lede);
+  }
+  .hero-chrome-role {
+    left: 2.75rem;
+    top: 13vh;
   }
   .hero-chrome-socials {
     display: flex;
@@ -342,24 +350,18 @@
     bottom: 4vh;
   }
 
-  /* Shared: the philosophy. Hero lower-right, then into the rail. */
+  /* Hero-only: the philosophy. It keeps one position in both states (it never
+     goes to the rail); on scroll its words lift and fade left to right. */
   .hero-chrome-philosophy {
-    line-height: 1.45;
-  }
-  .hero-chrome[data-state="hero"] .hero-chrome-philosophy {
     right: var(--pad);
     bottom: 10vh;
     width: 26ch;
     text-align: right;
     font-size: var(--text-base);
+    line-height: 1.45;
   }
-  .hero-chrome[data-state="rail"] .hero-chrome-philosophy {
-    left: 2.75rem;
-    top: 17vh;
-    width: 11rem;
-    text-align: left;
-    font-size: var(--text-fine);
-    line-height: 1.5;
+  .hero-chrome-philosophy [data-philo-word] {
+    display: inline-block;
   }
 
   /* Shared: proofs. Gold in both states, compact on the rail. */
@@ -390,7 +392,7 @@
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stats {
     left: 2.75rem;
-    top: 27vh;
+    top: 23vh;
     gap: 0.3rem;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stat {
@@ -406,42 +408,35 @@
     line-height: 1.3;
   }
 
-  /* Shared: routes. Two lists (each is `.hero-chrome-nav`) flank the portrait
-     in the hero and stack into one column on the rail. The wrapping <nav> is
-     display:contents so it is one landmark but adds no box. */
+  /* Shared: routes. One list — a single row under the wordmark in the hero,
+     a column on the rail. Each <li> travels independently; the state class
+     drives where the list itself sits so the leaves can be measured. The
+     wrapping <nav> is display:contents so it is one landmark but adds no box. */
   .hero-chrome-navwrap {
     display: contents;
   }
   .hero-chrome-nav {
     display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
   .hero-chrome-link {
     display: block;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-nav {
+    left: var(--pad);
     top: calc(var(--name-bottom) + 1.1rem);
     flex-direction: row;
     align-items: baseline;
     gap: 1.5rem;
   }
-  .hero-chrome[data-state="hero"] .hero-chrome-nav--left {
-    left: var(--pad);
-  }
-  .hero-chrome[data-state="hero"] .hero-chrome-nav--right {
-    right: var(--pad);
-    justify-content: flex-end;
-  }
   .hero-chrome[data-state="rail"] .hero-chrome-nav {
+    left: 2.75rem;
+    top: 48vh;
     flex-direction: column;
-    gap: 0.4rem;
-  }
-  .hero-chrome[data-state="rail"] .hero-chrome-nav--left {
-    left: 2.75rem;
-    top: 53vh;
-  }
-  .hero-chrome[data-state="rail"] .hero-chrome-nav--right {
-    left: 2.75rem;
-    top: 63vh;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   @media (min-width: 1024px) {
@@ -456,7 +451,8 @@
      that scrolls away, so the rail-only parts are simply not shown. */
   @media (max-width: 1023.98px) {
     .hero-chrome-panel,
-    .hero-chrome-mark,
+    .hero-chrome-caps,
+    .hero-chrome-role,
     .hero-chrome-socials,
     .hero-chrome-cta {
       display: none;
@@ -484,15 +480,10 @@
     .hero-chrome-nav {
       left: var(--pad);
       right: auto;
+      top: calc(var(--name-bottom) + 1rem);
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 1.25rem;
-    }
-    .hero-chrome-nav--left {
-      top: calc(var(--name-bottom) + 1rem);
-    }
-    .hero-chrome-nav--right {
-      top: calc(var(--name-bottom) + 2.9rem);
+      gap: 1rem 1.25rem;
     }
   }
 
