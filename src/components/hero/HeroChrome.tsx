@@ -109,11 +109,21 @@ export function HeroChrome() {
       const morphLeaves = [...statLeaves, ...navLeaves];
 
       let tl: gsap.core.Timeline | null = null;
+      // The wordmark rides its own timeline so it can be swapped for a crisp,
+      // real-font copy once it settles (a 20x transform scale of a 600px font
+      // rasterises soft). These carry the settled crisp form between builds.
+      let titleTl: gsap.core.Timeline | null = null;
+      let crispX = 0;
+      let crispY = 0;
+      let landedFont = 0;
+      let crisped = false;
 
       const build = () => {
         tl?.kill();
+        titleTl?.kill();
+        crisped = false;
         gsap.set(morphLeaves, { clearProps: "transform" });
-        if (h1) gsap.set(h1, { clearProps: "transform,width" });
+        if (h1) gsap.set(h1, { clearProps: "transform,width,fontSize" });
         for (const el of [caps, role]) {
           if (!el) continue;
           el.style.left = "";
@@ -196,13 +206,14 @@ export function HeroChrome() {
         // The wordmark itself slides and tightens into the rail, never fading:
         // it translates to the rail anchor, scales down to a rail-sized name,
         // and its width collapses to `max-content` so the spread letters close
-        // up. Scale is set from the font size so the landed name is a known
-        // ~1.3rem — small enough that "LIOUA ZEDDAM" fits the rail side by side.
+        // up. The landed name is a fixed 1.3rem — small enough that
+        // "LIOUA ZEDDAM" fits the rail side by side. It rides `titleTl` so the
+        // scaled transform can be swapped for a crisp real-font copy at settle.
         if (h1 && titleHero && anchor && titleTight && titleFont) {
-          const scale = (1.3 * rootFont) / titleFont;
-          const landedRight = anchor.left + titleTight * scale;
-          const landedH = titleHero.height * scale;
-          timeline.fromTo(
+          landedFont = 1.3 * rootFont;
+          const scale = landedFont / titleFont;
+          titleTl = gsap.timeline({ paused: true });
+          titleTl.fromTo(
             h1,
             { x: 0, y: 0, scale: 1, width: titleHero.width },
             {
@@ -212,21 +223,37 @@ export function HeroChrome() {
               width: titleTight,
               transformOrigin: "left top",
               ease: "power3.inOut",
-              duration: 0.82,
+              duration: 1,
             },
-            0.04,
+            0,
           );
-          // The last name lands right beside the tightened wordmark; the role
-          // sits under the name line. Positions use the exact scale the tween
-          // ends on, so caps meets the wordmark's edge with no overlap or gap.
+
+          // Measure the crisp settled form (real font, no scale): where the
+          // 1.3rem wordmark sits, so the swap lands pixel-for-pixel and the
+          // last name can butt right against its true edge.
+          h1.style.fontSize = `${String(landedFont)}px`;
+          h1.style.width = "max-content";
+          h1.style.transform = "none";
+          const cr = h1.getBoundingClientRect();
+          crispX = anchor.left - cr.left;
+          crispY = anchor.top - cr.top;
+          const landedW = cr.width;
+          const landedH = cr.height;
+          h1.style.fontSize = "";
+          h1.style.width = "";
+          h1.style.transform = "";
+
+          // The last name lands right beside the wordmark; the role sits under
+          // the name line. caps matches the wordmark's font exactly, so the two
+          // read as one name.
           if (caps) {
-            caps.style.left = `${String(landedRight + 0.4 * rootFont)}px`;
+            caps.style.left = `${String(anchor.left + landedW + 0.4 * rootFont)}px`;
             caps.style.top = `${String(anchor.top)}px`;
-            caps.style.fontSize = `${String(1.3 * rootFont)}px`;
+            caps.style.fontSize = `${String(landedFont)}px`;
           }
           if (role) {
             role.style.left = `${String(anchor.left)}px`;
-            role.style.top = `${String(anchor.top + landedH + 0.35 * rootFont)}px`;
+            role.style.top = `${String(anchor.top + landedH + 0.3 * rootFont)}px`;
           }
         }
 
@@ -253,6 +280,32 @@ export function HeroChrome() {
         onUpdate: (self) => {
           const p = self.progress;
           tl?.progress(p);
+
+          // The wordmark travels over p [0.04, 0.86]; at settle, swap the
+          // scaled transform for the crisp real-font copy so it reads sharp.
+          if (h1 && titleTl) {
+            const tp = gsap.utils.clamp(0, 1, (p - 0.04) / 0.82);
+            if (tp >= 0.999) {
+              if (!crisped) {
+                crisped = true;
+                gsap.set(h1, {
+                  fontSize: landedFont,
+                  width: "max-content",
+                  x: crispX,
+                  y: crispY,
+                  scale: 1,
+                  transformOrigin: "left top",
+                });
+              }
+            } else {
+              if (crisped) {
+                crisped = false;
+                gsap.set(h1, { clearProps: "fontSize" });
+              }
+              titleTl.progress(tp);
+            }
+          }
+
           if (panel) {
             gsap.set(panel, {
               autoAlpha: gsap.utils.clamp(0, 1, (p - 0.3) / 0.3),
@@ -264,9 +317,11 @@ export function HeroChrome() {
           gsap.set(heroOnly, {
             autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.4),
           });
-          // Lift the wordmark above the glass panel only once it has entered
-          // the rail; before that it stays behind the portrait for occlusion.
-          if (title) title.style.zIndex = p > 0.5 ? "31" : "";
+          // Lift the wordmark above the glass panel before the panel fades in,
+          // so its backdrop-filter never tints the orange letters yellow. By
+          // this point the portrait is already blurring, so losing the
+          // head-over-letters occlusion here is imperceptible.
+          if (title) title.style.zIndex = p > 0.26 ? "31" : "";
           resolveRoute();
         },
       });
@@ -289,6 +344,7 @@ export function HeroChrome() {
         st.kill();
         tracker.kill();
         tl?.kill();
+        titleTl?.kill();
         if (title) title.style.zIndex = "";
       };
     });
@@ -321,7 +377,7 @@ export function HeroChrome() {
 
       {/* Hero-only: the working philosophy. Its words lift and fade left to
           right on scroll rather than relocating to the rail. */}
-      <p className="hero-chrome-philosophy text-slate">
+      <p className="hero-chrome-philosophy type-display font-medium text-ink">
         {philoWords.map((word, i) => (
           <Fragment key={`${word}-${String(i)}`}>
             <span data-philo-word className="inline-block will-change-transform">

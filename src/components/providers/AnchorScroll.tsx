@@ -38,7 +38,13 @@ export function AnchorScroll() {
       // Pinned sections shift where a target actually starts, so make sure
       // ScrollTrigger's measurements are current before resolving the offset.
       ScrollTrigger.refresh();
-      lenis.scrollTo(target, { offset: 0, duration: 1.1 });
+      // The hero is pinned: resolving `#intro` lands at the END of its pin
+      // (mid-morph), not the top. Home always means the very top of the page.
+      if (href === "#intro") {
+        lenis.scrollTo(0, { offset: 0, duration: 1.1 });
+      } else {
+        lenis.scrollTo(target, { offset: 0, duration: 1.1 });
+      }
       history.replaceState(null, "", href);
 
       // Keyboard users still need focus to follow the jump.
