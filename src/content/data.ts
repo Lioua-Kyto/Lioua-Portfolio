@@ -27,33 +27,33 @@ export const rawContent: z.input<typeof contentSchema> = {
       { value: "400+", label: "API endpoints across projects" },
     ],
   },
-  // TODO(author): dates are from your résumé — confirm the years, and reword
-  // any beat that doesn't sound like you saying it out loud.
+  // The route is told in beats, not in a count of years — what changed each
+  // year says more than how many of them there have been.
   timeline: [
     {
       year: "2022",
       title: "Not sold on it yet",
-      text: "I started the computer science degree out of momentum more than passion. It hadn't clicked. I was doing the work, not chasing it.",
+      text: "I enrolled in computer science because it was the sensible next step, not because I loved it. I did the work. I wasn't chasing anything.",
     },
     {
       year: "2023",
       title: "The year it caught",
-      text: "Somewhere in 2023 it clicked. I taught myself Python and started building things that actually did something — and couldn't put it down after that.",
+      text: "Then I built something that actually ran. I taught myself Python, and the moment code started doing real work I couldn't put it down.",
     },
     {
       year: "2024",
-      title: "Into the deep end",
-      text: "January: an apprenticeship at Faderco, starting from HTML, CSS, and JavaScript. React by September, Django soon after — and by December I was building their internal job portal for real.",
+      title: "Thrown in at the deep end",
+      text: "An apprenticeship at Faderco, starting from HTML and CSS. React by September, Django right after — and by December I was building their internal job portal for people who depended on it, not for a grade.",
     },
     {
       year: "2025",
-      title: "Graduated, then went further",
-      text: "April: graduated first in my class at 14.79 on the strength of that portal. Then I kept building — FitGuild to sharpen full-stack, Cognitive to take on harder problems, and by December, Rezervitoo: the one I'm proudest of. Polymorphic models, a real service layer, caching that made it feel instant — the architecture finally matched the ambition.",
+      title: "Graduated, then kept going",
+      text: "That portal graduated me first in my class. I could have stopped there. Instead I went looking for harder problems — FitGuild, then Cognitive, then Rezervitoo, where polymorphic models, a real service layer and hard caching finally made the architecture match the ambition.",
     },
     {
       year: "2026",
       title: "Widening the stack",
-      text: "Now: I picked up Flutter and Riverpod building BrewPhoria, added Node to stretch past my Django-and-React home base, and started going deep on AI integration. This site is the current build. Next — enough AI to call myself an AI engineer and mean it.",
+      text: "Flutter and Riverpod for BrewPhoria. Node, to stretch past my Django-and-React home ground. Now AI integration — deep enough to earn the title rather than claim it. This site is the current build.",
     },
   ],
   about: {
@@ -67,11 +67,11 @@ export const rawContent: z.input<typeof contentSchema> = {
   sections: {
     background: {
       heading: "How I got here.",
-      lede: "Five years, no shortcut — the version with the 2am deploys and the “why is it slow now” left in.",
+      lede: "Not a straight line, and no shortcut — the version with the 2am deploys and the “why is it slow now” left in.",
     },
     principles: {
-      heading: "Things I'll argue about.",
-      lede: "Opinions production beat into me. They show up in every repo I touch.",
+      heading: "Opinions I'll defend in review.",
+      lede: "Not borrowed from a blog post — these are the three things production argued me into, and they show up in every repo I touch.",
     },
     work: {
       heading: "Things I've shipped.",
@@ -90,15 +90,21 @@ export const rawContent: z.input<typeof contentSchema> = {
   principles: [
     {
       title: "The server is the source of truth.",
-      body: "Clients lie — not on purpose, just constantly. Prices, stock, permissions: recompute it all server-side and let the client be a pretty view of the truth.",
+      body: "Clients lie — not on purpose, just constantly. Prices, stock, permissions: recompute all of it server-side and let the client be a pretty view of the truth.",
+      practice:
+        "Rezervitoo decides every price and every availability window on the backend. The client renders what it is told, and nothing it renders can be argued with.",
     },
     {
       title: "Real-time by default.",
-      body: "If something changes and a user has to refresh to see it, that's a bug with extra steps. A WebSocket is cheaper than a confused user.",
+      body: "If something changes and a user has to refresh to see it, that's a bug with extra steps. A WebSocket costs less than a confused user.",
+      practice:
+        "Faderco's hiring loop ran on a four-hour round-trip per candidate. Pushing state over Channels instead of waiting for a refresh took it to zero.",
     },
     {
       title: "Shipped beats perfect.",
-      body: "A deployed feature teaches more in a week than a perfect branch does in a month. Docker it, ship it, watch it, fix it.",
+      body: "A deployed feature teaches more in a week than a perfect branch does in a month. Docker it, ship it, watch it, fix what the traffic actually breaks.",
+      practice:
+        "Six products end to end. Every one of them taught me something the branch never would have — including the caching that took 176ms down to 40ms.",
     },
   ],
   // 03 — Work: client engagements and the products I built to teach myself,
