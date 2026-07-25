@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { pin } from "@/lib/motion/tokens";
@@ -51,6 +51,45 @@ function LinkedinIcon() {
 export function HeroChrome() {
   const lastName = content.intro.name.split(" ").slice(1).join(" ");
   const philoWords = content.intro.philosophy.split(" ");
+
+  // The rail's live details: a ticking local clock and copy-to-clipboard on the
+  // address. Both write straight to the DOM — a state update here would
+  // re-render the chrome that GSAP is mid-scrub on.
+  useEffect(() => {
+    const clock = document.querySelector<HTMLElement>("[data-rail-clock]");
+    const button = document.querySelector<HTMLElement>("[data-copy-email]");
+    const label = document.querySelector<HTMLElement>("[data-copy-label]");
+
+    const tick = () => {
+      if (!clock) return;
+      clock.textContent = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Africa/Algiers",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date());
+    };
+    tick();
+    const timer = window.setInterval(tick, 30_000);
+
+    let restore: number | undefined;
+    const copy = () => {
+      void navigator.clipboard.writeText(content.contact.email).then(() => {
+        if (!label) return;
+        label.textContent = "copied";
+        window.clearTimeout(restore);
+        restore = window.setTimeout(() => {
+          label.textContent = content.contact.email;
+        }, 1600);
+      });
+    };
+    button?.addEventListener("click", copy);
+
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(restore);
+      button?.removeEventListener("click", copy);
+    };
+  }, []);
 
   useGSAP(() => {
     const root = document.querySelector<HTMLElement>("[data-chrome]");
@@ -322,15 +361,25 @@ export function HeroChrome() {
           // this point the portrait is already blurring, so losing the
           // head-over-letters occlusion here is imperceptible.
           if (title) title.style.zIndex = p > 0.26 ? "31" : "";
+          // The route numbers belong to the rail only; `data-state` stays
+          // "hero" (the morph is pure transform), so the rail look is flagged
+          // separately.
+          root.dataset.rail = p > 0.62 ? "true" : "false";
           resolveRoute();
         },
       });
 
+      const threadFill = document.querySelector<HTMLElement>(
+        "[data-thread-fill]",
+      );
       const tracker = ScrollTrigger.create({
         trigger: document.documentElement,
         start: 0,
         end: () => ScrollTrigger.maxScroll(window),
-        onUpdate: resolveRoute,
+        onUpdate: (self) => {
+          if (threadFill) gsap.set(threadFill, { scaleY: self.progress });
+          resolveRoute();
+        },
         onRefresh: () => {
           measureRoutes();
           activeRoute = -1;
@@ -375,6 +424,34 @@ export function HeroChrome() {
         {content.intro.role}
       </span>
 
+      {/* Rail-only: the reading thread. The rail's own edge is the progress
+          instrument — it fills as the page is read, the same drawn-line idea
+          the Background section's timeline uses. */}
+      <div data-chrome-rail className="hero-chrome-thread">
+        <span data-thread-fill className="hero-chrome-thread-fill" />
+      </div>
+
+      {/* Rail-only: live status. A working signal and the local clock — the
+          two things a client or recruiter checks first. */}
+      <div data-chrome-rail className="hero-chrome-status">
+        <span className="hero-chrome-dot" aria-hidden="true" />
+        <span className="font-mono text-fine tracking-wide text-ink uppercase">
+          Available for work
+        </span>
+      </div>
+      <p
+        data-chrome-rail
+        className="hero-chrome-clock font-mono text-fine tracking-wide text-slate uppercase"
+      >
+        <span data-rail-clock>--:--</span> local · Algeria
+      </p>
+
+      {/* Rail-only: the module rules. Hairlines group the rail into masthead
+          blocks — identity, proof, routes, contact. */}
+      <div data-chrome-rail className="hero-chrome-rule hero-chrome-rule--a" />
+      <div data-chrome-rail className="hero-chrome-rule hero-chrome-rule--b" />
+      <div data-chrome-rail className="hero-chrome-rule hero-chrome-rule--c" />
+
       {/* Hero-only: the working philosophy. Its words lift and fade left to
           right on scroll rather than relocating to the rail. */}
       <p className="hero-chrome-philosophy type-display font-medium text-ink">
@@ -411,7 +488,7 @@ export function HeroChrome() {
                 href={item.href}
                 data-rail-link={item.href.slice(1)}
                 data-active="false"
-                className="hero-chrome-link transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
+                className="hero-chrome-link transition-micro font-mono text-label transition-colors"
               >
                 {item.label}
               </a>
@@ -439,6 +516,27 @@ export function HeroChrome() {
           <LinkedinIcon />
         </a>
       </div>
+
+      {/* Rail-only: the address, one click away. Recruiters copy it far more
+          often than they open a mail client. */}
+      <button
+        data-chrome-rail
+        data-copy-email
+        type="button"
+        className="hero-chrome-email transition-micro font-mono text-fine text-slate transition-colors hover:text-ink"
+      >
+        <span data-copy-label className="truncate">
+          {content.contact.email}
+        </span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0">
+          <path
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            d="M9 9V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-4M5 9h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z"
+          />
+        </svg>
+      </button>
 
       {/* Rail-only call to action. */}
       <a

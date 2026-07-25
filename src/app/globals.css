@@ -284,8 +284,42 @@
     pointer-events: none;
     --pad: clamp(1.25rem, 4.5vw, 3.5rem);
     --name-bottom: calc(4vh + var(--name-size) * var(--name-leading));
+    /* The rail's vertical rhythm. The stack is a fixed pixel height (cards and
+       routes don't scale with the viewport), so its offsets are rem, not vh —
+       vh drifted the blocks into each other on short screens. */
+    --r-caps: 4.5rem;
+    --r-status: 7.6rem;
+    --r-clock: 9.5rem;
+    --r-rule-a: 11.9rem;
+    --r-stats: 13.3rem;
+    --r-rule-b: 28.6rem;
+    --r-nav: 30rem;
+    --r-rule-c: 42.4rem;
+    --r-email: 43.9rem;
+    --r-socials: 47.4rem;
+    --r-stat-pad: 0.28rem;
+    --r-nav-gap: 0.5rem;
+    --r-cta-bottom: 5vh;
     /* eases in once the name has begun to land */
     animation: chrome-in 0.8s 0.95s both;
+  }
+  /* Laptop heights: the same modules, tightened so nothing runs off the rail. */
+  @media (max-height: 899px) {
+    .hero-chrome {
+      --r-caps: 3.6rem;
+      --r-status: 6.6rem;
+      --r-clock: 8.3rem;
+      --r-rule-a: 9.9rem;
+      --r-stats: 11.1rem;
+      --r-rule-b: 25.4rem;
+      --r-nav: 26.6rem;
+      --r-rule-c: 36.4rem;
+      --r-email: 37.6rem;
+      --r-socials: 40.3rem;
+      --r-stat-pad: 0.2rem;
+      --r-nav-gap: 0.3rem;
+      --r-cta-bottom: 4vh;
+    }
   }
   @keyframes chrome-in {
     from {
@@ -296,19 +330,101 @@
     }
   }
   .hero-chrome a,
-  .hero-chrome ul {
+  .hero-chrome ul,
+  .hero-chrome button {
     pointer-events: auto;
   }
   .hero-chrome-panel,
   .hero-chrome-caps,
   .hero-chrome-role,
+  .hero-chrome-thread,
+  .hero-chrome-status,
+  .hero-chrome-clock,
+  .hero-chrome-rule,
   .hero-chrome-philosophy,
+  .hero-chrome-email,
   .hero-chrome-cta,
   .hero-chrome-socials,
   .hero-chrome-stats,
   .hero-chrome-nav,
   .hero-chrome-tagline {
     position: absolute;
+  }
+
+  /* The reading thread: the rail's own edge is the progress instrument. */
+  .hero-chrome-thread {
+    left: 1.5rem;
+    top: 4vh;
+    width: 2px;
+    height: 92vh;
+    background: color-mix(in oklab, var(--ink) 8%, transparent);
+    overflow: hidden;
+  }
+  .hero-chrome-thread-fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  /* Live status: a working signal and the local clock. */
+  .hero-chrome-status {
+    left: 2.75rem;
+    top: var(--r-status);
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .hero-chrome-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: rail-pulse 2.6s var(--ease-out) infinite;
+  }
+  @keyframes rail-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 55%, transparent);
+    }
+    60% {
+      box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 0%, transparent);
+    }
+  }
+  .hero-chrome-clock {
+    left: 2.75rem;
+    top: var(--r-clock);
+  }
+
+  /* Hairlines group the rail into masthead blocks. */
+  .hero-chrome-rule {
+    left: 2.75rem;
+    width: 11rem;
+    height: 1px;
+    background: color-mix(in oklab, var(--ink) 12%, transparent);
+  }
+  .hero-chrome-rule--a {
+    top: var(--r-rule-a);
+  }
+  .hero-chrome-rule--b {
+    top: var(--r-rule-b);
+  }
+  .hero-chrome-rule--c {
+    top: var(--r-rule-c);
+  }
+
+  /* The address, one click away. */
+  .hero-chrome-email {
+    left: 2.75rem;
+    top: var(--r-email);
+    width: 12.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: left;
+    cursor: pointer;
   }
 
   /* Rail-only items — always at their rail spot, opacity is JS-driven. */
@@ -323,23 +439,23 @@
      `left`/`top` of the caps also serve as the wordmark's landing anchor. */
   .hero-chrome-caps {
     left: 2.75rem;
-    top: 6vh;
+    top: var(--r-caps);
     font-size: var(--text-lede);
   }
   .hero-chrome-role {
     left: 2.75rem;
-    top: 13vh;
+    top: calc(var(--r-caps) + 2rem);
   }
   .hero-chrome-socials {
     display: flex;
     gap: 0.9rem;
     left: 2.75rem;
-    top: 73vh;
+    top: var(--r-socials);
   }
   .hero-chrome-cta {
     display: block;
     left: 2.75rem;
-    bottom: 6vh;
+    bottom: var(--r-cta-bottom);
     width: 11rem;
     padding: 0.6rem 0.75rem;
   }
@@ -393,13 +509,13 @@
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stats {
     left: 2.75rem;
-    top: 23vh;
+    top: var(--r-stats);
     gap: 0.3rem;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stat {
     width: 11rem;
     gap: 0;
-    padding: 0.28rem 0.5rem 0.28rem 0.65rem;
+    padding: var(--r-stat-pad) 0.5rem var(--r-stat-pad) 0.65rem;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-stat dd {
     font-size: var(--text-base);
@@ -422,10 +538,51 @@
     margin: 0;
     padding: 0;
   }
+  /* The route's colour lives here rather than on utilities: the active state
+     has to win over the resting one, and a utility class would always beat a
+     base-layer rule no matter how specific. */
   .hero-chrome-link {
     display: block;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: var(--ink);
+  }
+  .hero-chrome-link:hover {
+    color: var(--signal);
+  }
+  /* The routes are a real sequence — the sections number themselves 01–05 — so
+     the rail numbers them too. The counter is absolutely placed, which keeps
+     each link's measured width identical in both layouts (the morph scales by
+     that ratio). `data-rail` is set by JS because `data-state` stays "hero":
+     the rail look is carried entirely by transforms. */
+  .hero-chrome-nav li {
+    position: relative;
+    counter-increment: rail-route;
+  }
+  .hero-chrome-nav {
+    counter-reset: rail-route;
+  }
+  .hero-chrome-nav li::before {
+    content: counter(rail-route, decimal-leading-zero);
+    position: absolute;
+    left: -1.6rem;
+    top: 0.2em;
+    font-family: var(--font-martian-mono), monospace;
+    font-size: var(--text-fine);
+    color: color-mix(in oklab, var(--ink) 35%, transparent);
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+    pointer-events: none;
+  }
+  .hero-chrome[data-rail="true"] .hero-chrome-nav li::before {
+    opacity: 1;
+  }
+  /* The route you are reading: accent, with the number lit to match. */
+  .hero-chrome-link[data-active="true"] {
+    color: var(--accent);
+  }
+  .hero-chrome-nav li:has([data-active="true"])::before {
+    color: var(--accent);
   }
   .hero-chrome[data-state="hero"] .hero-chrome-nav {
     left: var(--pad);
@@ -435,11 +592,11 @@
     gap: 1.5rem;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-nav {
-    left: 2.75rem;
-    top: 48vh;
+    left: 4.35rem;
+    top: var(--r-nav);
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: var(--r-nav-gap);
   }
 
   @media (min-width: 1024px) {
@@ -456,6 +613,11 @@
     .hero-chrome-panel,
     .hero-chrome-caps,
     .hero-chrome-role,
+    .hero-chrome-thread,
+    .hero-chrome-status,
+    .hero-chrome-clock,
+    .hero-chrome-rule,
+    .hero-chrome-email,
     .hero-chrome-socials,
     .hero-chrome-cta {
       display: none;
