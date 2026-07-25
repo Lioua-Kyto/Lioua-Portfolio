@@ -7,11 +7,3 @@ export const NAV = [
   { label: "toolkit", href: "#toolkit" },
   { label: "contact", href: "#contact" },
 ] as const;
-
-/**
- * In the hero the routes flank the portrait — the first half on the left, the
- * second on the right (the heynesh split). They converge into one column when
- * the rail forms.
- */
-export const NAV_LEFT = NAV.slice(0, 3);
-export const NAV_RIGHT = NAV.slice(3);

@@ -1,39 +1,13 @@
 "use client";
 
+import { Fragment } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap, Flip, ScrollTrigger } from "@/lib/motion/gsap";
+import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { pin } from "@/lib/motion/tokens";
 import { content } from "@/content";
-import { NAV_LEFT, NAV_RIGHT } from "@/components/nav";
+import { NAV } from "@/components/nav";
 
 const READING_LINE = 0.3;
-
-type Route = { label: string; href: string };
-
-function NavGroup({
-  routes,
-  align,
-}: {
-  routes: readonly Route[];
-  align: string;
-}) {
-  return (
-    <ul data-chrome-flip className={`hero-chrome-nav ${align}`}>
-      {routes.map((item) => (
-        <li key={item.href}>
-          <a
-            href={item.href}
-            data-rail-link={item.href.slice(1)}
-            data-active="false"
-            className="hero-chrome-link transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
-          >
-            {item.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 function GithubIcon() {
   return (
@@ -62,28 +36,30 @@ function LinkedinIcon() {
 /**
  * The hero chrome that becomes the side rail.
  *
- * The routes, proof numbers, and working philosophy are a single set of
- * elements — not duplicated between a hero and a separate sidebar. On load the
- * routes flank the portrait, the proofs sit lower-left, and the philosophy sits
- * lower-right. As the section pins and scrolls, GSAP Flip carries those same
- * elements into a fixed glass rail on the left; the rail's own additions (full
- * name mark, social links, call to action) fade in and the hero-only footnote
- * fades out. Nothing vanishes to be replaced — it relocates.
+ * The routes and proof numbers are a single set of elements — not duplicated
+ * between a hero and a separate sidebar. On load the routes sit as one row
+ * under the wordmark and the proofs stack lower-left. As the section pins and
+ * scrolls, each card and each link travels to the rail on its own stagger, so
+ * the block dissolves one piece at a time rather than sliding as a slab. The
+ * wordmark slides and tightens into the rail intact, and the last name fades in
+ * beside it. The working philosophy is hero-only: its words lift and fade left
+ * to right as the hero gives way.
  *
  * Desktop only. Below the rail breakpoint the chrome is a plain hero that
  * scrolls away.
  */
 export function HeroChrome() {
+  const lastName = content.intro.name.split(" ").slice(1).join(" ");
+  const philoWords = content.intro.philosophy.split(" ");
+
   useGSAP(() => {
     const root = document.querySelector<HTMLElement>("[data-chrome]");
     const hero = document.querySelector<HTMLElement>("#intro");
     if (!root || !hero) return;
 
-    const flipItems = gsap.utils.toArray<HTMLElement>("[data-chrome-flip]");
     const railOnly = gsap.utils.toArray<HTMLElement>("[data-chrome-rail]");
     const heroOnly = gsap.utils.toArray<HTMLElement>("[data-chrome-hero]");
     const panel = document.querySelector<HTMLElement>("[data-chrome-panel]");
-    const wordmark = document.querySelector<HTMLElement>("[data-hero='title']");
 
     const links = [...root.querySelectorAll<HTMLElement>("[data-rail-link]")];
     const sections = links
@@ -110,7 +86,6 @@ export function HeroChrome() {
       }
       if (current === activeRoute) return;
       activeRoute = current;
-      // Two links can point at the same section (e.g. home + intro); mark all.
       const activeId = sections[current]?.link.dataset.railLink;
       for (const s of sections) {
         s.link.dataset.active =
@@ -121,41 +96,144 @@ export function HeroChrome() {
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 1024px)", () => {
-      let flip: gsap.core.Timeline | null = null;
-      const mark = document.querySelector<HTMLElement>(".hero-chrome-mark");
-      // Where the giant wordmark should slide+shrink to: the rail's name mark.
-      let wordTo = { x: 0, y: 0, scale: 0.14 };
-      const measureWord = () => {
-        if (!wordmark || !mark) return;
-        gsap.set(wordmark, { clearProps: "transform" });
-        const w = wordmark.getBoundingClientRect();
-        const m = mark.getBoundingClientRect();
-        wordTo = {
-          x: m.left - w.left,
-          y: m.top - w.top,
-          scale: gsap.utils.clamp(0.08, 0.2, (m.width / (w.width || 1)) * 1.4),
-        };
-      };
+      const rootFont = parseFloat(
+        getComputedStyle(document.documentElement).fontSize,
+      );
+      const title = document.querySelector<HTMLElement>("[data-hero='title']");
+      const h1 = title?.querySelector<HTMLElement>("h1") ?? null;
+      const caps = document.querySelector<HTMLElement>(".hero-chrome-caps");
+      const role = document.querySelector<HTMLElement>(".hero-chrome-role");
+      const statLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="stat"]');
+      const navLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="nav"]');
+      const words = gsap.utils.toArray<HTMLElement>("[data-philo-word]");
+      const morphLeaves = [...statLeaves, ...navLeaves];
+
+      let tl: gsap.core.Timeline | null = null;
 
       const build = () => {
-        flip?.kill();
-        gsap.set(flipItems, { clearProps: "all" });
+        tl?.kill();
+        gsap.set(morphLeaves, { clearProps: "transform" });
+        if (h1) gsap.set(h1, { clearProps: "transform,width" });
+        for (const el of [caps, role]) {
+          if (!el) continue;
+          el.style.left = "";
+          el.style.top = "";
+          el.style.fontSize = "";
+        }
+
+        // Measure both layouts by toggling the state class, then rest on hero
+        // (the layout that matches the first paint, so nothing has to move at
+        // progress 0). The transforms below carry each leaf to its rail spot.
         root.dataset.state = "hero";
-        const state = Flip.getState(flipItems, {
-          props: "gap,padding,borderRadius,fontSize,textAlign",
-        });
+        const heroRect = new Map<HTMLElement, DOMRect>();
+        for (const el of morphLeaves)
+          heroRect.set(el, el.getBoundingClientRect());
+        let titleHero: DOMRect | null = null;
+        let titleTight = 0;
+        let titleFont = 0;
+        if (h1) {
+          titleHero = h1.getBoundingClientRect();
+          titleFont = parseFloat(getComputedStyle(h1).fontSize);
+          // `max-content` is what shrinks the justify-between flex row to the
+          // letters' true width — plain `auto` stretches it to the full column.
+          const prev = h1.style.width;
+          h1.style.width = "max-content";
+          titleTight = h1.getBoundingClientRect().width;
+          h1.style.width = prev;
+        }
+        const anchor = caps?.getBoundingClientRect() ?? null;
+
         root.dataset.state = "rail";
-        // No `absolute: true`: every chrome item is already position:absolute,
-        // so Flip animates pure transforms — which scrub cleanly in reverse.
-        // With absolute mode the elements were left mispositioned when scrolled
-        // back to the hero.
-        flip = Flip.from(state, {
-          scale: false,
-          paused: true,
-          nested: true,
+        const railRect = new Map<HTMLElement, DOMRect>();
+        for (const el of morphLeaves)
+          railRect.set(el, el.getBoundingClientRect());
+        root.dataset.state = "hero";
+
+        const timeline = gsap.timeline({ paused: true });
+
+        const addLeaf = (el: HTMLElement, start: number, arrive: number) => {
+          const a = heroRect.get(el);
+          const b = railRect.get(el);
+          if (!a || !b) return;
+          timeline.fromTo(
+            el,
+            { x: 0, y: 0, scale: 1 },
+            {
+              x: b.left - a.left,
+              y: b.top - a.top,
+              scale: a.width ? b.width / a.width : 1,
+              transformOrigin: "left top",
+              ease: "power3.inOut",
+              duration: arrive - start,
+            },
+            start,
+          );
+        };
+        // Staggered windows: each leaf starts and settles at a different point,
+        // so they travel at visibly different speeds instead of as one slab.
+        statLeaves.forEach((el, i) => {
+          addLeaf(el, 0.06 + i * 0.11, 0.72 + i * 0.08);
         });
-        measureWord();
+        navLeaves.forEach((el, i) => {
+          addLeaf(el, 0.12 + i * 0.055, 0.74 + i * 0.04);
+        });
+
+        // Philosophy words lift away, left to right — they do not go to the rail.
+        words.forEach((word, i) => {
+          timeline.fromTo(
+            word,
+            { yPercent: 0, autoAlpha: 1 },
+            {
+              yPercent: -130,
+              autoAlpha: 0,
+              ease: "power2.in",
+              duration: 0.22,
+            },
+            0.02 + i * 0.018,
+          );
+        });
+
+        // The wordmark itself slides and tightens into the rail, never fading:
+        // it translates to the rail anchor, scales down to a rail-sized name,
+        // and its width collapses to `max-content` so the spread letters close
+        // up. Scale is set from the font size so the landed name is a known
+        // ~1.3rem — small enough that "LIOUA ZEDDAM" fits the rail side by side.
+        if (h1 && titleHero && anchor && titleTight && titleFont) {
+          const scale = (1.3 * rootFont) / titleFont;
+          const landedRight = anchor.left + titleTight * scale;
+          const landedH = titleHero.height * scale;
+          timeline.fromTo(
+            h1,
+            { x: 0, y: 0, scale: 1, width: titleHero.width },
+            {
+              x: anchor.left - titleHero.left,
+              y: anchor.top - titleHero.top,
+              scale,
+              width: titleTight,
+              transformOrigin: "left top",
+              ease: "power3.inOut",
+              duration: 0.82,
+            },
+            0.04,
+          );
+          // The last name lands right beside the tightened wordmark; the role
+          // sits under the name line. Positions use the exact scale the tween
+          // ends on, so caps meets the wordmark's edge with no overlap or gap.
+          if (caps) {
+            caps.style.left = `${String(landedRight + 0.4 * rootFont)}px`;
+            caps.style.top = `${String(anchor.top)}px`;
+            caps.style.fontSize = `${String(1.3 * rootFont)}px`;
+          }
+          if (role) {
+            role.style.left = `${String(anchor.left)}px`;
+            role.style.top = `${String(anchor.top + landedH + 0.35 * rootFont)}px`;
+          }
+        }
+
+        tl = timeline;
+        return timeline;
       };
+
       build();
       gsap.set([...railOnly, panel].filter(Boolean), { autoAlpha: 0 });
       gsap.set(heroOnly, { autoAlpha: 1 });
@@ -174,30 +252,21 @@ export function HeroChrome() {
         },
         onUpdate: (self) => {
           const p = self.progress;
-          flip?.progress(p);
+          tl?.progress(p);
           if (panel) {
             gsap.set(panel, {
               autoAlpha: gsap.utils.clamp(0, 1, (p - 0.3) / 0.3),
             });
           }
           gsap.set(railOnly, {
-            autoAlpha: gsap.utils.clamp(0, 1, (p - 0.6) / 0.3),
+            autoAlpha: gsap.utils.clamp(0, 1, (p - 0.62) / 0.26),
           });
           gsap.set(heroOnly, {
-            autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.45),
+            autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.4),
           });
-          if (wordmark) {
-            // The wordmark slides and shrinks toward the rail's name mark, so
-            // the title relocates into the sidebar rather than just fading.
-            const e = gsap.utils.clamp(0, 1, p / 0.72);
-            gsap.set(wordmark, {
-              transformOrigin: "left top",
-              x: wordTo.x * e,
-              y: wordTo.y * e,
-              scale: gsap.utils.interpolate(1, wordTo.scale, e),
-              autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.78),
-            });
-          }
+          // Lift the wordmark above the glass panel only once it has entered
+          // the rail; before that it stays behind the portrait for occlusion.
+          if (title) title.style.zIndex = p > 0.5 ? "31" : "";
           resolveRoute();
         },
       });
@@ -219,7 +288,8 @@ export function HeroChrome() {
       return () => {
         st.kill();
         tracker.kill();
-        flip?.kill();
+        tl?.kill();
+        if (title) title.style.zIndex = "";
       };
     });
 
@@ -234,30 +304,39 @@ export function HeroChrome() {
           travelling inside it rather than over open page. */}
       <div data-chrome-panel className="hero-chrome-panel glass rounded-md" />
 
-      {/* Rail-only header: the full name mark (caps) + role. */}
-      <div data-chrome-rail className="hero-chrome-mark">
-        <a
-          href="#intro"
-          className="type-display block text-lede leading-[1.05] font-extrabold tracking-tight text-accent uppercase"
-        >
-          {content.intro.name}
-        </a>
-        <p className="mt-1 font-mono text-fine tracking-wide text-slate uppercase">
-          {content.intro.role}
-        </p>
-      </div>
+      {/* Rail-only: the last name lands beside the slid wordmark, and the role
+          sits under the name line. Both JS-positioned against the wordmark. */}
+      <span
+        data-chrome-rail
+        className="hero-chrome-caps type-display font-extrabold whitespace-nowrap text-accent uppercase leading-none"
+      >
+        {lastName}
+      </span>
+      <span
+        data-chrome-rail
+        className="hero-chrome-role font-mono text-fine tracking-wide text-slate uppercase"
+      >
+        {content.intro.role}
+      </span>
 
-      {/* Shared: the working philosophy — hero right, then the rail. */}
-      <p data-chrome-flip className="hero-chrome-philosophy text-slate">
-        {content.intro.philosophy}
+      {/* Hero-only: the working philosophy. Its words lift and fade left to
+          right on scroll rather than relocating to the rail. */}
+      <p className="hero-chrome-philosophy text-slate">
+        {philoWords.map((word, i) => (
+          <Fragment key={`${word}-${String(i)}`}>
+            <span data-philo-word className="inline-block will-change-transform">
+              {word}
+            </span>
+            {i < philoWords.length - 1 ? " " : ""}
+          </Fragment>
+        ))}
       </p>
 
-      {/* Shared: the proof numbers. The accent is spent only on the value and
-          a thin left rule — the card itself stays paper, so the amber reads as
-          an accent, not a fill. */}
-      <dl data-chrome-flip className="hero-chrome-stats">
+      {/* Shared: the proof numbers. Each card travels to the rail on its own
+          stagger. The accent is spent only on the value and a thin left rule. */}
+      <dl className="hero-chrome-stats">
         {content.intro.proofs.map((proof) => (
-          <div key={proof.label} className="hero-chrome-stat">
+          <div key={proof.label} data-morph="stat" className="hero-chrome-stat">
             <dd className="type-display font-semibold whitespace-nowrap text-accent">
               {proof.value}
             </dd>
@@ -266,11 +345,23 @@ export function HeroChrome() {
         ))}
       </dl>
 
-      {/* Shared: the routes, flanking the portrait, converging on the rail.
-          One nav landmark; two lists positioned independently for the split. */}
+      {/* Shared: the routes. One row under the wordmark on load; each link
+          travels to the rail column independently. */}
       <nav aria-label="Primary" className="hero-chrome-navwrap">
-        <NavGroup routes={NAV_LEFT} align="hero-chrome-nav--left" />
-        <NavGroup routes={NAV_RIGHT} align="hero-chrome-nav--right" />
+        <ul className="hero-chrome-nav">
+          {NAV.map((item) => (
+            <li key={item.href} data-morph="nav">
+              <a
+                href={item.href}
+                data-rail-link={item.href.slice(1)}
+                data-active="false"
+                className="hero-chrome-link transition-micro font-mono text-label text-ink transition-colors hover:text-signal"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </nav>
 
       {/* Rail-only: social links. */}
