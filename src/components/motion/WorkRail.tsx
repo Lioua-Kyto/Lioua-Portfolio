@@ -29,9 +29,30 @@ export function WorkRail() {
     const mm = gsap.matchMedia();
 
     mm.add("(min-width: 1024px)", () => {
-      const overflow = () =>
-        Math.max(0, track.scrollWidth - viewport.clientWidth);
-      if (overflow() === 0) return;
+      // The track travels between two centred positions rather than between
+      // its own edges: card 01 sits in the middle of the screen the moment the
+      // section pins, and the last card ends there. Anchoring on x:0 meant the
+      // first card was already off to the left on arrival and the second one
+      // was the one being read.
+      // Where the track must sit for `card` to be centred on screen. Measured
+      // off the live rect with the current translation backed out, so it is
+      // correct whenever it is called — mid-scrub included.
+      const centreOffset = (card: HTMLElement) => {
+        const x = Number(gsap.getProperty(track, "x"));
+        const cardCentre =
+          card.getBoundingClientRect().left - x + card.offsetWidth / 2;
+        return window.innerWidth / 2 - cardCentre;
+      };
+      const first = cards[0];
+      const last = cards[cards.length - 1];
+      if (!first || !last) return;
+      const startX = () => centreOffset(first);
+      const endX = () => centreOffset(last);
+      const travel = () => Math.max(0, startX() - endX());
+      // A beat of held scroll after the last card lands, so it is read at full
+      // strength before the section lets go.
+      const dwell = () => window.innerHeight * 0.45;
+      if (travel() === 0) return;
 
       // Whichever card sits closest to the middle of the screen is the one
       // being read. Measured from the live rects so it stays correct however
@@ -53,24 +74,26 @@ export function WorkRail() {
         }
       };
 
-      gsap.fromTo(
-        track,
-        { x: 0 },
-        {
-          x: () => -overflow(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: () => `+=${String(overflow())}`,
-            pin: true,
-            scrub: scrub.rail,
-            invalidateOnRefresh: true,
-            onUpdate: markActive,
-            onRefresh: markActive,
-          },
+      // Durations are in scroll pixels, so the travel maps 1:1 and the trailing
+      // hold consumes exactly `dwell` of scroll with the track standing still.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: () => `+=${String(travel() + dwell())}`,
+          pin: true,
+          scrub: scrub.rail,
+          invalidateOnRefresh: true,
+          onUpdate: markActive,
+          onRefresh: markActive,
         },
-      );
+      });
+      tl.fromTo(
+        track,
+        { x: () => startX() },
+        { x: () => endX(), ease: "none", duration: () => travel() },
+        0,
+      ).to({}, { duration: () => dwell() });
     });
 
     mm.add("(max-width: 1023.98px)", () => {

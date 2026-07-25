@@ -2,8 +2,10 @@ import type { z } from "zod";
 import type { contentSchema } from "./schemas";
 
 /**
- * The site's entire copy and data — real and final unless marked
- * TODO(author). Metrics come from the résumé only; nothing invented.
+ * The site's entire copy and data. Reviewed and approved by the author;
+ * metrics come from the résumé only, nothing invented. The remaining
+ * `todos` entries are missing assets (captures, live links), not unreviewed
+ * copy.
  */
 export const rawContent: z.input<typeof contentSchema> = {
   site: {
@@ -62,8 +64,7 @@ export const rawContent: z.input<typeof contentSchema> = {
     education:
       "Diploma, CS — ranked 1st in cohort · GPA 14.79/20 · dual-study, 2.5y placement",
   },
-  // TODO(author): this is the site's voice — read it aloud and cut anything
-  // that sounds like someone else wrote it about you.
+  // The site's voice — read aloud and approved.
   sections: {
     background: {
       heading: "How I got here.",
@@ -86,11 +87,11 @@ export const rawContent: z.input<typeof contentSchema> = {
       lede: "Open to backend and full-stack work. Tell me what's breaking; I'll tell you how I'd come at it.",
     },
   },
-  // TODO(author): confirm these are your real beliefs, reword freely.
+  // Confirmed by the author as genuinely held, each with its receipt.
   principles: [
     {
       title: "The server is the source of truth.",
-      body: "Clients lie — not on purpose, just constantly. Prices, stock, permissions: recompute all of it server-side and let the client be a pretty view of the truth.",
+      body: "A browser can be edited, replayed, or simply out of date — never maliciously, just constantly. Prices, stock, permissions: recompute all of it server-side and let the front end be a pretty view of the truth.",
       practice:
         "Rezervitoo decides every price and every availability window on the backend. The client renders what it is told, and nothing it renders can be argued with.",
     },
@@ -254,7 +255,6 @@ export const rawContent: z.input<typeof contentSchema> = {
     ],
     // Framed as working disciplines, not a resume dump — each group is how
     // the work is actually organised day to day.
-    // TODO(author): extend the AI group with any assistants you use daily.
     inventory: [
       {
         group: "AI-Assisted Engineering",
@@ -342,15 +342,14 @@ export const rawContent: z.input<typeof contentSchema> = {
         items: ["Python", "JavaScript (ES6+)", "TypeScript", "Dart", "SQL"],
       },
       {
-        group: "Practice",
+        group: "Testing & Tooling",
         items: [
           "PyTest",
           "Jest",
           "Supertest",
+          "Postman",
           "Swagger / OpenAPI",
-          "Stripe",
-          "Brevo",
-          "Release ownership",
+          "Git / code review",
         ],
       },
     ],
