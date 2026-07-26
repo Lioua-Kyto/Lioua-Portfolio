@@ -27,7 +27,51 @@
   --signal: #a0590d;
   --ok: #3f7a50; /* form states only */
   --err: #b23830; /* form states only */
+}
 
+/* ---- Palette variants (temporary, for choosing) ----
+   Every colour on the site derives from the tokens above, so a palette is a
+   token swap and nothing else. `VariantSwitcher` writes `data-theme` on the
+   root; delete these blocks, the switcher, and its mount once a palette is
+   locked in. */
+
+/* Ink ground. The portrait's navy suit reads hardest against near-black, and
+   the amber has to brighten to hold contrast on a dark field. */
+:root[data-theme="ink"] {
+  --paper: #121211;
+  --surface: #1d1d1a;
+  --ink: #f2efe8;
+  --slate: #9d968a;
+  --accent: #e08a2b;
+  --accent-deep: #e08a2b;
+  --accent-soft: #3b2a14;
+  --signal: #f0a75a;
+}
+
+/* Cool bone. The same composition with the warmth taken out of the ground —
+   the amber stops reading as part of a warm-craft palette and starts reading
+   as the one deliberate colour on a neutral page. */
+:root[data-theme="bone"] {
+  --paper: #f1f1ef;
+  --surface: #e6e6e3;
+  --ink: #15151a;
+  --slate: #64646b;
+}
+
+/* Blue ground. Drops the complementary amber for the suit's own hue, which
+   reads engineered rather than artisan. */
+:root[data-theme="cobalt"] {
+  --paper: #f2f2f0;
+  --surface: #e6e7e6;
+  --ink: #14141a;
+  --slate: #63636b;
+  --accent: #2b4ecc;
+  --accent-deep: #2b4ecc;
+  --accent-soft: #ccd6f7;
+  --signal: #2440a8;
+}
+
+:root {
   /* Type — three voices. Display: Bricolage Grotesque (expressive grotesque,
      the wordmark + headings). Body: General Sans. Utility: Martian Mono for
      labels, data, and section numbers. */

@@ -1068,3 +1068,98 @@
     background: color-mix(in oklab, var(--signal) 22%, transparent);
   }
 }
+
+/* Unlayered on purpose: these override Tailwind utility classes on the same
+   elements, and utilities beat anything inside @layer no matter how specific. */
+/* ---- Toolkit layout variants (temporary, for choosing) ----
+   The "ruled" variant restyles the same markup rather than duplicating it:
+   the boxes come off, the groups run as a two-column ruled index, the group
+   name takes display size, and the tools read as a line of text instead of
+   sixty little chips. Delete this block with the switcher. */
+:root[data-toolkit="ruled"] .toolkit-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+@media (min-width: 768px) {
+  :root[data-toolkit="ruled"] .toolkit-list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: clamp(2rem, 5vw, 5rem);
+  }
+}
+:root[data-toolkit="ruled"] .toolkit-group {
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  border-radius: 0;
+  background: none;
+  padding: 1.75rem 0;
+}
+/* The index and the tool count are decoration, not information. */
+:root[data-toolkit="ruled"] .toolkit-meta {
+  display: none;
+}
+:root[data-toolkit="ruled"] .toolkit-name {
+  margin-top: 0;
+  font-size: var(--text-headline);
+  line-height: 1.05;
+  font-weight: 500;
+}
+:root[data-toolkit="ruled"] .toolkit-tags {
+  margin-top: 0.9rem;
+  display: block;
+  max-width: 40ch;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-fine);
+  line-height: 1.9;
+  color: var(--slate);
+}
+:root[data-toolkit="ruled"] .toolkit-tag {
+  display: inline;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+:root[data-toolkit="ruled"] .toolkit-tag::after {
+  content: " / ";
+  color: color-mix(in oklab, var(--ink) 25%, transparent);
+}
+:root[data-toolkit="ruled"] .toolkit-tag:last-child::after {
+  content: "";
+}
+
+/* ---- The variant switcher (temporary) ---- */
+.variant-switcher {
+  position: fixed;
+  right: max(1rem, 2vw);
+  bottom: max(1rem, 2vh);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--paper) 94%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+  box-shadow: 0 12px 32px -18px color-mix(in oklab, var(--ink) 60%, transparent);
+}
+.variant-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.variant-key {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-fine);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: none;
+}
+.variant-key[data-on="true"] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
