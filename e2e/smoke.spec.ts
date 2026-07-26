@@ -422,14 +422,17 @@ test.describe("reduced motion", () => {
     page,
   }) => {
     await page.goto("/");
-    // The marquee is the one thing that moves without being asked to; under
-    // reduced motion it holds still.
+    // Nothing on the page plays on its own. The marquee is scroll-driven like
+    // everything else, so with the scroll position untouched it must be
+    // motionless — sampled after its scrub has settled onto the current
+    // position, which is a one-off on load rather than a loop.
     const marqueeX = () =>
       page.evaluate(() => {
         const track = document.querySelector("[data-marquee-track]");
         if (!track) return 0;
         return new DOMMatrixReadOnly(getComputedStyle(track).transform).m41;
       });
+    await page.waitForTimeout(1500);
     const first = await marqueeX();
     await page.waitForTimeout(900);
     expect(await marqueeX()).toBe(first);

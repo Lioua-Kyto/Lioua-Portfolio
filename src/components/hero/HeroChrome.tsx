@@ -61,6 +61,7 @@ function WhatsappIcon() {
  * scrolls away.
  */
 export function HeroChrome() {
+  const firstName = content.intro.name.split(" ")[0] ?? content.intro.name;
   const lastName = content.intro.name.split(" ").slice(1).join(" ");
   const philoWords = content.intro.philosophy.split(" ");
 
@@ -153,6 +154,7 @@ export function HeroChrome() {
       const title = document.querySelector<HTMLElement>("[data-hero='title']");
       const h1 = title?.querySelector<HTMLElement>("h1") ?? null;
       const caps = document.querySelector<HTMLElement>(".hero-chrome-caps");
+      const firstMark = document.querySelector<HTMLElement>("[data-chrome-first]");
       const role = document.querySelector<HTMLElement>(".hero-chrome-role");
       const statLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="stat"]');
       const navLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="nav"]');
@@ -164,8 +166,6 @@ export function HeroChrome() {
       // real-font copy once it settles (a 20x transform scale of a 600px font
       // rasterises soft). These carry the settled crisp form between builds.
       let titleTl: gsap.core.Timeline | null = null;
-      let crispX = 0;
-      let crispY = 0;
       let landedFont = 0;
       let crisped = false;
 
@@ -202,7 +202,12 @@ export function HeroChrome() {
           titleTight = h1.getBoundingClientRect().width;
           h1.style.width = prev;
         }
-        const anchor = caps?.getBoundingClientRect() ?? null;
+        // The landing spot is the chrome-layer copy's own CSS position, sized
+        // to the rail name, so the travelling title and its replacement agree
+        // without either being positioned from the other.
+        landedFont = 1.3 * rootFont;
+        if (firstMark) firstMark.style.fontSize = `${String(landedFont)}px`;
+        const anchor = firstMark?.getBoundingClientRect() ?? null;
 
         root.dataset.state = "rail";
         const railRect = new Map<HTMLElement, DOMRect>();
@@ -261,7 +266,6 @@ export function HeroChrome() {
         // "LIOUA ZEDDAM" fits the rail side by side. It rides `titleTl` so the
         // scaled transform can be swapped for a crisp real-font copy at settle.
         if (h1 && titleHero && anchor && titleTight && titleFont) {
-          landedFont = 1.3 * rootFont;
           const scale = landedFont / titleFont;
           titleTl = gsap.timeline({ paused: true });
           titleTl.fromTo(
@@ -279,20 +283,10 @@ export function HeroChrome() {
             0,
           );
 
-          // Measure the crisp settled form (real font, no scale): where the
-          // 1.3rem wordmark sits, so the swap lands pixel-for-pixel and the
-          // last name can butt right against its true edge.
-          h1.style.fontSize = `${String(landedFont)}px`;
-          h1.style.width = "max-content";
-          h1.style.transform = "none";
-          const cr = h1.getBoundingClientRect();
-          crispX = anchor.left - cr.left;
-          crispY = anchor.top - cr.top;
-          const landedW = cr.width;
-          const landedH = cr.height;
-          h1.style.fontSize = "";
-          h1.style.width = "";
-          h1.style.transform = "";
+          // The replacement copy's own box gives the landed footprint, so the
+          // last name butts against the mark's true edge.
+          const landedW = anchor.width;
+          const landedH = anchor.height;
 
           // The last name lands right beside the wordmark; the role sits under
           // the name line. caps matches the wordmark's font exactly, so the two
@@ -324,26 +318,24 @@ export function HeroChrome() {
       const apply = (p: number) => {
         tl?.progress(p);
 
-          // The wordmark travels over p [0.04, 0.86]; at settle, swap the
-          // scaled transform for the crisp real-font copy so it reads sharp.
+          // The wordmark travels over p [0.04, 0.86]. At settle it hands off to
+          // the chrome-layer copy sitting at the same spot: the travelling
+          // element lives under the portrait (so it is never seen in front of
+          // it) but is therefore also under the glass panel, which blurs it.
+          // The copy is above the panel, so the mark comes to rest sharp.
           if (h1 && titleTl) {
             const tp = gsap.utils.clamp(0, 1, (p - 0.04) / 0.82);
             if (tp >= 0.999) {
               if (!crisped) {
                 crisped = true;
-                gsap.set(h1, {
-                  fontSize: landedFont,
-                  width: "max-content",
-                  x: crispX,
-                  y: crispY,
-                  scale: 1,
-                  transformOrigin: "left top",
-                });
+                gsap.set(h1, { autoAlpha: 0 });
+                if (firstMark) gsap.set(firstMark, { autoAlpha: 1 });
               }
             } else {
               if (crisped) {
                 crisped = false;
-                gsap.set(h1, { clearProps: "fontSize" });
+                gsap.set(h1, { autoAlpha: 1 });
+                if (firstMark) gsap.set(firstMark, { autoAlpha: 0 });
               }
               titleTl.progress(tp);
             }
@@ -360,11 +352,6 @@ export function HeroChrome() {
           gsap.set(heroOnly, {
             autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.4),
           });
-          // Lift the wordmark above the glass panel before the panel fades in,
-          // so its backdrop-filter never tints the orange letters yellow. By
-          // this point the portrait is already blurring, so losing the
-          // head-over-letters occlusion here is imperceptible.
-          if (title) title.style.zIndex = p > 0.26 ? "31" : "";
           // The route numbers belong to the rail only; `data-state` stays
           // "hero" (the morph is pure transform), so the rail look is flagged
           // separately.
@@ -420,7 +407,6 @@ export function HeroChrome() {
         tracker.kill();
         tl?.kill();
         titleTl?.kill();
-        if (title) title.style.zIndex = "";
       };
     });
 
@@ -435,7 +421,19 @@ export function HeroChrome() {
           travelling inside it rather than over open page. */}
       <div data-chrome-panel className="hero-chrome-panel glass rounded-md" />
 
-      {/* Rail-only: the last name lands beside the slid wordmark, and the role
+      {/* The wordmark's landing spot. The sliding title travels behind the
+          portrait and hands off to this copy the instant it arrives: same
+          place, same size, but painted in the chrome layer above the glass, so
+          it is not blurred by the panel's backdrop-filter the way the layer
+          underneath it is. The swap is invisible because the positions match. */}
+      <span
+        data-chrome-first
+        className="hero-chrome-first type-display font-extrabold whitespace-nowrap text-accent uppercase leading-none"
+      >
+        {firstName}
+      </span>
+
+      {/* Rail-only: the last name lands beside the wordmark, and the role
           sits under the name line. Both JS-positioned against the wordmark. */}
       <span
         data-chrome-rail

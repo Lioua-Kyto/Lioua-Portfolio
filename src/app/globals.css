@@ -84,8 +84,10 @@
    it sits above the page instead of dissolving into it. */
 @utility glass {
   background-color: color-mix(in oklab, var(--paper) 62%, transparent);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  /* Blur only — no saturate. Boosting saturation pushed the amber wordmark
+     travelling behind this sheet toward yellow for the length of the morph. */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid color-mix(in oklab, var(--ink) 9%, transparent);
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, white 60%, transparent),
@@ -334,6 +336,7 @@
     pointer-events: auto;
   }
   .hero-chrome-panel,
+  .hero-chrome-first,
   .hero-chrome-caps,
   .hero-chrome-role,
   .hero-chrome-thread,
@@ -436,6 +439,15 @@
   /* The rail name. `.hero-chrome-caps` (last name) and `.hero-chrome-role` are
      JS-positioned against the slid wordmark; these are the pre-build defaults —
      `left`/`top` of the caps also serve as the wordmark's landing anchor. */
+  /* The wordmark's landing spot — the travelling title hands off to this. It
+     starts hidden and is switched on by JS at the exact frame the title
+     arrives, so the two are never both visible. */
+  .hero-chrome-first {
+    left: 2.75rem;
+    top: var(--r-caps);
+    opacity: 0;
+    visibility: hidden;
+  }
   .hero-chrome-caps {
     left: 2.75rem;
     top: var(--r-caps);
@@ -654,6 +666,7 @@
      that scrolls away, so the rail-only parts are simply not shown. */
   @media (max-width: 1023.98px) {
     .hero-chrome-panel,
+    .hero-chrome-first,
     .hero-chrome-caps,
     .hero-chrome-role,
     .hero-chrome-thread,
@@ -665,33 +678,70 @@
     .hero-chrome-cta {
       display: none;
     }
-    .hero-chrome-philosophy {
-      left: var(--pad);
-      right: auto;
-      bottom: 20vh;
-      width: min(30ch, 70vw);
-      text-align: left;
-      font-size: var(--text-base);
+    /* No rail below this width, so the chrome stops being an absolutely
+       positioned layer and becomes an ordinary column stacked under the
+       wordmark. Absolute placement was tuned for the desktop composition; on a
+       phone the blocks landed on top of each other. */
+    .hero-chrome {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: clamp(0.75rem, 2.5vh, 1.5rem);
+      padding: 0 var(--pad) max(4vh, 1.5rem);
+    }
+    /* The portrait runs full strength behind the stack on a phone, and the
+       copy sits over the suit. A paper wash under the column keeps it legible
+       without dimming the photograph itself. */
+    .hero-chrome::before {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 58%;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(
+        to top,
+        var(--paper) 38%,
+        color-mix(in oklab, var(--paper) 72%, transparent) 70%,
+        transparent 100%
+      );
+    }
+    .hero-chrome-philosophy,
+    .hero-chrome-stats,
+    .hero-chrome-nav,
+    .hero-chrome-tagline {
+      position: static;
+      inset: auto;
+    }
+    .hero-chrome-nav {
+      order: 1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.1rem;
     }
     .hero-chrome-stats {
-      left: var(--pad);
-      bottom: 9vh;
+      order: 2;
+      flex-direction: row;
+      flex-wrap: wrap;
       gap: 0.5rem;
     }
     .hero-chrome-stat {
-      width: 11rem;
+      flex: 1 1 9rem;
+      min-width: 8.5rem;
       padding: 0.4rem 0.5rem 0.4rem 0.85rem;
     }
     .hero-chrome-stat dd {
-      font-size: var(--text-lede);
+      font-size: var(--text-base);
     }
-    .hero-chrome-nav {
-      left: var(--pad);
-      right: auto;
-      top: calc(var(--name-bottom) + 1rem);
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 1rem 1.25rem;
+    .hero-chrome-philosophy {
+      order: 3;
+      width: min(34ch, 100%);
+      text-align: left;
+      font-size: var(--text-lede);
+      line-height: 1.3;
+    }
+    .hero-chrome-tagline {
+      order: 4;
     }
   }
 
@@ -706,17 +756,22 @@
     --mx: 50%;
     --my: 50%;
     --spot-r: clamp(70px, 9vw, 150px);
-    position: relative;
-    display: block;
+    /* Both layers occupy the same grid cell. Absolute positioning put the
+       accent copy on its own baseline, so the two outlines sat a few pixels
+       apart and the mark read as doubled boxes rather than letters. */
+    display: grid;
     user-select: none;
+  }
+  .footer-mark-layer {
+    grid-area: 1 / 1;
   }
   .footer-mark-layer {
     display: block;
     font-family: var(--font-display-stack);
     font-optical-sizing: auto;
-    /* One line, edge to edge: sized off the viewport and the glyph count so
-       the name fills the measure without the letters being flung apart. */
-    font-size: clamp(2rem, 15.5vw, 13rem);
+    /* One line, edge to edge. The size is measured and set by FooterMark; the
+       clamp is only the pre-hydration fallback. */
+    font-size: var(--mark-size, clamp(2rem, 13vw, 13rem));
     line-height: 0.82;
     font-weight: 800;
     letter-spacing: -0.02em;
@@ -726,8 +781,6 @@
     -webkit-text-stroke: 1px color-mix(in oklab, var(--ink) 20%, transparent);
   }
   .footer-mark-glow {
-    position: absolute;
-    inset: 0;
     -webkit-text-stroke-color: var(--accent);
     opacity: var(--spot);
     transition: opacity var(--dur-base, 0.35s) var(--ease-out);
@@ -756,6 +809,123 @@
     .footer-mark-glow {
       color: color-mix(in oklab, var(--accent) 60%, transparent);
     }
+  }
+
+  /* ---- Project pages ---- */
+
+  /* The card's title link stretches over the whole card, so the image and the
+     hook are clickable without nesting the card's own links inside it. */
+  .work-card-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .work-card-link:hover {
+    color: var(--accent);
+  }
+  .work-card a:not(.work-card-link) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .work-shot-button {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: zoom-in;
+  }
+  /* The media is taller than its frame so the parallax has room to travel
+     without exposing an edge. */
+  .work-shot-media {
+    position: absolute;
+    inset: -6% 0;
+    display: block;
+  }
+  .work-shot-zoom {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--ink) 82%, transparent);
+    color: var(--paper);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity var(--dur-micro) var(--ease-out);
+  }
+  .work-shot-button:hover .work-shot-zoom,
+  .work-shot-button:focus-visible .work-shot-zoom {
+    opacity: 1;
+  }
+  .work-shot-caption {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    max-width: 56ch;
+  }
+
+  /* ---- The zoom viewer ---- */
+  .shot-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+  }
+  .shot-viewer-scrim {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in oklab, var(--ink) 86%, transparent);
+    backdrop-filter: blur(6px);
+    cursor: zoom-out;
+  }
+  .shot-viewer-stage {
+    position: relative;
+    width: min(94vw, 84rem);
+    height: min(82vh, 52rem);
+    overflow: hidden;
+    touch-action: none;
+    cursor: grab;
+  }
+  .shot-viewer-stage:active {
+    cursor: grabbing;
+  }
+  .shot-viewer-frame {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+  .shot-viewer-bar {
+    position: absolute;
+    bottom: max(1rem, 3vh);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--paper) 94%, transparent);
+    border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  }
+  .shot-viewer-key {
+    min-width: 1.9rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+    font-family: var(--font-mono-stack);
+    font-size: var(--text-fine);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    transition: background-color var(--dur-micro) var(--ease-out);
+  }
+  .shot-viewer-key:hover {
+    background: color-mix(in oklab, var(--ink) 8%, transparent);
   }
 
   html::-webkit-scrollbar,

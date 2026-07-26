@@ -1,7 +1,14 @@
 import type { MetadataRoute } from "next";
 import { content } from "@/content";
 
-/** Sitemap: the homepage only until v3 routes exist. */
+/** The homepage plus a page per project. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [{ url: `https://${content.site.domain}`, priority: 1 }];
+  const base = `https://${content.site.domain}`;
+  return [
+    { url: base, priority: 1 },
+    ...content.work.map((item) => ({
+      url: `${base}/work/${item.slug}`,
+      priority: 0.8,
+    })),
+  ];
 }
