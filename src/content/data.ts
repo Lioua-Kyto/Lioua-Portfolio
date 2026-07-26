@@ -136,6 +136,63 @@ export const rawContent: z.input<typeof contentSchema> = {
         alt: "Rezervitoo's provider dashboard — bookings, listings and revenue in one view.",
         fit: "cover",
       },
+      gallery: [
+        {
+          src: "/work/Rezervitoo/dashboard.webp",
+          alt: "The Rezervitoo provider dashboard.",
+          caption:
+            "Where a provider lands: occupancy, bookings and revenue resolved server-side before the page paints.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/listings.webp",
+          alt: "The listings index.",
+          caption:
+            "Hotels, hostels, agencies and hosts in one index. Four provider types, one polymorphic model underneath.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/listing-details.webp",
+          alt: "A single listing's detail view.",
+          caption: null,
+          fit: "contain",
+        },
+        {
+          src: "/work/Rezervitoo/providers-ar.webp",
+          alt: "The providers screen rendered in Arabic, right to left.",
+          caption:
+            "The same screen in Arabic. The layout mirrors — navigation, tables, icons — not just the strings.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/swagger-api.webp",
+          alt: "The project's OpenAPI documentation.",
+          caption:
+            "Every endpoint documented as it was written. This is where the 400+ figure comes from.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/dashboard-dark.webp",
+          alt: "The dashboard in dark mode.",
+          caption:
+            "Theming is a token swap, not a second stylesheet.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/reports.webp",
+          alt: "The reports queue.",
+          caption:
+            "Moderation and reporting, because a multi-provider marketplace needs an answer for bad actors on day one.",
+          fit: "cover",
+        },
+        {
+          src: "/work/Rezervitoo/notifications-dark.webp",
+          alt: "Live notifications.",
+          caption:
+            "Pushed over Channels behind a custom JWT WebSocket middleware — no polling, no refresh.",
+          fit: "cover",
+        },
+      ],
       access: "code private — production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
@@ -163,6 +220,61 @@ export const rawContent: z.input<typeof contentSchema> = {
         alt: "The Faderco portal's in-browser interview room, built on WebRTC.",
         fit: "cover",
       },
+      gallery: [
+        {
+          src: "/work/JobPortal/hr-callroom.webp",
+          alt: "The in-browser interview room.",
+          caption:
+            "The change that mattered: interviews moved into the browser over WebRTC, and a four-hour round-trip per candidate became zero.",
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/hr-dashboard.webp",
+          alt: "The HR dashboard.",
+          caption:
+            "The pipeline at a glance — what replaced the spreadsheet.",
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/hr-applications.webp",
+          alt: "The applications queue.",
+          caption:
+            "Intake through offer for 50+ candidates a cycle.",
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/hr-interviews.webp",
+          alt: "Interview scheduling.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/hr-talentpool.webp",
+          alt: "The talent pool.",
+          caption:
+            "Candidates who were not right this time, kept findable for when they are.",
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/hr-jobposts.webp",
+          alt: "Job post management.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/dm-dashboard.webp",
+          alt: "The department manager's view.",
+          caption:
+            "A second role with its own surface: managers raise requests, HR runs the process.",
+          fit: "cover",
+        },
+        {
+          src: "/work/JobPortal/login.webp",
+          alt: "Sign-in, over Google OAuth2.",
+          caption: null,
+          fit: "cover",
+        },
+      ],
       access: "internal tool — code stays with Faderco",
       links: { live: null, source: null },
       todos: [],
@@ -189,6 +301,60 @@ export const rawContent: z.input<typeof contentSchema> = {
         alt: "BrewPhoria's storefront home screen on mobile.",
         fit: "contain",
       },
+      gallery: [
+        {
+          src: "/work/Brewphoria/onboarding-1.webp",
+          alt: "The onboarding screen.",
+          caption:
+            "First Flutter build. I did not know the framework when I started this.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/home-l.webp",
+          alt: "The storefront home screen.",
+          caption: null,
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/product-detail-l-1.webp",
+          alt: "A product detail screen.",
+          caption:
+            "Options, sizes and extras priced as you choose them.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/product-detail-options-d.webp",
+          alt: "Product options in dark mode.",
+          caption:
+            "Light and dark carried through every screen, not just the shell.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/cart-l.webp",
+          alt: "The cart.",
+          caption: null,
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/checkout-l.webp",
+          alt: "Checkout.",
+          caption: null,
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/loyalty-l.webp",
+          alt: "The loyalty screen.",
+          caption:
+            "Points, tiers and redemption — the reason a coffee app gets opened twice a day.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/orders-d.webp",
+          alt: "Order history in dark mode.",
+          caption: null,
+          fit: "contain",
+        },
+      ],
       access: "public repo — link on its way",
       links: { live: null, source: null },
       todos: [
@@ -219,6 +385,59 @@ export const rawContent: z.input<typeof contentSchema> = {
         alt: "FitGuild's storefront home page.",
         fit: "cover",
       },
+      gallery: [
+        {
+          src: "/work/FitGuild/home.webp",
+          alt: "The FitGuild storefront.",
+          caption:
+            "Built to sharpen the full-stack loop end to end — storefront, admin and the data between them.",
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/shop.webp",
+          alt: "The shop index.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/p-details.webp",
+          alt: "A product page.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/checkout.webp",
+          alt: "Checkout.",
+          caption:
+            "Atomic — the order either exists completely or not at all.",
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/ad-analytics.webp",
+          alt: "The admin analytics view.",
+          caption:
+            "The half most storefront demos skip: the operator's side.",
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/ad-products.webp",
+          alt: "Product administration.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/ad-orders.webp",
+          alt: "Order administration.",
+          caption: null,
+          fit: "cover",
+        },
+        {
+          src: "/work/FitGuild/ad-inventory.webp",
+          alt: "Inventory.",
+          caption: null,
+          fit: "cover",
+        },
+      ],
       access: "live site — repo private",
       links: { live: null, source: null },
       todos: [
@@ -242,6 +461,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Scoring blends accuracy, streak, and response time into per-category progression.",
       ],
       cover: null,
+      gallery: [],
       access: "repo private",
       links: { live: null, source: null },
       todos: ["TODO(author): captures (game mid-play, leaderboard, analytics)"],

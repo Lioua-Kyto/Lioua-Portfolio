@@ -19,6 +19,18 @@ export const readoutSchema = z.object({
 });
 
 /**
+ * One capture on a project's page. `fit` is explicit because the shots are a
+ * mix of 16:9 desktop and tall phone screens; `caption` is what the shot is
+ * being shown to prove, and is what the scrollytelling reveals beside it.
+ */
+export const shotSchema = z.object({
+  src: z.string().min(1),
+  alt: z.string().min(1),
+  caption: z.string().min(1).nullable(),
+  fit: z.enum(["cover", "contain"]),
+});
+
+/**
  * One piece of work — client engagements and personal products in a single
  * shape, because the site presents them as one body of work, not two lists.
  * `kind` is the only thing that tells them apart in the UI.
@@ -52,6 +64,8 @@ export const workSchema = z.object({
       fit: z.enum(["cover", "contain"]),
     })
     .nullable(),
+  /** The captures shown on the project's own page, in reading order. */
+  gallery: z.array(shotSchema).default([]),
   /** Honest access/status line, e.g. `code private — client work`. */
   access: z.string().min(1),
   links: z.object({
@@ -154,6 +168,7 @@ export const contentSchema = z.object({
   }),
 });
 
+export type Shot = z.infer<typeof shotSchema>;
 export type SectionCopy = z.infer<typeof sectionCopySchema>;
 export type Readout = z.infer<typeof readoutSchema>;
 export type Work = z.infer<typeof workSchema>;

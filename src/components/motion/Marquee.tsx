@@ -3,13 +3,18 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
-import { prefersReducedMotion } from "@/lib/motion/reduced";
+import { scrub } from "@/lib/motion/tokens";
 
 /**
- * A slow textural marquee — one band of discipline phrases looping between
- * sections, easing to near-stop on hover. Two copies of the track make the
- * `-50%` loop seamless. This one autoplays, so it is the rare piece that stays
- * still under prefers-reduced-motion. Decorative, so hidden from assistive tech.
+ * A textural band of discipline phrases between sections, drawn left to right
+ * by the scroll. Two copies of the track make the `-50%` travel seamless.
+ *
+ * It is scroll-driven rather than autoplaying, which is the same bargain the
+ * rest of the site makes: motion that only advances while the reader is
+ * actively scrolling carries none of the vestibular risk of a loop that plays
+ * on its own, so it does not have to be stilled under prefers-reduced-motion —
+ * where, as an autoplaying marquee, it simply never moved. Decorative, so
+ * hidden from assistive tech.
  */
 export function Marquee({ items }: { items: readonly string[] }) {
   const scope = useRef<HTMLDivElement>(null);
@@ -18,28 +23,26 @@ export function Marquee({ items }: { items: readonly string[] }) {
     () => {
       const root = scope.current;
       const track = root?.querySelector<HTMLElement>("[data-marquee-track]");
-      if (!root || !track || prefersReducedMotion()) return;
+      if (!root || !track) return;
 
       // Travels left to right: the track starts shifted a full copy to the
-      // left and walks back to zero, so the band reads against the direction
-      // the Work rail above it just moved.
-      const tween = gsap.fromTo(
+      // left and walks back to zero as the band crosses the viewport, so it
+      // reads against the direction the Work rail above it just moved.
+      gsap.fromTo(
         track,
         { xPercent: -50 },
-        { xPercent: 0, duration: 40, ease: "none", repeat: -1 },
+        {
+          xPercent: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: scrub.rail,
+            invalidateOnRefresh: true,
+          },
+        },
       );
-      const slow = () => {
-        gsap.to(tween, { timeScale: 0.12, duration: 0.4 });
-      };
-      const resume = () => {
-        gsap.to(tween, { timeScale: 1, duration: 0.4 });
-      };
-      root.addEventListener("pointerenter", slow);
-      root.addEventListener("pointerleave", resume);
-      return () => {
-        root.removeEventListener("pointerenter", slow);
-        root.removeEventListener("pointerleave", resume);
-      };
     },
     { scope },
   );

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Work as WorkItem } from "@/content/schemas";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
@@ -25,7 +26,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       data-work-card
       data-index={index}
       data-active={index === 0 ? "true" : "false"}
-      className="transition-micro flex w-[min(84vw,30rem)] shrink-0 flex-col opacity-40 transition-opacity duration-500 data-[active=true]:opacity-100"
+      className="work-card transition-micro relative flex w-[min(84vw,30rem)] shrink-0 flex-col opacity-40 transition-opacity duration-500 data-[active=true]:opacity-100"
     >
       <div className="flex items-center justify-between gap-4">
         <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">
@@ -79,7 +80,12 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       </p>
 
       <h3 className="type-display mt-1.5 text-title leading-tight font-semibold">
-        {item.title}
+        {/* The whole card reads as one target: the link stretches over it so
+            the image and the hook are clickable too, without nesting the
+            card's own links inside an anchor. */}
+        <Link href={`/work/${item.slug}`} className="work-card-link">
+          {item.title}
+        </Link>
       </h3>
 
       {/* The hook carries the card — the line said out loud. The longer
