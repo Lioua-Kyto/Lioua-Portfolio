@@ -46,8 +46,8 @@ export const rawContent: z.input<typeof contentSchema> = {
   timeline: [
     {
       year: "2022",
-      title: "Not sold on it yet",
-      text: "I enrolled in computer science because it was the sensible next step, not because I loved it. I did the work. I wasn't chasing anything.",
+      title: "Before it clicked",
+      text: "I came to computer science the way most people come to a degree: it was the sensible next step. I did the work, and did it properly. What I hadn't found yet was the part worth chasing.",
     },
     {
       year: "2023",
