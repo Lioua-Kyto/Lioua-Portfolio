@@ -397,6 +397,11 @@ export function HeroChrome() {
         trigger: document.documentElement,
         start: 0,
         end: () => ScrollTrigger.maxScroll(window),
+        // Refresh last. Pins add their spacers during refresh, so a tracker
+        // that measured earlier saw a page without the Work section's pin
+        // distance in it: the thread read 100% at the end of Work and the
+        // route offsets past it were wrong.
+        refreshPriority: -10,
         onUpdate: (self) => {
           if (threadFill) gsap.set(threadFill, { scaleY: self.progress });
           resolveRoute();
