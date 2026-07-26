@@ -852,6 +852,9 @@
        accent copy on its own baseline, so the two outlines sat a few pixels
        apart and the mark read as doubled boxes rather than letters. */
     display: grid;
+    /* Content-sized, not stretched: the layers must report the width of the
+       text so the fit can measure it. */
+    justify-items: start;
     user-select: none;
   }
   .footer-mark-layer {
@@ -884,9 +887,8 @@
     -webkit-text-stroke-color: var(--accent);
     opacity: var(--spot);
     transition: opacity var(--dur-base, 0.35s) var(--ease-out);
-    filter: drop-shadow(
-      0 0 12px color-mix(in oklab, var(--accent) 40%, transparent)
-    );
+    /* No drop-shadow: it threw an amber haze onto the paper around the letters.
+       The lit stroke alone carries the effect, so only the outline changes. */
     -webkit-mask-image: radial-gradient(
       circle var(--spot-r) at var(--mx) var(--my),
       #000 0%,
@@ -920,9 +922,6 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-  }
-  .work-card-link:hover {
-    color: var(--accent);
   }
   .work-card a:not(.work-card-link) {
     position: relative;

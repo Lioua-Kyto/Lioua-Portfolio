@@ -120,7 +120,7 @@ export default async function WorkDetail({
                   </span>
                 </>
               ) : (
-                <span className="text-base text-slate">—</span>
+                <span className="text-base text-slate">Not measured</span>
               )}
             </dd>
           </div>
@@ -174,8 +174,8 @@ export default async function WorkDetail({
               <Label index="A">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
-              Click any screen to open it in the zoom viewer — wheel to zoom,
-              drag to pan.
+              Click any screen to open it in the zoom viewer. Wheel to zoom, drag
+              to pan.
             </p>
             <WorkGallery shots={item.gallery} />
           </section>

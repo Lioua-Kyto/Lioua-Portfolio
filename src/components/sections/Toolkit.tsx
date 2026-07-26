@@ -3,10 +3,9 @@ import { Section } from "@/components/primitives/Section";
 import { MaskText } from "@/components/motion/MaskText";
 
 /**
- * 05 — Toolkit: the stack as a set of discipline cards (breedlove pattern) —
- * each numbered `T.0N` with an honest item count, a serif title, and the
- * tools as tags. Still no bars, percentages, or proficiency dots: a tag is
- * either in the list or it isn't.
+ * 05 Toolkit: the stack as a set of discipline groups, each with an honest
+ * item count and its tools as tags. No bars, percentages, or proficiency
+ * dots: a tag is either in the list or it isn't.
  */
 export function Toolkit() {
   const { inventory } = content.skills;

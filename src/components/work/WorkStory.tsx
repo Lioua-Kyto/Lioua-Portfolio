@@ -81,7 +81,8 @@ export function WorkStory({
                 src={shot.src}
                 alt={shot.alt}
                 fill
-                sizes="(max-width: 767px) 92vw, (max-width: 1279px) 80vw, 62rem"
+                sizes="(max-width: 767px) 92vw, (max-width: 1279px) 88vw, 77rem"
+                quality={90}
                 className={
                   shot.fit === "contain" ? "object-contain" : "object-cover"
                 }

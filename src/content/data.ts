@@ -9,7 +9,7 @@ import type { contentSchema } from "./schemas";
  */
 export const rawContent: z.input<typeof contentSchema> = {
   site: {
-    title: "Lioua Zeddam — Full Stack Developer",
+    title: "Lioua Zeddam · Full Stack Developer",
     description:
       "I build the systems behind the screens. Django · React · Flutter · PostgreSQL.",
     domain: "liouazeddam.dev",
@@ -20,7 +20,7 @@ export const rawContent: z.input<typeof contentSchema> = {
     line: "I build the systems behind the screens.",
     // The hook shown lower-right in the hero — the one line that has to land.
     philosophy:
-      "I ship whole products — with backends that stay fast under real load.",
+      "I ship whole products, with backends that stay fast under real load.",
     // Framed for what they say about the work, not lifted off a résumé:
     // breadth, performance, and real backend scale. (§5)
     proofs: [
@@ -31,7 +31,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       },
       {
         value: "~40ms",
-        label: "cached responses — effectively instant",
+        label: "cached responses, effectively instant",
         short: "cached responses",
       },
       {
@@ -57,42 +57,42 @@ export const rawContent: z.input<typeof contentSchema> = {
     {
       year: "2024",
       title: "Thrown in at the deep end",
-      text: "An apprenticeship at Faderco, starting from HTML and CSS. React by September, Django right after — and by December I was building their internal job portal for people who depended on it, not for a grade.",
+      text: "An apprenticeship at Faderco, starting from HTML and CSS. React by September, Django right after. By December I was building their internal job portal for people who depended on it, not for a grade.",
     },
     {
       year: "2025",
       title: "Graduated, then kept going",
-      text: "That portal graduated me first in my class. I could have stopped there. Instead I went looking for harder problems — FitGuild, then Cognitive, then Rezervitoo, where polymorphic models, a real service layer and hard caching finally made the architecture match the ambition.",
+      text: "That portal graduated me first in my class. I could have stopped there. Instead I went looking for harder problems: FitGuild, then Cognitive, then Rezervitoo, where polymorphic models, a real service layer and hard caching finally made the architecture match the ambition.",
     },
     {
       year: "2026",
       title: "Widening the stack",
-      text: "Flutter and Riverpod for BrewPhoria. Node, to stretch past my Django-and-React home ground. Now AI integration — deep enough to earn the title rather than claim it. This site is the current build.",
+      text: "Flutter and Riverpod for BrewPhoria. Node, to stretch past my Django-and-React home ground. Now AI integration, deep enough to earn the title rather than claim it. This site is the current build.",
     },
   ],
   about: {
     location: "Algeria · working worldwide (UTC+1)",
     languages: "AR native · EN C2 · FR B2",
     education:
-      "Diploma, CS — ranked 1st in cohort · GPA 14.79/20 · dual-study, 2.5y placement",
+      "Diploma, CS. Ranked 1st in cohort, GPA 14.79/20, with a 2.5-year placement.",
   },
   // The site's voice — read aloud and approved.
   sections: {
     background: {
       heading: "How I got here.",
-      lede: "Not a straight line, and no shortcut — the version with the 2am deploys and the “why is it slow now” left in.",
+      lede: "Not a straight line, and no shortcut. This is the version with the 2am deploys and the “why is it slow now” left in.",
     },
     principles: {
       heading: "Opinions I'll defend in review.",
-      lede: "Not borrowed from a blog post — these are the three things production argued me into, and they show up in every repo I touch.",
+      lede: "Not borrowed from a blog post. These are the three things production argued me into, and they show up in every repo I touch.",
     },
     work: {
       heading: "Things I've shipped.",
-      lede: "Client work and things I built to teach myself. Sole developer on nearly all of it — schema to deploy, nobody to hand the hard parts to.",
+      lede: "Client work and things I built to teach myself. Sole developer on nearly all of it, schema to deploy, with nobody to hand the hard parts to.",
     },
     toolkit: {
       heading: "What I reach for.",
-      lede: "Not everything I've touched — the tools I'd pick again, grouped by the problem they solve.",
+      lede: "Not everything I've touched. These are the tools I'd pick again, grouped by the problem they solve.",
     },
     contact: {
       heading: "Let's build something.",
@@ -103,7 +103,7 @@ export const rawContent: z.input<typeof contentSchema> = {
   principles: [
     {
       title: "The server is the source of truth.",
-      body: "A browser can be edited, replayed, or simply out of date — never maliciously, just constantly. Prices, stock, permissions: recompute all of it server-side and let the front end be a pretty view of the truth.",
+      body: "A browser can be edited, replayed, or simply out of date. Never maliciously, just constantly. Prices, stock, permissions: recompute all of it server-side and let the front end be a pretty view of the truth.",
       practice:
         "Rezervitoo decides every price and every availability window on the backend. The client renders what it is told, and nothing it renders can be argued with.",
     },
@@ -117,7 +117,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Shipped beats perfect.",
       body: "A deployed feature teaches more in a week than a perfect branch does in a month. Docker it, ship it, watch it, fix what the traffic actually breaks.",
       practice:
-        "Six products end to end. Every one of them taught me something the branch never would have — including the caching that took 176ms down to 40ms.",
+        "Six products end to end. Every one of them taught me something the branch never would have, including the caching that took 176ms down to 40ms.",
     },
   ],
   // 03 — Work: client engagements and the products I built to teach myself,
@@ -129,23 +129,23 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Rezervitoo",
       kind: "flagship",
       context: "Backend architect · the project I'm proudest of",
-      period: "Dec 2025 — now",
+      period: "Dec 2025 - now",
       hook: "The one I'm proudest of. The architecture finally caught up to the ambition.",
       summary:
-        "A live multi-provider booking platform — hotels, hostels, agencies, hosts — on one backend that's mine end to end.",
+        "A live multi-provider booking platform (hotels, hostels, agencies, hosts) on one backend that's mine end to end.",
       stack: "Django · DRF · PostgreSQL · Redis · Channels · TanStack Query",
       metric: {
         value: "~40ms",
-        label: "cached responses (from 176ms) — effectively instant",
+        label: "cached responses, down from 176ms",
       },
       highlights: [
-        "Four provider types wanted four schemas. They got one polymorphic model instead — about 60% less onboarding surface.",
+        "Four provider types wanted four schemas. They got one polymorphic model instead, cutting the onboarding surface by about 60%.",
         "Real-time notifications over Channels and FCM, behind a custom JWT WebSocket middleware.",
-        "Arabic, English, and French — the layout mirrors properly, not just the words.",
+        "Arabic, English, and French. The layout mirrors properly, not just the words.",
       ],
       cover: {
         src: "/work/Rezervitoo/dashboard.webp",
-        alt: "Rezervitoo's provider dashboard — bookings, listings and revenue in one view.",
+        alt: "Rezervitoo's provider dashboard showing bookings, listings and revenue.",
         fit: "cover",
       },
       gallery: [
@@ -173,7 +173,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/Rezervitoo/providers-ar.webp",
           alt: "The providers screen rendered in Arabic, right to left.",
           caption:
-            "The same screen in Arabic. The layout mirrors — navigation, tables, icons — not just the strings.",
+            "The same screen in Arabic. The layout mirrors: navigation, tables, icons, not just the strings.",
           fit: "cover",
         },
         {
@@ -201,11 +201,11 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/Rezervitoo/notifications-dark.webp",
           alt: "Live notifications.",
           caption:
-            "Pushed over Channels behind a custom JWT WebSocket middleware — no polling, no refresh.",
+            "Pushed over Channels behind a custom JWT WebSocket middleware. No polling, no refresh.",
           fit: "cover",
         },
       ],
-      access: "code private — production client work",
+      access: "code private, production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
     },
@@ -214,17 +214,17 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Faderco HR Portal",
       kind: "apprenticeship",
       context: "Apprenticeship · solo, 10 months",
-      period: "2024 — 2025",
+      period: "2024 - 2025",
       hook: "My first production system. Built it alone, from “what do you need” to “it's live.”",
       summary:
-        "An internal HR portal that retired the spreadsheets — candidate intake through offer, 50+ a cycle.",
+        "An internal HR portal that retired the spreadsheets: candidate intake through offer, 50+ a cycle.",
       stack: "Django · React · PostgreSQL · WebRTC · Google OAuth2",
       metric: {
         value: "4h → 0",
         label: "candidate round-trip per interview, once WebRTC shipped",
       },
       highlights: [
-        "Shipped their first remote interviewing with WebRTC — candidates stopped driving up to four hours each way.",
+        "Shipped their first remote interviewing with WebRTC. Candidates stopped driving up to four hours each way.",
         "A worker-evaluation module replaced paper and saved HR two hours of typing a cycle.",
       ],
       cover: {
@@ -244,7 +244,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/JobPortal/hr-dashboard.webp",
           alt: "The HR dashboard.",
           caption:
-            "The pipeline at a glance — what replaced the spreadsheet.",
+            "The pipeline at a glance. This is what replaced the spreadsheet.",
           fit: "cover",
         },
         {
@@ -287,7 +287,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "cover",
         },
       ],
-      access: "internal tool — code stays with Faderco",
+      access: "internal tool, code stays with Faderco",
       links: { live: null, source: null },
       todos: [],
     },
@@ -299,12 +299,12 @@ export const rawContent: z.input<typeof contentSchema> = {
       period: "2026",
       hook: "I didn't know Flutter. So I built a whole coffee app in it.",
       summary:
-        "Cross-platform coffee ordering — a Flutter client on a layered Node/Express/TypeScript API.",
+        "Cross-platform coffee ordering: a Flutter client on a layered Node/Express/TypeScript API.",
       stack:
         "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis · Gemini",
       metric: null,
       highlights: [
-        "Offline-first guest cart that merges conflict-free the moment you sign in — it survives cold starts.",
+        "Offline-first guest cart that merges conflict-free the moment you sign in. It survives cold starts.",
         "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
         "An AI barista (Gemini, tool-augmented) that resolves “something sweet and cold” to real menu items.",
       ],
@@ -357,7 +357,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/Brewphoria/loyalty-l.webp",
           alt: "The loyalty screen.",
           caption:
-            "Points, tiers and redemption — the reason a coffee app gets opened twice a day.",
+            "Points, tiers and redemption: the reason a coffee app gets opened twice a day.",
           fit: "contain",
         },
         {
@@ -367,7 +367,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "contain",
         },
       ],
-      access: "public repo — link on its way",
+      access: "public repo, link on its way",
       links: { live: null, source: null },
       todos: [
         "TODO(author): screens",
@@ -380,9 +380,9 @@ export const rawContent: z.input<typeof contentSchema> = {
       kind: "product",
       context: "Personal product · solo",
       period: "2025",
-      hook: "A full storefront with zero third-party commerce dependencies — because I wanted to know how.",
+      hook: "A full storefront with zero third-party commerce dependencies, because I wanted to know how.",
       summary:
-        "E-commerce end to end — variants, cart, wishlist, orders, reviews — a Django API through a React front.",
+        "E-commerce end to end: variants, cart, wishlist, orders and reviews, on a Django API through a React front.",
       stack: "Django · React · PostgreSQL · Stripe · Channels",
       metric: {
         value: "< 2s",
@@ -402,7 +402,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/FitGuild/home.webp",
           alt: "The FitGuild storefront.",
           caption:
-            "Built to sharpen the full-stack loop end to end — storefront, admin and the data between them.",
+            "Built to sharpen the full-stack loop end to end: storefront, admin and the data between them.",
           fit: "cover",
         },
         {
@@ -421,7 +421,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/FitGuild/checkout.webp",
           alt: "Checkout.",
           caption:
-            "Atomic — the order either exists completely or not at all.",
+            "Atomic. The order either exists completely or not at all.",
           fit: "cover",
         },
         {
@@ -450,7 +450,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "cover",
         },
       ],
-      access: "live site — repo private",
+      access: "live site, repo private",
       links: { live: null, source: null },
       todos: [
         "TODO(author): live URL + captures (catalog, variants, order-status mid-update)",
@@ -465,11 +465,11 @@ export const rawContent: z.input<typeof contentSchema> = {
       period: "2025",
       hook: "Fourteen little games, one big excuse to build real-time systems.",
       summary:
-        "A gamified cognitive platform — 7 categories, 14 browser games, XP, and multi-dimensional ranking.",
+        "A gamified cognitive platform: 7 categories, 14 browser games, XP, and multi-dimensional ranking.",
       stack: "Django · React · PostgreSQL · Channels",
       metric: null,
       highlights: [
-        "Real-time multiplayer over Channels — global chat, private messages, live leaderboards.",
+        "Real-time multiplayer over Channels: global chat, private messages, live leaderboards.",
         "Scoring blends accuracy, streak, and response time into per-category progression.",
       ],
       cover: null,
@@ -607,7 +607,7 @@ export const rawContent: z.input<typeof contentSchema> = {
     ],
   },
   contact: {
-    closing: "200 OK — let's build.",
+    closing: "200 OK. Let's build.",
     // The résumé and the author's account both use the liwaa- address; an
     // earlier liouazeddam@ spelling was a typo.
     email: "liwaazeddam@gmail.com",
