@@ -24,14 +24,14 @@ export function Toolkit() {
         </p>
       </div>
 
-      <ul className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      <ul className="toolkit-list mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {inventory.map((group, index) => (
           <li
             key={group.group}
             data-reveal
-            className="transition-micro rounded-xs border border-ink/12 bg-surface/60 p-6 transition-colors hover:border-accent-deep/40"
+            className="toolkit-group transition-micro rounded-xs border border-ink/12 bg-surface/60 p-6 transition-colors hover:border-accent-deep/40"
           >
-            <div className="flex items-baseline justify-between font-mono text-fine text-slate">
+            <div className="toolkit-meta flex items-baseline justify-between font-mono text-fine text-slate">
               <span className="text-signal">
                 T.{String(index + 1).padStart(2, "0")}
               </span>
@@ -41,15 +41,15 @@ export function Toolkit() {
               </span>
             </div>
 
-            <h4 className="type-display mt-4 text-title font-medium">
+            <h4 className="toolkit-name type-display mt-4 text-title font-medium">
               {group.group}
             </h4>
 
-            <ul className="mt-5 flex flex-wrap gap-2">
+            <ul className="toolkit-tags mt-5 flex flex-wrap gap-2">
               {group.items.map((item) => (
                 <li
                   key={item}
-                  className="rounded-xs border border-ink/10 bg-paper px-2.5 py-1 font-mono text-fine text-slate"
+                  className="toolkit-tag rounded-xs border border-ink/10 bg-paper px-2.5 py-1 font-mono text-fine text-slate"
                 >
                   {item}
                 </li>
