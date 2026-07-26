@@ -131,6 +131,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Real-time notifications over Channels and FCM, behind a custom JWT WebSocket middleware.",
         "Arabic, English, and French — the layout mirrors properly, not just the words.",
       ],
+      cover: {
+        src: "/work/Rezervitoo/dashboard.webp",
+        alt: "Rezervitoo's provider dashboard — bookings, listings and revenue in one view.",
+        fit: "cover",
+      },
       access: "code private — production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
@@ -153,6 +158,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Shipped their first remote interviewing with WebRTC — candidates stopped driving up to four hours each way.",
         "A worker-evaluation module replaced paper and saved HR two hours of typing a cycle.",
       ],
+      cover: {
+        src: "/work/JobPortal/hr-callroom.webp",
+        alt: "The Faderco portal's in-browser interview room, built on WebRTC.",
+        fit: "cover",
+      },
       access: "internal tool — code stays with Faderco",
       links: { live: null, source: null },
       todos: [],
@@ -174,6 +184,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
         "An AI barista (Gemini, tool-augmented) that resolves “something sweet and cold” to real menu items.",
       ],
+      cover: {
+        src: "/work/Brewphoria/home-l.webp",
+        alt: "BrewPhoria's storefront home screen on mobile.",
+        fit: "contain",
+      },
       access: "public repo — link on its way",
       links: { live: null, source: null },
       todos: [
@@ -199,6 +214,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "The full Stripe post-purchase loop lives server-side: payment → order transitions → inventory.",
         "Order status pushes over WebSockets instead of polling.",
       ],
+      cover: {
+        src: "/work/FitGuild/home.webp",
+        alt: "FitGuild's storefront home page.",
+        fit: "cover",
+      },
       access: "live site — repo private",
       links: { live: null, source: null },
       todos: [
@@ -221,6 +241,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Real-time multiplayer over Channels — global chat, private messages, live leaderboards.",
         "Scoring blends accuracy, streak, and response time into per-category progression.",
       ],
+      cover: null,
       access: "repo private",
       links: { live: null, source: null },
       todos: ["TODO(author): captures (game mid-play, leaderboard, analytics)"],
@@ -263,7 +284,6 @@ export const rawContent: z.input<typeof contentSchema> = {
           "Tool-augmented agents",
           "Prompt + context design",
           "LLM feature integration",
-          "Catalogue-grounded responses",
         ],
       },
       {

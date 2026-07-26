@@ -40,6 +40,18 @@ export const workSchema = z.object({
   /** The one number worth pulling out, when there is one. */
   metric: readoutSchema.nullable(),
   highlights: z.array(z.string().min(1)).min(1).max(3),
+  /**
+   * The card's cover shot. `fit` is explicit because the captures are a mix of
+   * 16:9 desktop and tall phone screens — cropping a phone screen to a card
+   * would show a sliver of it, so those are contained instead.
+   */
+  cover: z
+    .object({
+      src: z.string().min(1),
+      alt: z.string().min(1),
+      fit: z.enum(["cover", "contain"]),
+    })
+    .nullable(),
   /** Honest access/status line, e.g. `code private — client work`. */
   access: z.string().min(1),
   links: z.object({

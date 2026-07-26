@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Work as WorkItem } from "@/content/schemas";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
@@ -42,16 +43,31 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         </span>
       </div>
 
-      {/* Designed placeholder until real captures land — never a bare box. */}
-      <div className="group mt-3 aspect-[16/10] max-h-[22vh] overflow-hidden rounded-xs bg-surface">
-        <div
-          aria-hidden="true"
-          className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.04]"
-        >
-          <span className="type-display text-display font-semibold text-accent/20">
-            {item.title.charAt(0)}
-          </span>
-        </div>
+      {/* The capture, when there is one. Phone screens are contained rather
+          than cropped — cover would show a sliver of a 1080×2400 screen. The
+          initial stays as the fallback so a project without shots is still a
+          designed box, never a bare one. */}
+      <div className="group relative mt-3 aspect-[16/10] max-h-[22vh] overflow-hidden rounded-xs bg-surface">
+        {item.cover ? (
+          <Image
+            src={item.cover.src}
+            alt={item.cover.alt}
+            fill
+            sizes="(max-width: 1023px) 84vw, 30rem"
+            className={`transition-transform duration-500 group-hover:scale-[1.04] ${
+              item.cover.fit === "contain" ? "object-contain" : "object-cover"
+            } object-top`}
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.04]"
+          >
+            <span className="type-display text-display font-semibold text-accent/20">
+              {item.title.charAt(0)}
+            </span>
+          </div>
+        )}
       </div>
 
       <p className="mt-3 flex items-center gap-3 font-mono text-fine tracking-wide text-slate uppercase">

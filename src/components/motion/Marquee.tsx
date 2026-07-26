@@ -20,12 +20,14 @@ export function Marquee({ items }: { items: readonly string[] }) {
       const track = root?.querySelector<HTMLElement>("[data-marquee-track]");
       if (!root || !track || prefersReducedMotion()) return;
 
-      const tween = gsap.to(track, {
-        xPercent: -50,
-        duration: 40,
-        ease: "none",
-        repeat: -1,
-      });
+      // Travels left to right: the track starts shifted a full copy to the
+      // left and walks back to zero, so the band reads against the direction
+      // the Work rail above it just moved.
+      const tween = gsap.fromTo(
+        track,
+        { xPercent: -50 },
+        { xPercent: 0, duration: 40, ease: "none", repeat: -1 },
+      );
       const slow = () => {
         gsap.to(tween, { timeScale: 0.12, duration: 0.4 });
       };
