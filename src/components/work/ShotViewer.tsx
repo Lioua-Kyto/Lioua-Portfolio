@@ -140,7 +140,8 @@ export function ShotViewer({
             src={shot.src}
             alt={shot.alt}
             fill
-            sizes="92vw"
+            sizes="94vw"
+            quality={92}
             className="object-contain"
             draggable={false}
           />

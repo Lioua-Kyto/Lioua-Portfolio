@@ -24,7 +24,7 @@ export function ContactForm({ email }: { email: string }) {
     const from = field("email");
     const message = field("message");
     const subject = encodeURIComponent(`Hello from ${name}`);
-    const body = encodeURIComponent(`${message}\n\n— ${name} · ${from}`);
+    const body = encodeURIComponent(`${message}\n\n${name} · ${from}`);
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   };
 
@@ -85,7 +85,7 @@ export function ContactForm({ email }: { email: string }) {
           Send
         </button>
         <p className="font-mono text-fine text-slate">
-          opens your mail app — or write to {email}
+          opens your mail app, or write to {email}
         </p>
       </div>
     </form>

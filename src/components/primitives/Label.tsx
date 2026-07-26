@@ -21,7 +21,10 @@ export function Label({
         .filter(Boolean)
         .join(" ")}
     >
-      {index ? `${index} — ` : null}
+      {/* The index is set off by space rather than a dash: a separator glyph
+          between a number and a word is decoration, and the gap says the same
+          thing. The literal space keeps it readable to a screen reader. */}
+      {index ? <span className="mr-2">{index} </span> : null}
       {children}
     </span>
   );

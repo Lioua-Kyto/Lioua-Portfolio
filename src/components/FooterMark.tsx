@@ -37,7 +37,11 @@ export function FooterMark({ text }: { text: string }) {
         parseFloat(cs.paddingRight);
       if (box <= 0) return;
       el.style.setProperty("--mark-size", `${String(BASE_PX)}px`);
-      const natural = el.scrollWidth;
+      // Measure the text itself, not the box around it. `scrollWidth` on the
+      // container reports the container's own width whenever the text is
+      // narrower than it, which pinned the ratio at 1 and left the mark stuck
+      // at the base size on wide screens.
+      const natural = el.firstElementChild?.getBoundingClientRect().width ?? 0;
       if (natural === 0) return;
       el.style.setProperty(
         "--mark-size",

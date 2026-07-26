@@ -26,7 +26,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       data-work-card
       data-index={index}
       data-active={index === 0 ? "true" : "false"}
-      className="work-card transition-micro relative flex w-[min(84vw,30rem)] shrink-0 flex-col opacity-40 transition-opacity duration-500 data-[active=true]:opacity-100"
+      className="work-card transition-micro relative flex w-[min(88vw,34rem)] shrink-0 flex-col opacity-40 transition-opacity duration-500 data-[active=true]:opacity-100"
     >
       <div className="flex items-center justify-between gap-4">
         <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">
@@ -48,13 +48,14 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
           than cropped — cover would show a sliver of a 1080×2400 screen. The
           initial stays as the fallback so a project without shots is still a
           designed box, never a bare one. */}
-      <div className="group relative mt-3 aspect-[16/10] max-h-[22vh] overflow-hidden rounded-xs bg-surface">
+      <div className="group relative mt-3 aspect-[16/10] max-h-[34vh] overflow-hidden rounded-xs bg-surface">
         {item.cover ? (
           <Image
             src={item.cover.src}
             alt={item.cover.alt}
             fill
-            sizes="(max-width: 1023px) 84vw, 30rem"
+            sizes="(max-width: 1023px) 88vw, 34rem"
+            quality={90}
             className={`transition-transform duration-500 group-hover:scale-[1.04] ${
               item.cover.fit === "contain" ? "object-contain" : "object-cover"
             } object-top`}

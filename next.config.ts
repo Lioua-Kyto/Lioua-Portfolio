@@ -4,9 +4,11 @@ const nextConfig: NextConfig = {
   // Support both VPS/Docker and Vercel deploys.
   output: "standalone",
   images: {
-    // The portrait is served at quality 90; Next 16 requires every quality
-    // used to be declared up front.
-    qualities: [75, 90],
+    // Next 16 requires every quality used to be declared. UI captures are read
+    // for their text, so they are served well above the 75 default — at 75 the
+    // optimiser was re-encoding an already-compressed webp and the screens came
+    // out mushy.
+    qualities: [75, 90, 92],
   },
   eslint: {
     // Linting runs as a dedicated CI step (`eslint . --max-warnings 0`)
