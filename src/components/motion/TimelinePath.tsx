@@ -47,10 +47,15 @@ export function TimelinePath({ count }: { count: number }) {
         const h = box.height;
         svg.setAttribute("viewBox", `0 0 ${String(w)} ${String(h)}`);
 
-        // A wide weave inside the left lane: even beats hug the lane, odd beats
-        // swing out, so the thread reads as a route with real deviation.
-        const laneX = 20;
-        const amp = gsap.utils.clamp(52, 104, w * 0.09);
+        // A weave inside the left lane: even beats hug the lane, odd beats
+        // swing out, so the thread reads as a route with real deviation. The
+        // lane is only ~3rem wide on a phone, so the swing has to shrink with
+        // it or the thread crosses under the cards.
+        const narrow = w < 640;
+        const laneX = narrow ? 11 : 20;
+        const amp = narrow
+          ? Math.max(12, w * 0.05)
+          : gsap.utils.clamp(52, 104, w * 0.09);
         const points = nodes.map((node, index) => {
           const r = node.getBoundingClientRect();
           return {
@@ -163,7 +168,7 @@ export function TimelinePath({ count }: { count: number }) {
       ref={ref}
       aria-hidden="true"
       preserveAspectRatio="none"
-      className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block"
+      className="pointer-events-none absolute inset-0 block h-full w-full"
     >
       <defs>
         <clipPath id={`tail-${clipId}`} clipPathUnits="userSpaceOnUse">

@@ -95,7 +95,7 @@ export function PortraitBackdrop() {
           fetchPriority="high"
           quality={90}
           sizes="(max-width: 768px) 150vw, 90vw"
-          className="h-[80vh] w-auto max-w-none object-contain sm:h-[96vh]"
+          className="h-[92vh] w-auto max-w-none object-contain sm:h-[96vh]"
         />
       </div>
     </div>

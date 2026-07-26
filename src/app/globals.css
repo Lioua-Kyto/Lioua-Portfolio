@@ -689,60 +689,152 @@
       gap: clamp(0.75rem, 2.5vh, 1.5rem);
       padding: 0 var(--pad) max(4vh, 1.5rem);
     }
-    /* The portrait runs full strength behind the stack on a phone, and the
-       copy sits over the suit. A paper wash under the column keeps it legible
-       without dimming the photograph itself. */
-    .hero-chrome::before {
-      content: "";
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 58%;
-      z-index: -1;
-      pointer-events: none;
-      background: linear-gradient(
-        to top,
-        var(--paper) 38%,
-        color-mix(in oklab, var(--paper) 72%, transparent) 70%,
-        transparent 100%
-      );
-    }
     .hero-chrome-philosophy,
     .hero-chrome-stats,
-    .hero-chrome-nav,
     .hero-chrome-tagline {
       position: static;
       inset: auto;
     }
+    /* The routes live in the burger sheet on this size — six of them laid over
+       the portrait was the thing wrecking the composition. */
     .hero-chrome-nav {
+      display: none;
+    }
+    /* Proofs read as one compact strip of keynotes: the value carries it and
+       the label is cut to a few words. No card fill, so the portrait stays
+       visible straight through the row. */
+    .hero-chrome-stats {
       order: 1;
       flex-direction: row;
-      flex-wrap: wrap;
-      gap: 0.5rem 1.1rem;
-    }
-    .hero-chrome-stats {
-      order: 2;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      flex-wrap: nowrap;
+      gap: 0;
     }
     .hero-chrome-stat {
-      flex: 1 1 9rem;
-      min-width: 8.5rem;
-      padding: 0.4rem 0.5rem 0.4rem 0.85rem;
+      flex: 1 1 0;
+      min-width: 0;
+      background: none;
+      border-left: 1px solid color-mix(in oklab, var(--accent) 55%, transparent);
+      border-radius: 0;
+      padding: 0.1rem 0.5rem;
     }
     .hero-chrome-stat dd {
-      font-size: var(--text-base);
+      font-size: var(--text-lede);
+    }
+    .hero-chrome-stat dt {
+      line-height: 1.25;
     }
     .hero-chrome-philosophy {
-      order: 3;
-      width: min(34ch, 100%);
+      order: 2;
+      width: min(30ch, 100%);
       text-align: left;
-      font-size: var(--text-lede);
-      line-height: 1.3;
+      font-size: var(--text-title);
+      line-height: 1.2;
     }
     .hero-chrome-tagline {
-      order: 4;
+      order: 3;
     }
+    /* At this size the copy stacks over the portrait's suit, where dark type on
+       dark cloth cannot hold. Rather than lay a panel over the photograph, the
+       photograph dissolves into the paper across its lower third — the image
+       itself fades, so the type sits on clean ground and nothing looks like it
+       has been covered up. */
+    [data-portrait-layer] {
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 48%,
+        transparent 84%
+      );
+      mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 48%,
+        transparent 84%
+      );
+    }
+  }
+
+  /* The keynote label on phones, the full line from the rail breakpoint up. */
+  .hero-stat-short {
+    display: none;
+  }
+  @media (max-width: 1023.98px) {
+    .hero-stat-long {
+      display: none;
+    }
+    .hero-stat-short {
+      display: inline;
+    }
+  }
+
+  /* ---- The burger and its sheet (below the rail breakpoint) ---- */
+  .mobile-nav-toggle {
+    position: fixed;
+    top: max(1rem, 2vh);
+    right: var(--pad);
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.7rem;
+    color: var(--ink);
+  }
+  .mobile-nav-bars {
+    display: grid;
+    gap: 3px;
+    width: 1rem;
+  }
+  .mobile-nav-bars span {
+    display: block;
+    height: 1.5px;
+    background: var(--ink);
+    transition: transform var(--dur-micro) var(--ease-out);
+  }
+  .mobile-nav-bars[data-open="true"] span:first-child {
+    transform: translateY(2.25px) rotate(45deg);
+  }
+  .mobile-nav-bars[data-open="true"] span:last-child {
+    transform: translateY(-2.25px) rotate(-45deg);
+  }
+  .mobile-nav-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    overflow-y: auto;
+    padding: max(5rem, 12vh) var(--pad) max(2rem, 6vh);
+    background: var(--paper);
+    animation: sheet-in 0.3s var(--ease-out) both;
+  }
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .mobile-nav-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    padding: 0.75rem 0;
+    font-size: var(--text-title);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .mobile-nav-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0.8rem 0.9rem;
+    background: var(--ink);
+    color: var(--paper);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
   /* ---- The closing wordmark ----

@@ -1,5 +1,6 @@
 import { content } from "@/content";
 import { SiteFooter } from "@/components/SiteFooter";
+import { MobileMenu } from "@/components/MobileMenu";
 import { Motion } from "@/components/motion/Motion";
 import { AnchorScroll } from "@/components/providers/AnchorScroll";
 import { HeroChrome } from "@/components/hero/HeroChrome";
@@ -29,6 +30,7 @@ export default function HomePage() {
       <HeroName />
       <PortraitBackdrop />
       <HeroChrome />
+      <MobileMenu />
       <Motion>
         <main>
           <Intro />

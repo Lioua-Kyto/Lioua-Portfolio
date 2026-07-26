@@ -20,7 +20,10 @@ export function HeroName() {
   return (
     <div
       data-hero="title"
-      className="pointer-events-none absolute inset-x-0 top-[4vh] z-[5] px-[var(--pad)] lg:fixed"
+      // On phones the wordmark sits lower so the portrait's head and shoulders
+      // cross it — the occlusion that makes the layering read. On desktop it
+      // stays near the top, where the pinned composition wants it.
+      className="pointer-events-none absolute inset-x-0 top-[17vh] z-[5] px-[var(--pad)] sm:top-[4vh] lg:fixed"
     >
       {/* justify-between is what makes it truly full-bleed: the letters are
           distributed edge to edge whatever the font size resolves to, so the
