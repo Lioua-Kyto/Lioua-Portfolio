@@ -497,7 +497,13 @@ export function HeroChrome() {
             <dd className="type-display font-semibold whitespace-nowrap text-accent">
               {proof.value}
             </dd>
-            <dt className="font-mono text-fine text-slate">{proof.label}</dt>
+            {/* Both labels ship; the phone layout shows the keynote and the
+                rail shows the full line. Swapping by CSS keeps the desktop
+                morph measuring one stable set of elements. */}
+            <dt className="font-mono text-fine text-slate">
+              <span className="hero-stat-long">{proof.label}</span>
+              <span className="hero-stat-short">{proof.short}</span>
+            </dt>
           </div>
         ))}
       </dl>

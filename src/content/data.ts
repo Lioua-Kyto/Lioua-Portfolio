@@ -24,9 +24,21 @@ export const rawContent: z.input<typeof contentSchema> = {
     // Framed for what they say about the work, not lifted off a résumé:
     // breadth, performance, and real backend scale. (§5)
     proofs: [
-      { value: "6", label: "products shipped end to end" },
-      { value: "~40ms", label: "cached responses — effectively instant" },
-      { value: "400+", label: "API endpoints across projects" },
+      {
+        value: "6",
+        label: "products shipped end to end",
+        short: "products shipped",
+      },
+      {
+        value: "~40ms",
+        label: "cached responses — effectively instant",
+        short: "cached responses",
+      },
+      {
+        value: "400+",
+        label: "API endpoints across projects",
+        short: "API endpoints",
+      },
     ],
   },
   // The route is told in beats, not in a count of years — what changed each

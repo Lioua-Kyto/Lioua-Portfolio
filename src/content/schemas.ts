@@ -97,7 +97,14 @@ export const contentSchema = z.object({
     /** The working philosophy — shown in the hero and carried to the rail. */
     philosophy: z.string().min(1),
     proofs: z
-      .array(z.object({ value: z.string().min(1), label: z.string().min(1) }))
+      .array(
+        z.object({
+          value: z.string().min(1),
+          label: z.string().min(1),
+          /** The label cut to its keynote, for the phone layout. */
+          short: z.string().min(1),
+        }),
+      )
       .length(3),
   }),
   /** 01 — Background: the honest year-by-year arc — the story spine. Each
