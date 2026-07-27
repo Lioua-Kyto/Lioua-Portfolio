@@ -191,12 +191,12 @@ export default async function WorkDetail({
 
       <div id="under-the-hood" className="hood-layer">
         <div className="shell pt-[clamp(3rem,8vh,6rem)] pb-[clamp(4rem,12vh,9rem)]">
-          {item.diagram ? (
+          {item.diagram ?? item.erd ? (
             <section aria-label="Architecture">
               <h2 className="hairline pt-4">
                 <Label index="B">Architecture</Label>
               </h2>
-              <ArchitectureBlock diagram={item.diagram} />
+              <ArchitectureBlock diagram={item.diagram} erd={item.erd} />
             </section>
           ) : null}
 

@@ -71,6 +71,50 @@ export const diagramSchema = z.object({
 });
 
 /**
+ * A project's data model, as data.
+ *
+ * Entities are laid out in columns exactly like the system map, so the two
+ * drawings read as one family. Fields are the few that matter to the story,
+ * not the full column list: a reader wants to see the shape of the model, and
+ * a full schema dump is what a repository is for.
+ */
+export const erdSchema = z.object({
+  title: z.string().min(1),
+  caption: z.string().min(1),
+  columns: z
+    .array(
+      z.object({
+        title: z.string().min(1),
+        entities: z
+          .array(
+            z.object({
+              id: z.string().min(1),
+              name: z.string().min(1),
+              /** The handful of fields worth showing, in reading order. */
+              fields: z.array(z.string().min(1)).min(1).max(6),
+              /** `owned` marks the tables this project's story turns on. */
+              kind: z.enum(["core", "owned", "support"]),
+            }),
+          )
+          .min(1)
+          .max(4),
+      }),
+    )
+    .min(2)
+    .max(3),
+  relations: z
+    .array(
+      z.object({
+        from: z.string().min(1),
+        to: z.string().min(1),
+        /** Cardinality as it is said out loud, e.g. `one to many`. */
+        label: z.string().min(1),
+      }),
+    )
+    .min(1),
+});
+
+/**
  * One piece of work — client engagements and personal products in a single
  * shape, because the site presents them as one body of work, not two lists.
  * `kind` is the only thing that tells them apart in the UI.
@@ -108,6 +152,8 @@ export const workSchema = z.object({
   gallery: z.array(shotSchema).default([]),
   /** How the system is put together, drawn from data. */
   diagram: diagramSchema.nullable(),
+  /** The shape of the data underneath it. */
+  erd: erdSchema.nullable(),
   /** Honest access/status line, e.g. `code private — client work`. */
   access: z.string().min(1),
   links: z.object({
@@ -219,6 +265,7 @@ export const contentSchema = z.object({
 
 export type Shot = z.infer<typeof shotSchema>;
 export type Diagram = z.infer<typeof diagramSchema>;
+export type Erd = z.infer<typeof erdSchema>;
 export type DiagramNode = z.infer<typeof diagramNodeSchema>;
 export type SectionCopy = z.infer<typeof sectionCopySchema>;
 export type Readout = z.infer<typeof readoutSchema>;
