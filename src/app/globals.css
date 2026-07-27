@@ -1163,3 +1163,127 @@
   color: var(--paper);
   border-color: var(--ink);
 }
+
+/* ---- Toolkit: Rows ----
+   Six full-width rows. The group name carries at display size and the tools sit
+   opposite it on a single line, so the eye reads six things rather than sixty. */
+:root[data-toolkit="rows"] .toolkit-list {
+  display: block;
+}
+:root[data-toolkit="rows"] .toolkit-group {
+  display: grid;
+  gap: 0.5rem 3rem;
+  align-items: baseline;
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  border-radius: 0;
+  background: none;
+  padding: 1.6rem 0;
+}
+@media (min-width: 768px) {
+  :root[data-toolkit="rows"] .toolkit-group {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+:root[data-toolkit="rows"] .toolkit-meta {
+  display: none;
+}
+:root[data-toolkit="rows"] .toolkit-name {
+  margin-top: 0;
+  font-size: var(--text-headline);
+  line-height: 1;
+  font-weight: 500;
+}
+:root[data-toolkit="rows"] .toolkit-tags {
+  margin-top: 0;
+  display: block;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-fine);
+  line-height: 1.8;
+  color: var(--slate);
+}
+:root[data-toolkit="rows"] .toolkit-tag {
+  display: inline;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+:root[data-toolkit="rows"] .toolkit-tag::after {
+  content: " · ";
+  color: color-mix(in oklab, var(--ink) 25%, transparent);
+}
+:root[data-toolkit="rows"] .toolkit-tag:last-child::after {
+  content: "";
+}
+
+/* ---- Toolkit: Reveal ----
+   At rest the section is six names and nothing else. The tools are there for
+   anyone who wants them, one row at a time, on hover or keyboard focus. */
+:root[data-toolkit="reveal"] .toolkit-list {
+  display: block;
+}
+:root[data-toolkit="reveal"] .toolkit-group {
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  border-radius: 0;
+  background: none;
+  padding: 0;
+}
+:root[data-toolkit="reveal"] .toolkit-meta {
+  display: none;
+}
+:root[data-toolkit="reveal"] .toolkit-name {
+  margin: 0;
+  padding: 1.5rem 0 1.5rem;
+  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+  line-height: 1;
+  font-weight: 500;
+  transition: color var(--dur-micro) var(--ease-out);
+}
+:root[data-toolkit="reveal"] .toolkit-group:hover .toolkit-name,
+:root[data-toolkit="reveal"] .toolkit-group:focus-within .toolkit-name {
+  color: var(--accent);
+}
+:root[data-toolkit="reveal"] .toolkit-tags {
+  margin: 0;
+  display: block;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  font-family: var(--font-mono-stack);
+  font-size: var(--text-fine);
+  line-height: 1.8;
+  color: var(--slate);
+  transition:
+    max-height 0.4s var(--ease-out),
+    opacity 0.3s var(--ease-out),
+    padding 0.4s var(--ease-out);
+}
+:root[data-toolkit="reveal"] .toolkit-group:hover .toolkit-tags,
+:root[data-toolkit="reveal"] .toolkit-group:focus-within .toolkit-tags {
+  max-height: 8rem;
+  opacity: 1;
+  padding-bottom: 1.5rem;
+}
+:root[data-toolkit="reveal"] .toolkit-tag {
+  display: inline;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+:root[data-toolkit="reveal"] .toolkit-tag::after {
+  content: " · ";
+  color: color-mix(in oklab, var(--ink) 25%, transparent);
+}
+:root[data-toolkit="reveal"] .toolkit-tag:last-child::after {
+  content: "";
+}
+/* Touch has no hover: show everything rather than hiding it behind a gesture
+   that does not exist there. */
+@media (hover: none) {
+  :root[data-toolkit="reveal"] .toolkit-tags {
+    max-height: none;
+    opacity: 1;
+    padding-bottom: 1.5rem;
+  }
+}

@@ -23,6 +23,8 @@ const THEMES = [
 const TOOLKITS = [
   { id: "", label: "Cards" },
   { id: "ruled", label: "Ruled" },
+  { id: "rows", label: "Rows" },
+  { id: "reveal", label: "Reveal" },
 ] as const;
 
 export function VariantSwitcher() {
