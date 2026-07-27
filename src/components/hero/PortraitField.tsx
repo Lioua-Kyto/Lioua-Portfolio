@@ -44,24 +44,28 @@ void main() {
   float fall = 1.0 - smoothstep(0.0, radius, d);
   fall = pow(fall, 1.7) * uStrength;
 
-  // The figure stands on the bottom edge of the frame. Displacing pixels there
-  // lifts it off that edge and opens a gap under the feet, so the last of the
-  // frame is held still and the effect eases out into it.
-  fall *= smoothstep(0.0, 0.10, 1.0 - vUv.y);
-
   // The disturbed area quantises into cells: it stops being a photograph and
-  // becomes the grid it was always printed on.
+  // becomes the grid it was always printed on. This half follows the cursor
+  // everywhere, right down to the last row — it moves nothing, so it cannot
+  // open a gap.
   float cell = mix(1.0, 15.0, fall);
   vec2 snapped = (floor(px / cell) * cell + cell * 0.5) / uRes;
   vec2 uv = mix(vUv, snapped, fall * 0.88);
 
-  // Cells drift away from the cursor, breathing rather than exploding. Right
-  // under the cursor there is almost nothing: the pull belongs to the ring
-  // around it, so the middle stays legible instead of smearing.
-  float ring = smoothstep(0.0, radius * 0.42, d);
+  // Only the displacement is held off the floor, and only in the last few
+  // rows. Fading the whole effect out down there made the disturbance sit
+  // visibly above and beside the cursor; this way the effect stays centred on
+  // the pointer and just stops shifting pixels where a shift would lift the
+  // figure off the bottom edge and show daylight under it.
+  float floored = smoothstep(0.0, 24.0 / uRes.y, 1.0 - vUv.y);
+
+  // Cells drift away from the cursor, breathing rather than exploding. The
+  // very centre is calmer than the ring around it, so the point being looked
+  // at stays legible instead of smearing.
+  float ring = mix(0.55, 1.0, smoothstep(0.0, radius * 0.30, d));
   vec2 dir = normalize(px - uPointer + vec2(0.0001));
   float breath = 0.5 + 0.5 * sin(uTime * 1.3 + d * 0.018);
-  vec2 push = dir * fall * ring * (5.0 + 13.0 * breath) / uRes;
+  vec2 push = dir * fall * ring * floored * (5.0 + 13.0 * breath) / uRes;
 
   // Channel split, the way a plate slips on press.
   float split = fall * 0.006;

@@ -2,7 +2,7 @@
 
 import { Fragment, useRef, type ElementType } from "react";
 import { useGSAP } from "@gsap/react";
-import { gsap } from "@/lib/motion/gsap";
+import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { dur, ease, stagger } from "@/lib/motion/tokens";
 
 /**
@@ -38,25 +38,36 @@ export function MaskText({
       const inners = root.querySelectorAll("[data-mask-inner]");
 
       gsap.set(inners, { yPercent: 118 });
-      gsap.to(inners, {
+      const rise = gsap.to(inners, {
         yPercent: 0,
         duration: dur.reveal,
         ease: ease.out,
         stagger: stagger.words,
         delay,
-        scrollTrigger: scroll
-          ? {
-              trigger: root,
-              start: "top 88%",
-              // Reversible: scrolling back drops the words behind the mask.
-              toggleActions: "play none none reverse",
-              // The start is remeasured on every refresh — the webfont swap
-              // moves this heading, and a start cached against the fallback
-              // metrics is how a title ended up never revealing.
-              invalidateOnRefresh: true,
-            }
-          : undefined,
+        paused: scroll,
       });
+      if (!scroll) return;
+
+      const trigger = ScrollTrigger.create({
+        trigger: root,
+        start: "top 88%",
+        // The start is remeasured on every refresh — the webfont swap moves
+        // this heading, and a start cached against the fallback metrics is one
+        // way a title ended up never revealing.
+        invalidateOnRefresh: true,
+        onEnter: () => rise.play(),
+        // Reversible: scrolling back drops the words behind the mask.
+        onLeaveBack: () => rise.reverse(),
+        // A toggle only fires when the scroll CROSSES the start line. Coming
+        // back from a project page, the home page remounts already scrolled
+        // past every heading above the landing point, so nothing ever crossed
+        // and they stayed behind their masks until a reload. State, not
+        // events: if the line is already behind us, the words are already up.
+        onRefresh: (self) => {
+          if (self.progress > 0) rise.progress(1).pause();
+        },
+      });
+      if (trigger.progress > 0) rise.progress(1).pause();
     },
     { scope: ref },
   );

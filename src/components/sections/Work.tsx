@@ -1,10 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Work as WorkItem } from "@/content/schemas";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
 import { MaskText } from "@/components/motion/MaskText";
 import { WorkRail } from "@/components/motion/WorkRail";
+import { ProjectLink } from "@/components/work/ProjectLink";
 
 const KIND_LABEL: Record<WorkItem["kind"], string> = {
   flagship: "flagship build",
@@ -48,7 +48,10 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
           than cropped — cover would show a sliver of a 1080×2400 screen. The
           initial stays as the fallback so a project without shots is still a
           designed box, never a bare one. */}
-      <div className="group relative mt-3 aspect-[16/10] max-h-[34vh] overflow-hidden rounded-xs bg-surface">
+      <div
+        data-card-cover
+        className="group relative mt-3 aspect-[16/10] max-h-[34vh] overflow-hidden rounded-xs bg-surface"
+      >
         {item.cover ? (
           <Image
             src={item.cover.src}
@@ -84,9 +87,13 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         {/* The whole card reads as one target: the link stretches over it so
             the image and the hook are clickable too, without nesting the
             card's own links inside an anchor. */}
-        <Link href={`/work/${item.slug}`} className="work-card-link">
+        <ProjectLink
+          href={`/work/${item.slug}`}
+          cover={item.cover?.src ?? null}
+          className="work-card-link"
+        >
           {item.title}
-        </Link>
+        </ProjectLink>
       </h3>
 
       {/* The hook carries the card — the line said out loud. The longer

@@ -1,26 +1,39 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** The size the mark is measured at before being scaled to fit. */
 const BASE_PX = 100;
 
+/** The four treatments on offer while the choice is still open. */
+const VARIANTS = [
+  { id: "spot", label: "spotlight" },
+  { id: "slip", label: "plate slip" },
+  { id: "rise", label: "rise" },
+  { id: "rule", label: "ruled" },
+] as const;
+
+type VariantId = (typeof VARIANTS)[number]["id"];
+
+/** Latin display type, one grapheme per span. */
+const glyphsOf = (word: string) =>
+  [...new Intl.Segmenter().segment(word)].map((part) => part.segment);
+
 /**
- * The closing wordmark: the name drawn as an outline, lit by the cursor.
+ * The closing wordmark: the name drawn as an outline, answering the cursor.
  *
  * One line per name, each fitted to the full measure on its own — so the two
  * words stack and both run edge to edge, which means their sizes differ
  * slightly. That is the point: justified to the measure, the way a masthead is
  * set, rather than one line of type with a ragged second.
  *
- * Two identical layers sit on top of each other — a faint ink outline and an
- * accent one. The accent layer is masked to a soft circle that follows the
- * pointer, so what lights up is the part of the mark under the cursor rather
- * than a whole letter. The mask is driven by CSS custom properties written on
- * pointermove; nothing re-renders.
+ * Every letter is its own span carrying `--n`, how near the cursor it is from
+ * 0 to 1. That one number drives all four treatments from CSS, so switching
+ * between them costs nothing and none of them re-render React.
  */
 export function FooterMark({ text }: { text: string }) {
   const root = useRef<HTMLDivElement>(null);
+  const [variant, setVariant] = useState<VariantId>("spot");
   const lines = text.split(" ");
 
   // Fit each line to the measure by measurement, not by a vw guess. The display
@@ -60,8 +73,15 @@ export function FooterMark({ text }: { text: string }) {
       }
       // The spotlight is tracked against the whole mark, so each line has to
       // know where its own top sits to offset the mask into its own box.
+      // Measured against the mark, not `offsetTop` — that reports the distance
+      // to the nearest positioned ancestor, which here is the page, and a
+      // twelve-thousand-pixel offset put the mask somewhere off in the void.
+      const origin = el.getBoundingClientRect().top;
       for (const row of rows) {
-        row.style.setProperty("--ly", `${String(row.offsetTop)}px`);
+        row.style.setProperty(
+          "--ly",
+          `${String(row.getBoundingClientRect().top - origin)}px`,
+        );
       }
     };
 
@@ -81,28 +101,89 @@ export function FooterMark({ text }: { text: string }) {
     const box = el.getBoundingClientRect();
     el.style.setProperty("--mx", `${String(event.clientX - box.left)}px`);
     el.style.setProperty("--my", `${String(event.clientY - box.top)}px`);
+
+    // How near each letter is to the cursor, 0 to 1. Written straight onto the
+    // node: a state update per pointermove would re-render eleven spans a
+    // frame for a value only CSS ever reads.
+    const reach = Math.max(160, box.width * 0.16);
+    for (const glyph of el.querySelectorAll<HTMLElement>("[data-mark-glyph]")) {
+      const g = glyph.getBoundingClientRect();
+      const dx = event.clientX - (g.left + g.width / 2);
+      const dy = event.clientY - (g.top + g.height / 2);
+      const near = Math.max(0, 1 - Math.hypot(dx, dy) / reach);
+      glyph.style.setProperty("--n", near.toFixed(3));
+    }
+  };
+
+  const clear = () => {
+    const el = root.current;
+    if (!el) return;
+    el.style.setProperty("--spot", "0");
+    for (const glyph of el.querySelectorAll<HTMLElement>("[data-mark-glyph]")) {
+      glyph.style.setProperty("--n", "0");
+    }
   };
 
   return (
-    <div
-      ref={root}
-      aria-hidden="true"
-      className="footer-mark"
-      onPointerMove={move}
-      onPointerEnter={(event) => {
-        move(event);
-        root.current?.style.setProperty("--spot", "1");
-      }}
-      onPointerLeave={() => {
-        root.current?.style.setProperty("--spot", "0");
-      }}
-    >
-      {lines.map((line) => (
-        <div key={line} data-mark-line className="footer-mark-line">
-          <span className="footer-mark-layer footer-mark-base">{line}</span>
-          <span className="footer-mark-layer footer-mark-glow">{line}</span>
-        </div>
-      ))}
-    </div>
+    <>
+      {/* Temporary while the treatment is still being chosen — it comes out
+          with the variants once one is locked in. */}
+      <div className="mark-variants font-mono text-fine uppercase">
+        <span className="text-slate">wordmark hover</span>
+        {VARIANTS.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            data-on={option.id === variant ? "true" : "false"}
+            className="mark-variant"
+            onClick={() => {
+              setVariant(option.id);
+            }}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
+      <div
+        ref={root}
+        aria-hidden="true"
+        className="footer-mark"
+        data-mark-fx={variant}
+        onPointerMove={move}
+        onPointerEnter={(event) => {
+          move(event);
+          root.current?.style.setProperty("--spot", "1");
+        }}
+        onPointerLeave={clear}
+      >
+        {lines.map((line) => (
+          <div key={line} data-mark-line className="footer-mark-line">
+            <span className="footer-mark-layer footer-mark-base">
+              {glyphsOf(line).map((glyph, index) => (
+                <span
+                  key={`${glyph}-${String(index)}`}
+                  data-mark-glyph
+                  className="footer-mark-glyph"
+                >
+                  {glyph}
+                </span>
+              ))}
+            </span>
+            <span className="footer-mark-layer footer-mark-glow">
+              {glyphsOf(line).map((glyph, index) => (
+                <span
+                  key={`${glyph}-${String(index)}`}
+                  data-mark-glyph
+                  className="footer-mark-glyph"
+                >
+                  {glyph}
+                </span>
+              ))}
+            </span>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
