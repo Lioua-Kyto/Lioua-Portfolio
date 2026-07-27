@@ -142,14 +142,14 @@ export function Work() {
 
   return (
     <section
-      id="work"
+      id="projects"
       aria-label="Work"
       data-work
       className="relative z-10 overflow-hidden bg-paper lg:flex lg:h-svh lg:flex-col lg:justify-center"
     >
       <div className="shell lg:pl-60">
         <h2 className="hairline pt-4">
-          <Label index="03">Work</Label>
+          <Label index="03">Projects</Label>
         </h2>
         <div className="mt-5 grid gap-x-16 gap-y-3 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-end">
           <MaskText

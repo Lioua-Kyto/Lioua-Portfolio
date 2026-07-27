@@ -5,12 +5,17 @@ import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { scrub } from "@/lib/motion/tokens";
 
+/** Three dashes: 11 on, 9 off, 11, 9, 11 — the run ends on a dash, not a gap. */
+const DASH_RUN = 11 * 3 + 9 * 2;
+
 /**
  * The thread running through the journey — a line that weaves down past the
  * cards, drawing itself as you scroll, a dot lighting exactly as the line
- * reaches each beat. Past the last beat it carries on as a dashed tail: the
- * present, still being written. Everything is on one scrubbed timeline, so the
- * dots and the tail can never run ahead of the drawing line.
+ * reaches each beat. Past the last beat the solid line carries on down under
+ * the last card and only then breaks into three dashes: the present, still
+ * being written, rather than a long dotted run to nowhere. Everything is on one
+ * scrubbed timeline, so the dots and the tail can never run ahead of the
+ * drawing line.
  *
  * Decorative — the beats are a real ordered list on their own.
  */
@@ -24,8 +29,11 @@ export function TimelinePath({ count }: { count: number }) {
       const container = svg?.closest<HTMLElement>("[data-timeline]");
       const line = svg?.querySelector<SVGPathElement>("[data-timeline-line]");
       const tail = svg?.querySelector<SVGPathElement>("[data-timeline-tail]");
+      const dashes = svg?.querySelector<SVGPathElement>(
+        "[data-timeline-dashes]",
+      );
       const clipRect = svg?.querySelector<SVGRectElement>("[data-tail-clip]");
-      if (!svg || !container || !line || !tail || !clipRect) return;
+      if (!svg || !container || !line || !tail || !dashes || !clipRect) return;
 
       const dots = gsap.utils.toArray<SVGCircleElement>(
         "[data-timeline-dot]",
@@ -81,14 +89,23 @@ export function TimelinePath({ count }: { count: number }) {
         const mainLen = line.getTotalLength();
         line.style.strokeDasharray = String(mainLen);
 
-        // Dashed tail: from the last beat down to the bottom.
+        // Past the last beat the line stays a line: it runs down the lane and
+        // under the last card, and only there breaks into exactly three dashes.
         const last = points[points.length - 1] ?? { x: laneX, y: h * 0.7 };
-        const tailY = h;
+        const lastNode = nodes[nodes.length - 1];
+        const underCard = lastNode
+          ? lastNode.getBoundingClientRect().bottom - box.top + 20
+          : h - DASH_RUN;
+        const solidEnd = Math.min(underCard, h - DASH_RUN);
         tail.setAttribute(
           "d",
-          `M ${String(last.x)} ${String(last.y)}${seg({ x: last.x + amp * 0.35, y: last.y }, { x: laneX, y: tailY })}`,
+          `M ${String(last.x)} ${String(last.y)}${seg({ x: last.x + amp * 0.35, y: last.y }, { x: laneX, y: solidEnd })}`,
         );
-        // The clip starts at the last beat and grows down to reveal the tail.
+        dashes.setAttribute(
+          "d",
+          `M ${String(laneX)} ${String(solidEnd)} L ${String(laneX)} ${String(solidEnd + DASH_RUN)}`,
+        );
+        // The clip starts at the last beat and grows down to reveal both.
         clipRect.setAttribute("x", "0");
         clipRect.setAttribute("y", String(last.y));
         clipRect.setAttribute("width", String(w));
@@ -185,6 +202,15 @@ export function TimelinePath({ count }: { count: number }) {
       />
       <path
         data-timeline-tail
+        fill="none"
+        stroke="var(--accent)"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.75"
+        clipPath={`url(#tail-${clipId})`}
+      />
+      <path
+        data-timeline-dashes
         fill="none"
         stroke="var(--accent)"
         strokeWidth="3"

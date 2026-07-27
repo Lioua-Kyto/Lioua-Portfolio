@@ -42,11 +42,12 @@ export function AnchorScroll() {
       // (mid-morph), not the top. Home always means the very top of the page.
       if (href === "#intro") {
         lenis.scrollTo(0, { offset: 0, duration: 1.1 });
-      } else if (href === "#under-the-hood") {
+      } else if (href === "#under-the-hood" || href === "#back-to-the-surface") {
         // Deliberately slower than an ordinary jump: the travel passes through
         // the pinned curtain, so the bonnet-opening plays as the scroll goes by
         // rather than being skipped. It is the same motion a reader would get
-        // scrolling there themselves, only carried out for them.
+        // scrolling there themselves, only carried out for them — and the same
+        // motion in reverse on the way back up.
         lenis.scrollTo(target, { offset: 0, duration: 2.2 });
       } else {
         lenis.scrollTo(target, { offset: 0, duration: 1.1 });

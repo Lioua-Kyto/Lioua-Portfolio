@@ -39,23 +39,32 @@ varying vec2 vUv;
 
 void main() {
   vec2 px = vUv * uRes;
-  float radius = min(uRes.x, uRes.y) * 0.46;
-  float fall = 1.0 - smoothstep(0.0, radius, distance(px, uPointer));
+  float d = distance(px, uPointer);
+  float radius = min(uRes.x, uRes.y) * 0.30;
+  float fall = 1.0 - smoothstep(0.0, radius, d);
   fall = pow(fall, 1.7) * uStrength;
 
-  // The disturbed area quantises into cells: the figure stops being a
-  // photograph and becomes the grid it was always printed on.
+  // The figure stands on the bottom edge of the frame. Displacing pixels there
+  // lifts it off that edge and opens a gap under the feet, so the last of the
+  // frame is held still and the effect eases out into it.
+  fall *= smoothstep(0.0, 0.10, 1.0 - vUv.y);
+
+  // The disturbed area quantises into cells: it stops being a photograph and
+  // becomes the grid it was always printed on.
   float cell = mix(1.0, 15.0, fall);
   vec2 snapped = (floor(px / cell) * cell + cell * 0.5) / uRes;
   vec2 uv = mix(vUv, snapped, fall * 0.88);
 
-  // Cells drift away from the cursor, breathing rather than exploding.
+  // Cells drift away from the cursor, breathing rather than exploding. Right
+  // under the cursor there is almost nothing: the pull belongs to the ring
+  // around it, so the middle stays legible instead of smearing.
+  float ring = smoothstep(0.0, radius * 0.42, d);
   vec2 dir = normalize(px - uPointer + vec2(0.0001));
-  float breath = 0.5 + 0.5 * sin(uTime * 1.3 + distance(px, uPointer) * 0.018);
-  vec2 push = dir * fall * (8.0 + 24.0 * breath) / uRes;
+  float breath = 0.5 + 0.5 * sin(uTime * 1.3 + d * 0.018);
+  vec2 push = dir * fall * ring * (5.0 + 13.0 * breath) / uRes;
 
   // Channel split, the way a plate slips on press.
-  float split = fall * 0.009;
+  float split = fall * 0.006;
   vec4 g = texture2D(uTex, uv + push);
   float r = texture2D(uTex, uv + push + vec2(split, 0.0)).r;
   float b = texture2D(uTex, uv + push - vec2(split, 0.0)).b;
@@ -172,10 +181,10 @@ export function PortraitField({ src }: { src: string }) {
       // Only what is over the figure counts, with a margin so it eases in at
       // the edges rather than switching on.
       const inside =
-        event.clientX > box.left - 160 &&
-        event.clientX < box.right + 160 &&
-        event.clientY > box.top - 160 &&
-        event.clientY < box.bottom + 160;
+        event.clientX > box.left - 100 &&
+        event.clientX < box.right + 100 &&
+        event.clientY > box.top - 100 &&
+        event.clientY < box.bottom + 100;
       strength.target = inside ? 1 : 0;
     };
 

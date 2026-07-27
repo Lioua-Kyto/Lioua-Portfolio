@@ -23,7 +23,7 @@ const SECTION_IDS = [
   "intro",
   "background",
   "principles",
-  "work",
+  "projects",
   "toolkit",
   "contact",
 ];
@@ -172,7 +172,7 @@ test("work shows one project at a time and advances on scroll", async ({
     page,
     () =>
       page.evaluate(() => {
-        const w = document.querySelector("#work");
+        const w = document.querySelector("#projects");
         return !!w && w.getBoundingClientRect().top <= 2;
       }),
     { step: 600, max: 90 },
@@ -213,7 +213,7 @@ test("the section navigation highlights the section you are in", async ({
     page,
     () =>
       page
-        .locator('[data-rail-link="work"][data-active="true"]')
+        .locator('[data-rail-link="projects"][data-active="true"]')
         .count()
         .then((n) => n === 1),
     { step: 600, max: 40 },
