@@ -43,11 +43,11 @@ export function AnchorScroll() {
       if (href === "#intro") {
         lenis.scrollTo(0, { offset: 0, duration: 1.1 });
       } else if (href === "#under-the-hood") {
-        // Travelling to this one smoothly drags the scroll through the pinned
-        // curtain, which scrubs the whole bonnet-opening on the way past. Going
-        // straight there arrives with it already open; scrolling back up still
-        // plays it in reverse, which is how a reader returns to the surface.
-        lenis.scrollTo(target, { offset: 0, immediate: true });
+        // Deliberately slower than an ordinary jump: the travel passes through
+        // the pinned curtain, so the bonnet-opening plays as the scroll goes by
+        // rather than being skipped. It is the same motion a reader would get
+        // scrolling there themselves, only carried out for them.
+        lenis.scrollTo(target, { offset: 0, duration: 2.2 });
       } else {
         lenis.scrollTo(target, { offset: 0, duration: 1.1 });
       }

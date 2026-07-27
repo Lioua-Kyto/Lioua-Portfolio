@@ -11,11 +11,20 @@ import { ShotViewer } from "@/components/work/ShotViewer";
  */
 export function WorkGallery({ shots }: { shots: readonly Shot[] }) {
   const [open, setOpen] = useState<Shot | null>(null);
+  // Where the viewer should grow from: the capture the reader actually clicked.
+  const [origin, setOrigin] = useState<DOMRect | null>(null);
 
   return (
     <>
-      <WorkStory shots={shots} onOpen={setOpen} />
+      <WorkStory
+        shots={shots}
+        onOpen={(shot, box) => {
+          setOrigin(box);
+          setOpen(shot);
+        }}
+      />
       <ShotViewer
+        origin={origin}
         shot={open}
         onClose={() => {
           setOpen(null);

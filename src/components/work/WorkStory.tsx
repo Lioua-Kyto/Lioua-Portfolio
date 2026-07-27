@@ -18,7 +18,7 @@ export function WorkStory({
   onOpen,
 }: {
   shots: readonly Shot[];
-  onOpen: (shot: Shot) => void;
+  onOpen: (shot: Shot, origin: DOMRect) => void;
 }) {
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -70,8 +70,8 @@ export function WorkStory({
         <figure key={shot.src} data-shot className="work-shot">
           <button
             type="button"
-            onClick={() => {
-              onOpen(shot);
+            onClick={(event) => {
+              onOpen(shot, event.currentTarget.getBoundingClientRect());
             }}
             className="work-shot-button group"
             aria-label={`Open ${shot.alt} in the zoom viewer`}
