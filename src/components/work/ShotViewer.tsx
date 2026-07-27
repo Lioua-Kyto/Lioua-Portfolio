@@ -32,13 +32,25 @@ export function ShotViewer({
   const [zoomLabel, setZoomLabel] = useState(100);
   const { getLenis } = useSmoothScroll();
 
+  const isVector = Boolean(shot?.content);
+
   const paint = useCallback(() => {
     const el = frame.current;
     if (!el) return;
     const { scale, x, y } = view.current;
-    el.style.transform = `translate3d(${String(x)}px, ${String(y)}px, 0) scale(${String(scale)})`;
+    if (isVector) {
+      // Scaling a transformed layer resamples whatever it was rasterised at,
+      // which is exactly why a zoomed diagram went soft. Growing the drawing's
+      // own width makes the browser lay it out and repaint the vector at the
+      // new size, so the text stays as sharp at 400% as it is at 100%. The
+      // transform is left to do the panning only.
+      el.style.transform = `translate(${String(x)}px, ${String(y)}px)`;
+      el.style.setProperty("--zoom", String(scale));
+    } else {
+      el.style.transform = `translate3d(${String(x)}px, ${String(y)}px, 0) scale(${String(scale)})`;
+    }
     setZoomLabel(Math.round(scale * 100));
-  }, []);
+  }, [isVector]);
 
   const reset = useCallback(() => {
     view.current = { scale: 1, x: 0, y: 0 };
