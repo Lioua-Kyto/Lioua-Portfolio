@@ -1,8 +1,6 @@
 import { content } from "@/content";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileMenu } from "@/components/MobileMenu";
-// TEMPORARY: remove with the variant blocks once a direction is locked in.
-import { VariantSwitcher } from "@/components/VariantSwitcher";
 import { Motion } from "@/components/motion/Motion";
 import { AnchorScroll } from "@/components/providers/AnchorScroll";
 import { HeroChrome } from "@/components/hero/HeroChrome";
@@ -45,7 +43,6 @@ export default function HomePage() {
         </main>
       </Motion>
       <SiteFooter />
-      <VariantSwitcher />
     </div>
   );
 }

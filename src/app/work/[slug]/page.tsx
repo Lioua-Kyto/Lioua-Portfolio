@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
 import { WorkGallery } from "@/components/work/WorkGallery";
+import { ArchitectureBlock } from "@/components/work/ArchitectureBlock";
 
 const KIND_LABEL: Record<string, string> = {
   flagship: "flagship build",
@@ -168,10 +169,19 @@ export default async function WorkDetail({
           ))}
         </ol>
 
+        {item.diagram ? (
+          <section className="mt-24" aria-label="Architecture">
+            <h2 className="hairline pt-4">
+              <Label index="A">Architecture</Label>
+            </h2>
+            <ArchitectureBlock diagram={item.diagram} />
+          </section>
+        ) : null}
+
         {item.gallery.length > 0 ? (
           <section className="mt-24" aria-label="Screens">
             <h2 className="hairline pt-4">
-              <Label index="A">Screens</Label>
+              <Label index="B">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
               Click any screen to open it in the zoom viewer. Wheel to zoom, drag
@@ -182,7 +192,7 @@ export default async function WorkDetail({
         ) : (
           <section className="mt-24" aria-label="Screens">
             <h2 className="hairline pt-4">
-              <Label index="A">Screens</Label>
+              <Label index="B">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] text-base text-slate">
               Captures for this one are still to come.
