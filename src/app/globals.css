@@ -1309,3 +1309,36 @@
   border-color: color-mix(in oklab, var(--ink) 18%, transparent);
   background: color-mix(in oklab, var(--surface) 70%, transparent);
 }
+
+/* ---- Entity relationship maps ----
+   Same family as the system map: shared column headers, connectors and frame.
+   The only new parts are the banded table head and the field rows. */
+.erd-entity rect {
+  fill: var(--paper);
+  stroke: color-mix(in oklab, var(--ink) 16%, transparent);
+  stroke-width: 1;
+}
+.erd-entity .erd-head {
+  fill: color-mix(in oklab, var(--surface) 85%, var(--paper));
+  stroke: none;
+}
+.erd-entity[data-kind="owned"] .erd-head {
+  fill: color-mix(in oklab, var(--accent-soft) 55%, var(--paper));
+}
+.erd-entity[data-kind="owned"] rect:first-child {
+  stroke: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+.erd-entity[data-kind="support"] rect:first-child {
+  stroke-dasharray: 4 3;
+}
+.erd-name {
+  font-family: var(--font-display-stack);
+  font-size: 12.5px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+.erd-field {
+  font-family: var(--font-mono-stack);
+  font-size: 8px;
+  fill: var(--slate);
+}

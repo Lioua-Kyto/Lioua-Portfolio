@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import type { Diagram } from "@/content/schemas";
+import type { Diagram, Erd } from "@/content/schemas";
 import { SystemMap } from "@/components/work/SystemMap";
+import { ErdMap } from "@/components/work/ErdMap";
 import { ShotViewer } from "@/components/work/ShotViewer";
 
 /**
@@ -21,48 +22,82 @@ const LEGEND = [
   { kind: "external", label: "Someone else's service" },
 ] as const;
 
-export function ArchitectureBlock({ diagram }: { diagram: Diagram }) {
-  const [open, setOpen] = useState(false);
+export function ArchitectureBlock({
+  diagram,
+  erd,
+}: {
+  diagram: Diagram | null;
+  erd: Erd | null;
+}) {
+  const [open, setOpen] = useState<"map" | "erd" | null>(null);
 
   return (
     <>
-      <p className="type-display mt-6 max-w-[46ch] text-title leading-tight font-medium">
-        {diagram.title}
-      </p>
-      <p className="mt-3 max-w-[58ch] text-base text-slate">
-        {diagram.caption}
-      </p>
+      {diagram ? (
+        <>
+          <p className="type-display mt-6 max-w-[46ch] text-title leading-tight font-medium">
+            {diagram.title}
+          </p>
+          <p className="mt-3 max-w-[58ch] text-base text-slate">
+            {diagram.caption}
+          </p>
 
-      <div className="system-map-frame group mt-8">
-        <div className="system-map-scroll">
-          <SystemMap diagram={diagram} />
-        </div>
-        <button
-          type="button"
-          className="system-map-open font-mono text-fine uppercase"
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          Open
-        </button>
-      </div>
+          <div className="system-map-frame group mt-8">
+            <div className="system-map-scroll">
+              <SystemMap diagram={diagram} />
+            </div>
+            <button
+              type="button"
+              className="system-map-open font-mono text-fine uppercase"
+              onClick={() => {
+                setOpen("map");
+              }}
+            >
+              Open
+            </button>
+          </div>
 
-      <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
-        {LEGEND.map((entry) => (
-          <li
-            key={entry.kind}
-            data-kind={entry.kind}
-            className="system-map-key font-mono text-fine text-slate"
-          >
-            {entry.label}
-          </li>
-        ))}
-      </ul>
+          <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+            {LEGEND.map((entry) => (
+              <li
+                key={entry.kind}
+                data-kind={entry.kind}
+                className="system-map-key font-mono text-fine text-slate"
+              >
+                {entry.label}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+
+      {erd ? (
+        <>
+          <p className="type-display mt-20 max-w-[46ch] text-title leading-tight font-medium">
+            {erd.title}
+          </p>
+          <p className="mt-3 max-w-[58ch] text-base text-slate">{erd.caption}</p>
+
+          <div className="system-map-frame group mt-8">
+            <div className="system-map-scroll">
+              <ErdMap erd={erd} />
+            </div>
+            <button
+              type="button"
+              className="system-map-open font-mono text-fine uppercase"
+              onClick={() => {
+                setOpen("erd");
+              }}
+            >
+              Open
+            </button>
+          </div>
+        </>
+      ) : null}
 
       <ShotViewer
         shot={
-          open
+          open === "map" && diagram
             ? {
                 alt: `${diagram.title}. ${diagram.caption}`,
                 content: (
@@ -71,10 +106,19 @@ export function ArchitectureBlock({ diagram }: { diagram: Diagram }) {
                   </div>
                 ),
               }
-            : null
+            : open === "erd" && erd
+              ? {
+                  alt: `${erd.title}. ${erd.caption}`,
+                  content: (
+                    <div className="system-map-stage">
+                      <ErdMap erd={erd} />
+                    </div>
+                  ),
+                }
+              : null
         }
         onClose={() => {
-          setOpen(false);
+          setOpen(null);
         }}
       />
     </>

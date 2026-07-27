@@ -111,7 +111,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Real-time by default.",
       body: "If something changes and a user has to refresh to see it, that's a bug with extra steps. A WebSocket costs less than a confused user.",
       practice:
-        "Faderco's hiring loop ran on a four-hour round-trip per candidate. Pushing state over Channels instead of waiting for a refresh took it to zero.",
+        "Faderco's hiring loop cost a candidate four hours of driving each way. Moving the interview into the browser cut it to a fifteen-minute call, and live updates meant nobody refreshed a page to find out what changed.",
     },
     {
       title: "Shipped beats perfect.",
@@ -311,6 +311,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           { from: "auth", to: "ws", label: null },
         ],
       },
+      erd: null,
       access: "code private, production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
@@ -326,11 +327,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "An internal HR portal that retired the spreadsheets: candidate intake through offer, 50+ a cycle.",
       stack: "Django · React · PostgreSQL · WebRTC · Google OAuth2",
       metric: {
-        value: "4h → 0",
-        label: "candidate round-trip per interview, once WebRTC shipped",
+        value: "4h → 15min",
+        label: "per interview, once the call moved into the browser",
       },
       highlights: [
-        "Shipped their first remote interviewing with WebRTC. Candidates stopped driving up to four hours each way.",
+        "Shipped their first remote interviewing on the Stream API. A four-hour drive each way became a fifteen-minute call in the browser.",
         "A worker-evaluation module replaced paper and saved HR two hours of typing a cycle.",
       ],
       cover: {
@@ -431,15 +432,15 @@ export const rawContent: z.input<typeof contentSchema> = {
                 kind: "service",
               },
               {
-                id: "oauth",
-                label: "Google OAuth2",
-                note: "Sign-in, no passwords stored",
+                id: "live",
+                label: "WebRTC channel",
+                note: "Live updates and notifications",
                 kind: "service",
               },
               {
                 id: "rtc",
-                label: "WebRTC signalling",
-                note: "Puts the interview in the browser",
+                label: "Stream API",
+                note: "Runs the interview call in the browser",
                 kind: "service",
               },
             ],
@@ -474,10 +475,82 @@ export const rawContent: z.input<typeof contentSchema> = {
           { from: "cand", to: "api", label: "applies" },
           { from: "cand", to: "rtc", label: "joins interview" },
           { from: "hr", to: "rtc", label: null },
-          { from: "api", to: "oauth", label: null },
+          { from: "api", to: "live", label: "live updates" },
           { from: "api", to: "pg", label: null },
           { from: "api", to: "files", label: null },
           { from: "api", to: "mail", label: null },
+        ],
+      },
+      erd: {
+        title: "A vacancy becomes a hire",
+        caption:
+          "The whole pipeline is one chain of records. A request becomes a post, a post collects applicants, and an applicant carries an interview and an evaluation, so nothing about a candidate lives in somebody's inbox.",
+        columns: [
+          {
+            title: "Who is involved",
+            entities: [
+              {
+                id: "user",
+                name: "CustomUser",
+                fields: ["id", "email", "user_type", "phone"],
+                kind: "core",
+              },
+              {
+                id: "appl",
+                name: "Applicant",
+                fields: ["first_name / last_name", "email", "resume_file", "status", "hired_date"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "The pipeline",
+            entities: [
+              {
+                id: "req",
+                name: "JobRequest",
+                fields: ["field", "required_employees", "experience_level", "status", "district_manager"],
+                kind: "owned",
+              },
+              {
+                id: "post",
+                name: "JobPost",
+                fields: ["job_request (1:1)", "contract_type", "human_resources", "is_active"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "What comes of it",
+            entities: [
+              {
+                id: "intv",
+                name: "Interview",
+                fields: ["meeting_id", "interviewer", "candidate", "scheduled_time", "status"],
+                kind: "owned",
+              },
+              {
+                id: "eval",
+                name: "PerformanceEvaluation",
+                fields: ["applicant", "technical_skills", "communication", "problem_solving", "leadership"],
+                kind: "owned",
+              },
+              {
+                id: "note",
+                name: "Notification",
+                fields: ["recipient", "sender_type", "notification_type", "is_read"],
+                kind: "support",
+              },
+            ],
+          },
+        ],
+        relations: [
+          { from: "user", to: "req", label: "raises many" },
+          { from: "req", to: "post", label: "one to one" },
+          { from: "post", to: "appl", label: "one to many" },
+          { from: "appl", to: "intv", label: "one to many" },
+          { from: "appl", to: "eval", label: "one to many" },
+          { from: "user", to: "note", label: "one to many" },
         ],
       },
       access: "internal tool, code stays with Faderco",
@@ -495,7 +568,10 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Cross-platform coffee ordering: a Flutter client on a layered Node/Express/TypeScript API.",
       stack:
         "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis · Gemini",
-      metric: null,
+      metric: {
+        value: "1",
+        label: "transaction covers the order, the stock, the cart and the points",
+      },
       highlights: [
         "Offline-first guest cart that merges conflict-free the moment you sign in. It survives cold starts.",
         "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
@@ -653,6 +729,91 @@ export const rawContent: z.input<typeof contentSchema> = {
           { from: "ord", to: "fcm", label: "after commit" },
         ],
       },
+      erd: {
+        title: "An order that cannot change under you",
+        caption:
+          "What you bought is copied onto the order at the moment of purchase: name, image, price and options. The catalogue can be edited afterwards and a delivered order still reads exactly as it did at the till.",
+        columns: [
+          {
+            title: "Who buys",
+            entities: [
+              {
+                id: "user",
+                name: "User",
+                fields: ["firebaseUid", "email", "displayName", "role", "fcmToken"],
+                kind: "core",
+              },
+              {
+                id: "loy",
+                name: "LoyaltyAccount",
+                fields: ["user (1:1)", "currentPoints", "lifetimePoints", "tier"],
+                kind: "owned",
+              },
+              {
+                id: "ledger",
+                name: "LoyaltyTransaction",
+                fields: ["type", "points", "description"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "What is for sale",
+            entities: [
+              {
+                id: "prod",
+                name: "Product",
+                fields: ["slug", "price (Decimal)", "stock", "type", "avgRating"],
+                kind: "core",
+              },
+              {
+                id: "grp",
+                name: "ModifierGroup",
+                fields: ["name", "selectionType", "isRequired"],
+                kind: "support",
+              },
+              {
+                id: "opt",
+                name: "ModifierOption",
+                fields: ["label", "priceDelta (Decimal)", "isDefault"],
+                kind: "support",
+              },
+            ],
+          },
+          {
+            title: "What was bought",
+            entities: [
+              {
+                id: "order",
+                name: "Order",
+                fields: ["subtotal / total", "loyaltyDiscount", "pointsEarned", "status", "estimatedReadyAt"],
+                kind: "owned",
+              },
+              {
+                id: "item",
+                name: "OrderItem",
+                fields: ["productName (snapshot)", "unitPrice (snapshot)", "modifiers (JSON)", "quantity"],
+                kind: "owned",
+              },
+              {
+                id: "rev",
+                name: "Review",
+                fields: ["orderItem (1:1)", "rating", "comment", "isVisible"],
+                kind: "support",
+              },
+            ],
+          },
+        ],
+        relations: [
+          { from: "user", to: "order", label: "one to many" },
+          { from: "user", to: "loy", label: "one to one" },
+          { from: "loy", to: "ledger", label: "one to many" },
+          { from: "prod", to: "grp", label: "one to many" },
+          { from: "grp", to: "opt", label: "one to many" },
+          { from: "order", to: "item", label: "one to many" },
+          { from: "item", to: "rev", label: "one to one" },
+        ],
+      },
       access: "public repo, link on its way",
       links: { live: null, source: null },
       todos: [
@@ -668,11 +829,11 @@ export const rawContent: z.input<typeof contentSchema> = {
       period: "2025",
       hook: "A full storefront with zero third-party commerce dependencies, because I wanted to know how.",
       summary:
-        "E-commerce end to end: variants, cart, wishlist, orders and reviews, on a Django API through a React front.",
+        "A storefront with the back office behind it: catalogue and checkout on the shop side, inventory, orders, customers and sales on the admin side.",
       stack: "Django · React · PostgreSQL · Stripe · Channels",
       metric: {
-        value: "< 2s",
-        label: "catalog loads, measured on Core Web Vitals",
+        value: "7",
+        label: "admin surfaces: inventory, orders, customers, sales, analytics",
       },
       highlights: [
         "The full Stripe post-purchase loop lives server-side: payment → order transitions → inventory.",
@@ -808,6 +969,78 @@ export const rawContent: z.input<typeof contentSchema> = {
           { from: "api", to: "media", label: null },
         ],
       },
+      erd: {
+        title: "Stock that can always be explained",
+        caption:
+          "A product is not one thing: it is a set of sellable variants, each with its own stock. Every change to that stock is written to a ledger with the quantity before and after, so the number on the shelf is never a mystery.",
+        columns: [
+          {
+            title: "The catalogue",
+            entities: [
+              {
+                id: "prod",
+                name: "Product",
+                fields: ["title", "slug", "brand", "specs (JSON)", "rating"],
+                kind: "core",
+              },
+              {
+                id: "cat",
+                name: "Category",
+                fields: ["name", "slug", "parent (self)"],
+                kind: "support",
+              },
+              {
+                id: "sale",
+                name: "Sale",
+                fields: ["product (1:1)", "discount_percent", "starts_at / ends_at"],
+                kind: "support",
+              },
+            ],
+          },
+          {
+            title: "What is actually sold",
+            entities: [
+              {
+                id: "sku",
+                name: "VariantSKU",
+                fields: ["sku", "price", "color / size", "attributes (JSON)", "is_active"],
+                kind: "owned",
+              },
+              {
+                id: "inv",
+                name: "Inventory",
+                fields: ["sku (1:1)", "quantity", "low_stock_threshold"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "The paper trail",
+            entities: [
+              {
+                id: "mv",
+                name: "StockMovement",
+                fields: ["movement_type", "quantity_change", "quantity_before", "quantity_after", "order", "user"],
+                kind: "owned",
+              },
+              {
+                id: "ord",
+                name: "Order",
+                fields: ["user", "address", "status", "total"],
+                kind: "core",
+              },
+            ],
+          },
+        ],
+        relations: [
+          { from: "cat", to: "prod", label: "many to many" },
+          { from: "prod", to: "sku", label: "one to many" },
+          { from: "sku", to: "inv", label: "one to one" },
+          { from: "sku", to: "mv", label: "one to many" },
+          { from: "ord", to: "mv", label: "one to many" },
+          { from: "prod", to: "sale", label: "one to one" },
+        ],
+      },
       access: "live site, repo private",
       links: { live: null, source: null },
       todos: [
@@ -825,7 +1058,10 @@ export const rawContent: z.input<typeof contentSchema> = {
       summary:
         "A gamified cognitive platform: 7 categories, 14 browser games, XP, and multi-dimensional ranking.",
       stack: "Django · React · PostgreSQL · Channels",
-      metric: null,
+      metric: {
+        value: "14",
+        label: "browser games on one shared scoring and XP model",
+      },
       highlights: [
         "Real-time multiplayer over Channels: global chat, private messages, live leaderboards.",
         "Scoring blends accuracy, streak, and response time into per-category progression.",
@@ -903,6 +1139,85 @@ export const rawContent: z.input<typeof contentSchema> = {
           { from: "ws", to: "pg", label: null },
           { from: "api", to: "xp", label: null },
           { from: "xp", to: "pg", label: null },
+        ],
+      },
+      erd: {
+        title: "One scoring model, fourteen games",
+        caption:
+          "Every game writes the same shape of result, so a leaderboard, a personal best and an XP total are all views of one record rather than fourteen special cases.",
+        columns: [
+          {
+            title: "Who plays",
+            entities: [
+              {
+                id: "user",
+                name: "CustomUser",
+                fields: ["email", "username", "profile_picture", "bio"],
+                kind: "core",
+              },
+              {
+                id: "friend",
+                name: "Friendship",
+                fields: ["requester", "receiver", "status"],
+                kind: "support",
+              },
+              {
+                id: "status",
+                name: "UserStatus",
+                fields: ["user (1:1)", "status", "last_activity"],
+                kind: "support",
+              },
+            ],
+          },
+          {
+            title: "What is played",
+            entities: [
+              {
+                id: "game",
+                name: "Game",
+                fields: ["name", "category", "base_xp_reward", "difficulty_multiplier"],
+                kind: "core",
+              },
+              {
+                id: "match",
+                name: "MultiplayerMatch",
+                fields: ["game", "player1 / player2", "status", "winner", "game_data (JSON)"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "What it records",
+            entities: [
+              {
+                id: "res",
+                name: "GameResult",
+                fields: ["user", "game", "score", "xp_earned", "streaks / mistakes"],
+                kind: "owned",
+              },
+              {
+                id: "best",
+                name: "BestScore",
+                fields: ["user", "game", "best_streak", "fewest_mistakes", "times_played"],
+                kind: "owned",
+              },
+              {
+                id: "msc",
+                name: "MultiplayerScore",
+                fields: ["match", "player", "score", "performance_data (JSON)"],
+                kind: "owned",
+              },
+            ],
+          },
+        ],
+        relations: [
+          { from: "user", to: "res", label: "one to many" },
+          { from: "game", to: "res", label: "one to many" },
+          { from: "user", to: "best", label: "one to many" },
+          { from: "game", to: "match", label: "one to many" },
+          { from: "match", to: "msc", label: "one to many" },
+          { from: "user", to: "friend", label: "many to many" },
+          { from: "user", to: "status", label: "one to one" },
         ],
       },
       access: "repo private",

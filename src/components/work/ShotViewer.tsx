@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSmoothScroll } from "@/components/providers/SmoothScrollProvider";
 
 /** Either a capture to zoom, or arbitrary vector content (a system map). */
 type Shot = { src?: string; alt: string; content?: ReactNode };
@@ -29,6 +30,7 @@ export function ShotViewer({
   const view = useRef({ scale: 1, x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number } | null>(null);
   const [zoomLabel, setZoomLabel] = useState(100);
+  const { getLenis } = useSmoothScroll();
 
   const paint = useCallback(() => {
     const el = frame.current;
@@ -78,14 +80,38 @@ export function ShotViewer({
       if (event.key === "0") reset();
     };
     window.addEventListener("keydown", onKey);
-    // The page scroller must not run underneath the open viewer.
+
+    // The page scroller has to be stopped, not just hidden: Lenis drives its
+    // own animation frame and transforms the page itself, so `overflow:hidden`
+    // on the body left the page travelling underneath while the wheel zoomed.
+    const lenis = getLenis();
+    lenis?.stop();
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // React attaches wheel handlers passively, which cannot cancel the scroll.
+    // A native non-passive listener can, so the wheel means zoom and nothing
+    // else while the viewer is open.
+    const el = stage.current;
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const box = el?.getBoundingClientRect();
+      if (!box) return;
+      zoomBy(
+        event.deltaY < 0 ? 1.12 : 0.89,
+        event.clientX - box.left - box.width / 2,
+        event.clientY - box.top - box.height / 2,
+      );
+    };
+    el?.addEventListener("wheel", onWheel, { passive: false });
+
     return () => {
       window.removeEventListener("keydown", onKey);
+      el?.removeEventListener("wheel", onWheel);
       document.body.style.overflow = previous;
+      lenis?.start();
     };
-  }, [shot, onClose, reset, zoomBy]);
+  }, [shot, onClose, reset, zoomBy, getLenis]);
 
   if (!shot) return null;
 
@@ -106,15 +132,6 @@ export function ShotViewer({
       <div
         ref={stage}
         className="shot-viewer-stage"
-        onWheel={(event) => {
-          const box = stage.current?.getBoundingClientRect();
-          if (!box) return;
-          zoomBy(
-            event.deltaY < 0 ? 1.12 : 0.89,
-            event.clientX - box.left - box.width / 2,
-            event.clientY - box.top - box.height / 2,
-          );
-        }}
         onDoubleClick={() => {
           if (view.current.scale > 1) reset();
           else zoomBy(2);
