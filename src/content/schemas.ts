@@ -115,6 +115,39 @@ export const erdSchema = z.object({
 });
 
 /**
+ * A process, drawn as swimlanes.
+ *
+ * Lanes are the parties involved and steps run left to right in the order they
+ * actually happen, so the drawing answers "who does what, and then what" — the
+ * question a client asks — while the state each step leaves behind is the
+ * answer an engineer wants. Steps connect to the one after them; a step that
+ * ends a branch says so in its own state.
+ */
+export const flowSchema = z.object({
+  title: z.string().min(1),
+  caption: z.string().min(1),
+  lanes: z
+    .array(z.object({ id: z.string().min(1), label: z.string().min(1) }))
+    .min(2)
+    .max(4),
+  steps: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        lane: z.string().min(1),
+        label: z.string().min(1),
+        note: z.string().min(1).nullable(),
+        /** The state this step leaves the record in, if it changes one. */
+        state: z.string().min(1).nullable(),
+        /** `gate` marks a decision, `end` a terminal step. */
+        kind: z.enum(["step", "gate", "end"]),
+      }),
+    )
+    .min(3)
+    .max(10),
+});
+
+/**
  * One piece of work — client engagements and personal products in a single
  * shape, because the site presents them as one body of work, not two lists.
  * `kind` is the only thing that tells them apart in the UI.
@@ -154,6 +187,8 @@ export const workSchema = z.object({
   diagram: diagramSchema.nullable(),
   /** The shape of the data underneath it. */
   erd: erdSchema.nullable(),
+  /** The process it runs, lane by lane. */
+  flow: flowSchema.nullable(),
   /** Honest access/status line, e.g. `code private — client work`. */
   access: z.string().min(1),
   links: z.object({
@@ -266,6 +301,7 @@ export const contentSchema = z.object({
 export type Shot = z.infer<typeof shotSchema>;
 export type Diagram = z.infer<typeof diagramSchema>;
 export type Erd = z.infer<typeof erdSchema>;
+export type Flow = z.infer<typeof flowSchema>;
 export type DiagramNode = z.infer<typeof diagramNodeSchema>;
 export type SectionCopy = z.infer<typeof sectionCopySchema>;
 export type Readout = z.infer<typeof readoutSchema>;
