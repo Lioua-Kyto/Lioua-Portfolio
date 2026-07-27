@@ -58,9 +58,6 @@ export function ArchitectureBlock({
               aria-label={`Open ${flow.title} full size`}
             >
               <FlowMap flow={flow} />
-              <span className="system-map-hint font-mono text-fine uppercase">
-                Click to open
-              </span>
             </button>
           </div>
         </>
@@ -86,9 +83,6 @@ export function ArchitectureBlock({
               aria-label={`Open ${diagram.title} full size`}
             >
               <SystemMap diagram={diagram} />
-              <span className="system-map-hint font-mono text-fine uppercase">
-                Click to open
-              </span>
             </button>
           </div>
 
@@ -126,9 +120,6 @@ export function ArchitectureBlock({
               aria-label={`Open ${erd.title} full size`}
             >
               <ErdMap erd={erd} />
-              <span className="system-map-hint font-mono text-fine uppercase">
-                Click to open
-              </span>
             </button>
           </div>
         </>
