@@ -57,7 +57,7 @@ export default async function WorkDetail({
   const stack = item.stack.split(" · ");
 
   return (
-    <main className="pb-[clamp(4rem,12vh,9rem)]">
+    <main>
       <div className="shell">
         <p className="hairline flex flex-wrap items-center gap-x-4 gap-y-1 pt-4">
           <Link

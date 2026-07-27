@@ -42,6 +42,12 @@ export function AnchorScroll() {
       // (mid-morph), not the top. Home always means the very top of the page.
       if (href === "#intro") {
         lenis.scrollTo(0, { offset: 0, duration: 1.1 });
+      } else if (href === "#under-the-hood") {
+        // Travelling to this one smoothly drags the scroll through the pinned
+        // curtain, which scrubs the whole bonnet-opening on the way past. Going
+        // straight there arrives with it already open; scrolling back up still
+        // plays it in reverse, which is how a reader returns to the surface.
+        lenis.scrollTo(target, { offset: 0, immediate: true });
       } else {
         lenis.scrollTo(target, { offset: 0, duration: 1.1 });
       }

@@ -45,18 +45,19 @@ export function ArchitectureBlock({
             {flow.caption}
           </p>
 
-          <div className="system-map-frame group mt-8">
-            <div className="system-map-scroll">
-              <FlowMap flow={flow} />
-            </div>
+          <div className="mt-8">
             <button
               type="button"
-              className="system-map-open font-mono text-fine uppercase"
+              className="system-map-frame"
               onClick={() => {
                 setOpen("flow");
               }}
+              aria-label={`Open ${flow.title} full size`}
             >
-              Open
+              <FlowMap flow={flow} />
+              <span className="system-map-hint font-mono text-fine uppercase">
+                Click to open
+              </span>
             </button>
           </div>
         </>
@@ -71,18 +72,19 @@ export function ArchitectureBlock({
             {diagram.caption}
           </p>
 
-          <div className="system-map-frame group mt-8">
-            <div className="system-map-scroll">
-              <SystemMap diagram={diagram} />
-            </div>
+          <div className="mt-8">
             <button
               type="button"
-              className="system-map-open font-mono text-fine uppercase"
+              className="system-map-frame"
               onClick={() => {
                 setOpen("map");
               }}
+              aria-label={`Open ${diagram.title} full size`}
             >
-              Open
+              <SystemMap diagram={diagram} />
+              <span className="system-map-hint font-mono text-fine uppercase">
+                Click to open
+              </span>
             </button>
           </div>
 
@@ -109,18 +111,19 @@ export function ArchitectureBlock({
             {erd.caption}
           </p>
 
-          <div className="system-map-frame group mt-8">
-            <div className="system-map-scroll">
-              <ErdMap erd={erd} />
-            </div>
+          <div className="mt-8">
             <button
               type="button"
-              className="system-map-open font-mono text-fine uppercase"
+              className="system-map-frame"
               onClick={() => {
                 setOpen("erd");
               }}
+              aria-label={`Open ${erd.title} full size`}
             >
-              Open
+              <ErdMap erd={erd} />
+              <span className="system-map-hint font-mono text-fine uppercase">
+                Click to open
+              </span>
             </button>
           </div>
         </>

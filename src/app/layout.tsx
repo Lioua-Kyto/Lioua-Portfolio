@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Bricolage_Grotesque, Martian_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
+import { RouteScrollReset } from "@/components/providers/RouteScrollReset";
 import { content } from "@/content";
 import "./globals.css";
 
@@ -97,7 +98,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-        <SmoothScrollProvider>{children}</SmoothScrollProvider>
+        <SmoothScrollProvider>
+          <RouteScrollReset />
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );
