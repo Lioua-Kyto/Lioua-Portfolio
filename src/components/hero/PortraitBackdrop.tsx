@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
 import { pin, scrub } from "@/lib/motion/tokens";
+import { PortraitField } from "@/components/hero/PortraitField";
 
 /**
  * The portrait as a fixed backdrop: it resolves in behind the name on load,
@@ -82,21 +83,27 @@ export function PortraitBackdrop() {
         data-portrait-layer
         className="flex h-full w-full items-end justify-center"
       >
-        <Image
-          data-portrait
-          src="/img/portrait.webp"
-          alt=""
-          // The source (re-encoded from assets/portrait/portrait.png) is
-          // 2000x1500. Declaring the real size lets Next serve it crisp on
-          // high-DPI screens without upscaling.
-          width={2000}
-          height={1500}
-          priority
-          fetchPriority="high"
-          quality={90}
-          sizes="(max-width: 768px) 150vw, 90vw"
-          className="h-[92vh] w-auto max-w-none object-contain sm:h-[96vh]"
-        />
+        {/* The shader draws over the image, pixel for pixel, and only takes
+            the frame once it has one to give. Everything the scroll does to
+            this layer — blur, fade, scale — applies to both at once. */}
+        <div className="portrait-plate">
+          <Image
+            data-portrait
+            src="/img/portrait.webp"
+            alt=""
+            // The source (re-encoded from assets/portrait/portrait.png) is
+            // 2000x1500. Declaring the real size lets Next serve it crisp on
+            // high-DPI screens without upscaling.
+            width={2000}
+            height={1500}
+            priority
+            fetchPriority="high"
+            quality={90}
+            sizes="(max-width: 768px) 150vw, 90vw"
+            className="h-[92vh] w-auto max-w-none object-contain sm:h-[96vh]"
+          />
+          <PortraitField src="/img/portrait.webp" />
+        </div>
       </div>
     </div>
   );

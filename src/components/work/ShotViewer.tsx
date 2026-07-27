@@ -81,29 +81,80 @@ export function ShotViewer({
     paint();
   }, [paint]);
 
-  // Clamp the pan so at least part of the image stays over the stage.
+  /**
+   * Pull the pan back into range.
+   *
+   * For a drawing this is measured, never inferred from the scale: the drawing
+   * is centred while it fits and top-left aligned once it overflows, so a
+   * symmetric limit computed off the scale let the sheet slide to blank space
+   * on one side while the far side stayed out of reach. Reading where the
+   * drawing actually is and closing any gap gets both edges, on both axes.
+   * Must run after a paint, so the rect reflects the current size and offset.
+   */
   const clamp = useCallback(() => {
     const box = stage.current?.getBoundingClientRect();
     if (!box) return;
+    if (isVector) {
+      const svg = frame.current?.querySelector("svg");
+      if (!svg) return;
+      const art = svg.getBoundingClientRect();
+      if (art.width <= box.width) view.current.x = 0;
+      else if (art.left > box.left) view.current.x -= art.left - box.left;
+      else if (art.right < box.right) view.current.x += box.right - art.right;
+
+      if (art.height <= box.height) view.current.y = 0;
+      else if (art.top > box.top) view.current.y -= art.top - box.top;
+      else if (art.bottom < box.bottom)
+        view.current.y += box.bottom - art.bottom;
+      return;
+    }
     const limitX = (box.width * (view.current.scale - 1)) / 2;
     const limitY = (box.height * (view.current.scale - 1)) / 2;
     view.current.x = Math.max(-limitX, Math.min(limitX, view.current.x));
     view.current.y = Math.max(-limitY, Math.min(limitY, view.current.y));
-  }, []);
+  }, [isVector]);
 
   const zoomBy = useCallback(
-    (factor: number, originX = 0, originY = 0) => {
+    (factor: number, pointerX?: number, pointerY?: number) => {
       const next = Math.max(1, Math.min(6, view.current.scale * factor));
-      const ratio = next / view.current.scale;
-      // Keep the point under the cursor fixed as the scale changes.
-      view.current.x = originX - (originX - view.current.x) * ratio;
-      view.current.y = originY - (originY - view.current.y) * ratio;
-      view.current.scale = next;
+      const box = stage.current?.getBoundingClientRect();
+      const at = {
+        x: pointerX ?? (box ? box.left + box.width / 2 : 0),
+        y: pointerY ?? (box ? box.top + box.height / 2 : 0),
+      };
+
+      if (isVector) {
+        // The drawing changes size by relayout, so the only reliable way to
+        // hold the point under the cursor is to note where it sits in the
+        // drawing, grow it, then shift by however far that point moved.
+        const svg = frame.current?.querySelector("svg");
+        const before = svg?.getBoundingClientRect();
+        const u =
+          before && before.width ? (at.x - before.left) / before.width : 0.5;
+        const v =
+          before && before.height ? (at.y - before.top) / before.height : 0.5;
+        view.current.scale = next;
+        paint();
+        const after = svg?.getBoundingClientRect();
+        if (after) {
+          view.current.x += at.x - (after.left + u * after.width);
+          view.current.y += at.y - (after.top + v * after.height);
+        }
+      } else {
+        const ratio = next / view.current.scale;
+        const originX = box ? at.x - box.left - box.width / 2 : 0;
+        const originY = box ? at.y - box.top - box.height / 2 : 0;
+        view.current.x = originX - (originX - view.current.x) * ratio;
+        view.current.y = originY - (originY - view.current.y) * ratio;
+        view.current.scale = next;
+      }
+
       if (next === 1) view.current = { scale: 1, x: 0, y: 0 };
+      paint();
       clamp();
       paint();
     },
-    [clamp, paint],
+    [clamp, paint, isVector],
   );
 
   /**
@@ -208,13 +259,7 @@ export function ShotViewer({
     const el = stage.current;
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const box = el?.getBoundingClientRect();
-      if (!box) return;
-      zoomBy(
-        event.deltaY < 0 ? 1.12 : 0.89,
-        event.clientX - box.left - box.width / 2,
-        event.clientY - box.top - box.height / 2,
-      );
+      zoomBy(event.deltaY < 0 ? 1.12 : 0.89, event.clientX, event.clientY);
     };
     el?.addEventListener("wheel", onWheel, { passive: false });
 
@@ -262,6 +307,7 @@ export function ShotViewer({
           if (!drag.current || view.current.scale === 1) return;
           view.current.x = event.clientX - drag.current.x;
           view.current.y = event.clientY - drag.current.y;
+          paint();
           clamp();
           paint();
         }}

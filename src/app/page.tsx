@@ -2,7 +2,6 @@ import { content } from "@/content";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileMenu } from "@/components/MobileMenu";
 import { Motion } from "@/components/motion/Motion";
-import { AnchorScroll } from "@/components/providers/AnchorScroll";
 import { HeroChrome } from "@/components/hero/HeroChrome";
 import { HeroName } from "@/components/hero/HeroName";
 import { PortraitBackdrop } from "@/components/hero/PortraitBackdrop";
@@ -24,7 +23,6 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      <AnchorScroll />
       {/* Painting order: the wordmark (z-5) sits under the portrait (z-10),
           which sits under the hero chrome (z-30) that becomes the side rail. */}
       <HeroName />

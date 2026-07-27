@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, Martian_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { RouteScrollReset } from "@/components/providers/RouteScrollReset";
+import { AnchorScroll } from "@/components/providers/AnchorScroll";
 import { content } from "@/content";
 import "./globals.css";
 
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <SmoothScrollProvider>
           <RouteScrollReset />
+          <AnchorScroll />
           {children}
         </SmoothScrollProvider>
       </body>

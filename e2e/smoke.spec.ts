@@ -95,8 +95,10 @@ test("the hero name sits behind the portrait, its letters settling in", async ({
   // z-order is the move: the portrait layer paints over the name.
   const z = await page.evaluate(() => {
     const name = document.querySelector('[data-hero="title"]');
-    const portrait = document.querySelector("[data-portrait]");
-    const layer = portrait?.parentElement?.parentElement ?? null;
+    // The fixed layer that carries the z-index, found by name rather than by
+    // counting parents — the portrait gained a wrapper for the shader canvas.
+    const layer =
+      document.querySelector("[data-portrait-layer]")?.parentElement ?? null;
     return {
       name: Number(getComputedStyle(name as Element).zIndex),
       portrait: Number(getComputedStyle(layer as Element).zIndex),

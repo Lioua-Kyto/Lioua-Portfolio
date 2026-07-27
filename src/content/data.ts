@@ -1379,11 +1379,11 @@ export const rawContent: z.input<typeof contentSchema> = {
         "A cognitive training platform: seven skill categories — attention, memory, speed, logic, language, multi-domain and competitive — each with its own exercises, its own progression and its own ranking.",
       stack: "Django · React · PostgreSQL · Channels",
       metric: {
-        value: "25",
-        label: "exercises across five categories, one result model",
+        value: "35",
+        label: "exercises across seven categories, 25 built so far",
       },
       highlights: [
-        "Seven categories of skill, twenty-five exercises built across five of them, and one result shape underneath: score, level, streak, mistakes, correct answers. A ranking, a personal best and an XP total are three readings of one row.",
+        "Thirty-five exercises across seven categories — five apiece — seeded, routed and scored through one result shape: score, level, streak, mistakes, correct answers. A ranking, a personal best and an XP total are three readings of one row.",
         "The client's XP claim is thrown away. The server recomputes it from base reward, level reached, score, streak bonus and a mistake penalty, then decides whether that was a level-up.",
         "Ranking in three dimensions — overall, per category, per exercise — with friends, presence and chat over Channels, and head-to-head reserved for the competitive category alone.",
       ],
@@ -1470,9 +1470,9 @@ export const rawContent: z.input<typeof contentSchema> = {
         ],
       },
       erd: {
-        title: "One result model, twenty-five exercises",
+        title: "One result model, thirty-five exercises",
         caption:
-          "Every exercise writes the same shape of result, so a ranking, a personal best and an XP total are views of one record rather than twenty-five special cases. Head-to-head hangs off the side, limited to the competitive category.",
+          "Every exercise writes the same shape of result, so a ranking, a personal best and an XP total are views of one record rather than thirty-five special cases. Head-to-head hangs off the side, limited to the competitive category.",
         columns: [
           {
             title: "Who plays",
@@ -1595,7 +1595,7 @@ export const rawContent: z.input<typeof contentSchema> = {
             id: "c5",
             lane: "db",
             label: "Writes one result row",
-            note: "The shape all twenty-five share",
+            note: "The shape all thirty-five share",
             state: null,
             kind: "step",
           },
