@@ -138,14 +138,15 @@
      `data-hero` nodes; these touch only the inner ones, so the two never
      write to the same property. */
 
-  /* The name falls letter by letter from above the screen. Mid-flight the
-     letters run big-to-small across the word (--i is the letter's index) and
-     resolve to a single uniform size as they land. `both` fill holds them
-     off-screen from first paint — no pre-animation flash, no layout shift. */
+  /* The name falls letter by letter from above the screen. Through the whole
+     descent the letters run big-to-small across the word (--i is the letter's
+     index); the sizes only equalise once they have landed, so the arrival is
+     two moves and not one. `both` fill holds them off-screen from first paint
+     — no pre-animation flash, no layout shift. */
   [data-title-letter] {
     transform-origin: 50% 100%;
-    animation: letter-fall 1.05s cubic-bezier(0.19, 1, 0.22, 1) both;
-    animation-delay: calc(var(--i, 0) * 0.07s);
+    animation: letter-fall 1.25s cubic-bezier(0.19, 1, 0.22, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.085s);
   }
 
   /* The portrait resolves in from blur once the name has landed — the art
@@ -153,42 +154,20 @@
      in behind it. It is the LCP element, so the hold is as tight as the
      effect allows. */
   [data-portrait] {
-    animation: hero-portrait 1.05s 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  /* The supporting matter arrives with the portrait, each group from its own
-     side over its own duration, so the composition assembles rather than
-     appearing in one block. */
-  [data-hero="nav"] [data-hero-in] {
-    animation: hero-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(1.15s + var(--i, 0) * 0.05s);
-  }
-
-  [data-hero="stats"] [data-hero-in] {
-    animation: hero-left 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(1.25s + var(--i, 0) * 0.08s);
-  }
-
-  [data-hero="lede"] [data-hero-in] {
-    animation: hero-up-far 1s 1.35s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  [data-hero="capabilities"] [data-hero-in] {
-    animation: hero-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(1.4s + var(--i, 0) * 0.06s);
-  }
-
-  [data-hero="tagline"] [data-hero-in] {
-    animation: hero-fade 1s 1.7s ease-out both;
+    animation: hero-portrait 1.05s 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   @keyframes letter-fall {
     from {
       opacity: 0;
-      transform: translateY(-118vh) scale(calc(1 - var(--i, 0) * 0.16));
+      transform: translateY(-118vh) scale(calc(1 - var(--i, 0) * 0.19));
     }
-    28% {
+    24% {
       opacity: 1;
+    }
+    /* Landed, still at their own sizes. */
+    64% {
+      transform: translateY(0) scale(calc(1 - var(--i, 0) * 0.19));
     }
     to {
       opacity: 1;
@@ -206,59 +185,6 @@
       opacity: 1;
       transform: scale(1);
       filter: blur(0);
-    }
-  }
-
-  @keyframes hero-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes hero-up-far {
-    from {
-      opacity: 0;
-      transform: translateY(44px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes hero-left {
-    from {
-      opacity: 0;
-      transform: translateX(-48px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes hero-right {
-    from {
-      opacity: 0;
-      transform: translateX(48px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes hero-fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
     }
   }
 
@@ -301,8 +227,6 @@
     --r-stat-pad: 0.28rem;
     --r-nav-gap: 0.5rem;
     --r-cta-bottom: 5vh;
-    /* eases in once the name has begun to land */
-    animation: chrome-in 0.8s 0.95s both;
   }
   /* Laptop heights: the same modules, tightened so nothing runs off the rail. */
   @media (max-height: 899px) {
@@ -322,12 +246,42 @@
       --r-cta-bottom: 4vh;
     }
   }
-  @keyframes chrome-in {
+  /* The hero entrance order: name, portrait, routes, proofs, then the two
+     lines of copy that close the composition. Opacity and the standalone
+     `translate` property only — GSAP owns `transform` on these same nodes for
+     the hero-to-rail morph, and the two must never write to one property. */
+  .hero-chrome-nav li {
+    animation: chrome-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(2s + var(--i, 0) * 0.07s);
+  }
+  .hero-chrome-stat {
+    animation: chrome-slide 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(2.5s + var(--i, 0) * 0.1s);
+  }
+  .hero-chrome-philosophy {
+    animation: chrome-rise 0.9s 2.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .hero-chrome-tagline [data-hero-in] {
+    animation: chrome-rise 0.9s 3.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes chrome-rise {
     from {
       opacity: 0;
+      translate: 0 16px;
     }
     to {
       opacity: 1;
+      translate: 0 0;
+    }
+  }
+  @keyframes chrome-slide {
+    from {
+      opacity: 0;
+      translate: -28px 0;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
     }
   }
   .hero-chrome a,
@@ -887,6 +841,139 @@
     paint-order: stroke fill;
     -webkit-text-stroke: 2px color-mix(in oklab, var(--ink) 22%, transparent);
   }
+  .footer-mark-glyph {
+    display: inline-block;
+    /* --n is how near the cursor this letter is, 0 to 1, written from JS.
+       Every treatment below is a different reading of that one number. */
+    --n: 0;
+    will-change: transform;
+  }
+
+  /* --- A · spotlight: the accent outline is revealed under a soft circle, so
+     what lights is the part of the mark under the cursor, not a whole letter.
+     The quietest of the four and the one that reads as pure print. --- */
+
+  /* --- B · plate slip: the accent copy slides toward the cursor, the way a
+     plate slips on press. Same language as the portrait's channel split, so
+     the top and the bottom of the page answer each other. --- */
+  .footer-mark[data-mark-fx="slip"] .footer-mark-glow {
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .footer-mark[data-mark-fx="slip"] .footer-mark-glow .footer-mark-glyph {
+    transform: translate(calc(var(--n) * 0.055em), calc(var(--n) * -0.045em));
+    transition: transform 0.18s var(--ease-out);
+  }
+
+  /* --- C · rise: letters lift and fill as the cursor nears, and settle back.
+     The kinetic option — the mark behaves like a keyboard. --- */
+  .footer-mark[data-mark-fx="rise"] .footer-mark-glow {
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .footer-mark[data-mark-fx="rise"] .footer-mark-glow .footer-mark-glyph {
+    transform: translateY(calc(var(--n) * -0.09em));
+    color: color-mix(
+      in oklab,
+      var(--accent) calc(var(--n) * 100%),
+      transparent
+    );
+    -webkit-text-stroke-color: color-mix(
+      in oklab,
+      var(--accent) calc(var(--n) * 100%),
+      transparent
+    );
+    transition:
+      transform 0.24s var(--ease-out),
+      color 0.24s var(--ease-out);
+  }
+  .footer-mark[data-mark-fx="rise"] .footer-mark-base .footer-mark-glyph {
+    transform: translateY(calc(var(--n) * -0.09em));
+    transition: transform 0.24s var(--ease-out);
+  }
+
+  /* --- D · ruled: hairlines cut through the letterforms near the cursor and
+     the mark reads as a technical drawing of itself. --- */
+  .footer-mark[data-mark-fx="rule"] .footer-mark-glow {
+    opacity: 1;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .footer-mark[data-mark-fx="rule"] .footer-mark-glow .footer-mark-glyph {
+    color: transparent;
+    -webkit-text-stroke-color: var(--accent);
+    opacity: var(--n);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      var(--accent) 0 1px,
+      transparent 1px 7px
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  /* The way into a project: the cover the reader clicked grows to fill the
+     screen while the second layer's ground rises under it, and the route
+     change happens behind that. Inert until a card asks for it. */
+  .project-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .project-transition[data-on="true"] {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .project-transition-ground {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+  }
+  .project-transition-shot {
+    position: absolute;
+    background-position: center top;
+    background-size: cover;
+    box-shadow: 0 40px 120px -40px
+      color-mix(in oklab, var(--ink) 55%, transparent);
+  }
+
+  /* The variant switcher — temporary, and styled as a tool rather than as
+     part of the page. */
+  .mark-variants {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+    border-radius: var(--radius);
+    background: color-mix(in oklab, var(--paper) 88%, transparent);
+    backdrop-filter: blur(8px);
+    letter-spacing: 0.08em;
+  }
+  .mark-variant {
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-xs, 4px);
+    color: var(--slate);
+    cursor: pointer;
+    transition: color var(--dur-micro) var(--ease-out);
+  }
+  .mark-variant:hover {
+    color: var(--ink);
+  }
+  .mark-variant[data-on="true"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
   .footer-mark-glow {
     -webkit-text-stroke-color: var(--accent);
     opacity: var(--spot);

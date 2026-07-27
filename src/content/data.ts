@@ -129,11 +129,12 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Rezervitoo",
       kind: "flagship",
       context: "Backend architect · the project I'm proudest of",
-      period: "Dec 2025 - now",
+      period: "2026",
       hook: "The one I'm proudest of. The architecture finally caught up to the ambition.",
       summary:
         "A live multi-provider booking platform (hotels, hostels, agencies, hosts) on one backend that's mine end to end.",
-      stack: "Django · DRF · PostgreSQL · Redis · Channels · TanStack Query",
+      stack:
+        "Django · React · PostgreSQL · Redis · Channels · TanStack Query · DRF",
       metric: {
         value: "~40ms",
         label: "cached responses, down from 176ms",
@@ -186,8 +187,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         {
           src: "/work/Rezervitoo/dashboard-dark.webp",
           alt: "The dashboard in dark mode.",
-          caption:
-            "Theming is a token swap, not a second stylesheet.",
+          caption: "Theming is a token swap, not a second stylesheet.",
           fit: "cover",
         },
         {
@@ -390,7 +390,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       title: "Faderco HR Portal",
       kind: "apprenticeship",
       context: "Apprenticeship · solo, 10 months",
-      period: "2024 - 2025",
+      period: "2024",
       hook: "My first production system. Built it alone, from “what do you need” to “it's live.”",
       summary:
         "An internal HR portal that retired the spreadsheets: candidate intake through offer, 50+ a cycle.",
@@ -426,8 +426,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         {
           src: "/work/JobPortal/hr-applications.webp",
           alt: "The applications queue.",
-          caption:
-            "Intake through offer for 50+ candidates a cycle.",
+          caption: "Intake through offer for 50+ candidates a cycle.",
           fit: "cover",
         },
         {
@@ -590,13 +589,24 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "req",
                 name: "JobRequest",
-                fields: ["field", "required_employees", "experience_level", "status", "district_manager"],
+                fields: [
+                  "field",
+                  "required_employees",
+                  "experience_level",
+                  "status",
+                  "district_manager",
+                ],
                 kind: "owned",
               },
               {
                 id: "post",
                 name: "JobPost",
-                fields: ["job_request (1:1)", "contract_type", "human_resources", "is_active"],
+                fields: [
+                  "job_request (1:1)",
+                  "contract_type",
+                  "human_resources",
+                  "is_active",
+                ],
                 kind: "owned",
               },
             ],
@@ -620,13 +630,24 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "eval",
                 name: "PerformanceEvaluation",
-                fields: ["applicant", "technical_skills", "communication", "problem_solving", "leadership"],
+                fields: [
+                  "applicant",
+                  "technical_skills",
+                  "communication",
+                  "problem_solving",
+                  "leadership",
+                ],
                 kind: "owned",
               },
               {
                 id: "note",
                 name: "Notification",
-                fields: ["recipient", "sender_type", "notification_type", "is_read"],
+                fields: [
+                  "recipient",
+                  "sender_type",
+                  "notification_type",
+                  "is_read",
+                ],
                 kind: "support",
               },
             ],
@@ -743,7 +764,8 @@ export const rawContent: z.input<typeof contentSchema> = {
         "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis · Gemini",
       metric: {
         value: "1",
-        label: "transaction covers the order, the stock, the cart and the points",
+        label:
+          "transaction covers the order, the stock, the cart and the points",
       },
       highlights: [
         "Offline-first guest cart that merges conflict-free the moment you sign in. It survives cold starts.",
@@ -772,8 +794,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         {
           src: "/work/Brewphoria/product-detail-l-1.webp",
           alt: "A product detail screen.",
-          caption:
-            "Options, sizes and extras priced as you choose them.",
+          caption: "Options, sizes and extras priced as you choose them.",
           fit: "contain",
         },
         {
@@ -913,13 +934,24 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "user",
                 name: "User",
-                fields: ["firebaseUid", "email", "displayName", "role", "fcmToken"],
+                fields: [
+                  "firebaseUid",
+                  "email",
+                  "displayName",
+                  "role",
+                  "fcmToken",
+                ],
                 kind: "core",
               },
               {
                 id: "loy",
                 name: "LoyaltyAccount",
-                fields: ["user (1:1)", "currentPoints", "lifetimePoints", "tier"],
+                fields: [
+                  "user (1:1)",
+                  "currentPoints",
+                  "lifetimePoints",
+                  "tier",
+                ],
                 kind: "owned",
               },
               {
@@ -936,7 +968,13 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "prod",
                 name: "Product",
-                fields: ["slug", "price (Decimal)", "stock", "type", "avgRating"],
+                fields: [
+                  "slug",
+                  "price (Decimal)",
+                  "stock",
+                  "type",
+                  "avgRating",
+                ],
                 kind: "core",
               },
               {
@@ -959,13 +997,24 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "order",
                 name: "Order",
-                fields: ["subtotal / total", "loyaltyDiscount", "pointsEarned", "status", "estimatedReadyAt"],
+                fields: [
+                  "subtotal / total",
+                  "loyaltyDiscount",
+                  "pointsEarned",
+                  "status",
+                  "estimatedReadyAt",
+                ],
                 kind: "owned",
               },
               {
                 id: "item",
                 name: "OrderItem",
-                fields: ["productName (snapshot)", "unitPrice (snapshot)", "modifiers (JSON)", "quantity"],
+                fields: [
+                  "productName (snapshot)",
+                  "unitPrice (snapshot)",
+                  "modifiers (JSON)",
+                  "quantity",
+                ],
                 kind: "owned",
               },
               {
@@ -1118,15 +1167,13 @@ export const rawContent: z.input<typeof contentSchema> = {
         {
           src: "/work/FitGuild/checkout.webp",
           alt: "Checkout.",
-          caption:
-            "Atomic. The order either exists completely or not at all.",
+          caption: "Atomic. The order either exists completely or not at all.",
           fit: "cover",
         },
         {
           src: "/work/FitGuild/ad-analytics.webp",
           alt: "The admin analytics view.",
-          caption:
-            "The half most storefront demos skip: the operator's side.",
+          caption: "The half most storefront demos skip: the operator's side.",
           fit: "cover",
         },
         {
@@ -1243,7 +1290,11 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "sale",
                 name: "Sale",
-                fields: ["product (1:1)", "discount_percent", "starts_at / ends_at"],
+                fields: [
+                  "product (1:1)",
+                  "discount_percent",
+                  "starts_at / ends_at",
+                ],
                 kind: "support",
               },
             ],
@@ -1254,7 +1305,13 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "sku",
                 name: "VariantSKU",
-                fields: ["sku", "price", "color / size", "attributes (JSON)", "is_active"],
+                fields: [
+                  "sku",
+                  "price",
+                  "color / size",
+                  "attributes (JSON)",
+                  "is_active",
+                ],
                 kind: "owned",
               },
               {
@@ -1271,7 +1328,14 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "mv",
                 name: "StockMovement",
-                fields: ["movement_type", "quantity_change", "quantity_before", "quantity_after", "order", "user"],
+                fields: [
+                  "movement_type",
+                  "quantity_change",
+                  "quantity_before",
+                  "quantity_after",
+                  "order",
+                  "user",
+                ],
                 kind: "owned",
               },
               {
@@ -1503,13 +1567,23 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "game",
                 name: "Game",
-                fields: ["name", "category (1 of 7)", "base_xp_reward", "difficulty_multiplier"],
+                fields: [
+                  "name",
+                  "category (1 of 7)",
+                  "base_xp_reward",
+                  "difficulty_multiplier",
+                ],
                 kind: "core",
               },
               {
                 id: "match",
                 name: "MultiplayerMatch",
-                fields: ["game (competitive only)", "player1 / player2", "status", "winner"],
+                fields: [
+                  "game (competitive only)",
+                  "player1 / player2",
+                  "status",
+                  "winner",
+                ],
                 kind: "owned",
               },
             ],
@@ -1520,13 +1594,25 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "res",
                 name: "GameResult",
-                fields: ["user", "game", "score", "xp_earned", "streaks / mistakes"],
+                fields: [
+                  "user",
+                  "game",
+                  "score",
+                  "xp_earned",
+                  "streaks / mistakes",
+                ],
                 kind: "owned",
               },
               {
                 id: "best",
                 name: "BestScore",
-                fields: ["user", "game", "best_streak", "fewest_mistakes", "times_played"],
+                fields: [
+                  "user",
+                  "game",
+                  "best_streak",
+                  "fewest_mistakes",
+                  "times_played",
+                ],
                 kind: "owned",
               },
               {
