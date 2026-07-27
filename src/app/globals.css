@@ -1069,221 +1069,146 @@
   }
 }
 
-/* Unlayered on purpose: these override Tailwind utility classes on the same
-   elements, and utilities beat anything inside @layer no matter how specific. */
-/* ---- Toolkit layout variants (temporary, for choosing) ----
-   The "ruled" variant restyles the same markup rather than duplicating it:
-   the boxes come off, the groups run as a two-column ruled index, the group
-   name takes display size, and the tools read as a line of text instead of
-   sixty little chips. Delete this block with the switcher. */
-:root[data-toolkit="ruled"] .toolkit-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
+/* ---- System maps ----
+   Unlayered so these win over the utility classes on the same elements. The
+   drawing is styled entirely from tokens: it inherits the site's palette, so
+   changing the accent restyles every diagram at once. */
+.system-map-frame {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--surface) 45%, transparent);
+  padding: clamp(1rem, 2.5vw, 2rem);
 }
-@media (min-width: 768px) {
-  :root[data-toolkit="ruled"] .toolkit-list {
-    grid-template-columns: 1fr 1fr;
-    column-gap: clamp(2rem, 5vw, 5rem);
-  }
+.system-map-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
 }
-:root[data-toolkit="ruled"] .toolkit-group {
-  border: 0;
-  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-  border-radius: 0;
-  background: none;
-  padding: 1.75rem 0;
-}
-/* The index and the tool count are decoration, not information. */
-:root[data-toolkit="ruled"] .toolkit-meta {
-  display: none;
-}
-:root[data-toolkit="ruled"] .toolkit-name {
-  margin-top: 0;
-  font-size: var(--text-headline);
-  line-height: 1.05;
-  font-weight: 500;
-}
-:root[data-toolkit="ruled"] .toolkit-tags {
-  margin-top: 0.9rem;
+.system-map {
   display: block;
-  max-width: 40ch;
-  font-family: var(--font-mono-stack);
-  font-size: var(--text-fine);
-  line-height: 1.9;
-  color: var(--slate);
+  width: 100%;
+  min-width: 44rem;
+  height: auto;
 }
-:root[data-toolkit="ruled"] .toolkit-tag {
-  display: inline;
-  border: 0;
-  background: none;
-  padding: 0;
+.system-map-stage .system-map {
+  min-width: 0;
+  max-height: 82vh;
 }
-:root[data-toolkit="ruled"] .toolkit-tag::after {
-  content: " / ";
-  color: color-mix(in oklab, var(--ink) 25%, transparent);
+.system-map-open {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--ink) 84%, transparent);
+  color: var(--paper);
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity var(--dur-micro) var(--ease-out);
 }
-:root[data-toolkit="ruled"] .toolkit-tag:last-child::after {
-  content: "";
+.system-map-frame:hover .system-map-open,
+.system-map-open:focus-visible {
+  opacity: 1;
 }
 
-/* ---- The variant switcher (temporary) ---- */
-.variant-switcher {
-  position: fixed;
-  right: max(1rem, 2vw);
-  bottom: max(1rem, 2vh);
-  z-index: 90;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.7rem 0.8rem;
-  border-radius: var(--radius);
-  background: color-mix(in oklab, var(--paper) 94%, transparent);
-  border: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
-  box-shadow: 0 12px 32px -18px color-mix(in oklab, var(--ink) 60%, transparent);
+/* Column headers: the site's mono micro-voice, not diagram chrome. */
+.system-map-column {
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  fill: var(--slate);
 }
-.variant-row {
+.system-map-rule {
+  stroke: color-mix(in oklab, var(--ink) 16%, transparent);
+  stroke-width: 1;
+}
+
+/* Nodes. The kind decides the fill and the left edge; everything else is
+   shared, so the boxes read as one family. */
+.system-map-node rect {
+  fill: var(--paper);
+  stroke: color-mix(in oklab, var(--ink) 14%, transparent);
+  stroke-width: 1;
+}
+.system-map-node .system-map-edge {
+  stroke: color-mix(in oklab, var(--ink) 20%, transparent);
+  stroke-width: 2;
+}
+.system-map-node[data-kind="service"] rect {
+  fill: color-mix(in oklab, var(--accent-soft) 42%, var(--paper));
+}
+.system-map-node[data-kind="service"] .system-map-edge {
+  stroke: var(--accent);
+}
+.system-map-node[data-kind="data"] rect {
+  fill: color-mix(in oklab, var(--surface) 80%, var(--paper));
+}
+.system-map-node[data-kind="external"] rect {
+  fill: none;
+  stroke-dasharray: 4 3;
+}
+.system-map-node[data-kind="external"] .system-map-edge {
+  stroke: color-mix(in oklab, var(--ink) 14%, transparent);
+}
+.system-map-label {
+  font-family: var(--font-display-stack);
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+.system-map-note {
+  font-family: var(--font-mono-stack);
+  font-size: 8px;
+  fill: var(--slate);
+}
+
+/* Connectors. Thin, curved, and terminated with a dot so direction reads
+   without arrowheads cluttering every junction. */
+.system-map-flow {
+  fill: none;
+  stroke: color-mix(in oklab, var(--ink) 26%, transparent);
+  stroke-width: 1;
+}
+.system-map-dot {
+  fill: var(--accent);
+}
+.system-map-flow-label {
+  font-family: var(--font-mono-stack);
+  font-size: 7.5px;
+  letter-spacing: 0.06em;
+  fill: var(--signal);
+}
+
+/* Legend swatches mirror the node styling exactly. */
+.system-map-key {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
 }
-.variant-key {
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius);
-  border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-  font-family: var(--font-mono-stack);
-  font-size: var(--text-fine);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink);
+.system-map-key::before {
+  content: "";
+  width: 0.85rem;
+  height: 0.6rem;
+  border-radius: 1px;
+  border: 1px solid color-mix(in oklab, var(--ink) 16%, transparent);
+  background: var(--paper);
+}
+.system-map-key[data-kind="service"]::before {
+  background: color-mix(in oklab, var(--accent-soft) 42%, var(--paper));
+  border-left: 2px solid var(--accent);
+}
+.system-map-key[data-kind="data"]::before {
+  background: color-mix(in oklab, var(--surface) 80%, var(--paper));
+}
+.system-map-key[data-kind="external"]::before {
   background: none;
+  border-style: dashed;
 }
-.variant-key[data-on="true"] {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-}
-
-/* ---- Toolkit: Rows ----
-   Six full-width rows. The group name carries at display size and the tools sit
-   opposite it on a single line, so the eye reads six things rather than sixty. */
-:root[data-toolkit="rows"] .toolkit-list {
-  display: block;
-}
-:root[data-toolkit="rows"] .toolkit-group {
+.system-map-stage {
   display: grid;
-  gap: 0.5rem 3rem;
-  align-items: baseline;
-  border: 0;
-  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-  border-radius: 0;
-  background: none;
-  padding: 1.6rem 0;
-}
-@media (min-width: 768px) {
-  :root[data-toolkit="rows"] .toolkit-group {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-}
-:root[data-toolkit="rows"] .toolkit-meta {
-  display: none;
-}
-:root[data-toolkit="rows"] .toolkit-name {
-  margin-top: 0;
-  font-size: var(--text-headline);
-  line-height: 1;
-  font-weight: 500;
-}
-:root[data-toolkit="rows"] .toolkit-tags {
-  margin-top: 0;
-  display: block;
-  font-family: var(--font-mono-stack);
-  font-size: var(--text-fine);
-  line-height: 1.8;
-  color: var(--slate);
-}
-:root[data-toolkit="rows"] .toolkit-tag {
-  display: inline;
-  border: 0;
-  background: none;
-  padding: 0;
-}
-:root[data-toolkit="rows"] .toolkit-tag::after {
-  content: " · ";
-  color: color-mix(in oklab, var(--ink) 25%, transparent);
-}
-:root[data-toolkit="rows"] .toolkit-tag:last-child::after {
-  content: "";
-}
-
-/* ---- Toolkit: Reveal ----
-   At rest the section is six names and nothing else. The tools are there for
-   anyone who wants them, one row at a time, on hover or keyboard focus. */
-:root[data-toolkit="reveal"] .toolkit-list {
-  display: block;
-}
-:root[data-toolkit="reveal"] .toolkit-group {
-  border: 0;
-  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-  border-radius: 0;
-  background: none;
-  padding: 0;
-}
-:root[data-toolkit="reveal"] .toolkit-meta {
-  display: none;
-}
-:root[data-toolkit="reveal"] .toolkit-name {
-  margin: 0;
-  padding: 1.5rem 0 1.5rem;
-  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  line-height: 1;
-  font-weight: 500;
-  transition: color var(--dur-micro) var(--ease-out);
-}
-:root[data-toolkit="reveal"] .toolkit-group:hover .toolkit-name,
-:root[data-toolkit="reveal"] .toolkit-group:focus-within .toolkit-name {
-  color: var(--accent);
-}
-:root[data-toolkit="reveal"] .toolkit-tags {
-  margin: 0;
-  display: block;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  font-family: var(--font-mono-stack);
-  font-size: var(--text-fine);
-  line-height: 1.8;
-  color: var(--slate);
-  transition:
-    max-height 0.4s var(--ease-out),
-    opacity 0.3s var(--ease-out),
-    padding 0.4s var(--ease-out);
-}
-:root[data-toolkit="reveal"] .toolkit-group:hover .toolkit-tags,
-:root[data-toolkit="reveal"] .toolkit-group:focus-within .toolkit-tags {
-  max-height: 8rem;
-  opacity: 1;
-  padding-bottom: 1.5rem;
-}
-:root[data-toolkit="reveal"] .toolkit-tag {
-  display: inline;
-  border: 0;
-  background: none;
-  padding: 0;
-}
-:root[data-toolkit="reveal"] .toolkit-tag::after {
-  content: " · ";
-  color: color-mix(in oklab, var(--ink) 25%, transparent);
-}
-:root[data-toolkit="reveal"] .toolkit-tag:last-child::after {
-  content: "";
-}
-/* Touch has no hover: show everything rather than hiding it behind a gesture
-   that does not exist there. */
-@media (hover: none) {
-  :root[data-toolkit="reveal"] .toolkit-tags {
-    max-height: none;
-    opacity: 1;
-    padding-bottom: 1.5rem;
-  }
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
 }

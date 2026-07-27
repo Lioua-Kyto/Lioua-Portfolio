@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Shot = { src: string; alt: string };
+/** Either a capture to zoom, or arbitrary vector content (a system map). */
+type Shot = { src?: string; alt: string; content?: ReactNode };
 
 /**
  * A zoom-and-pan window for a capture — the same control a diagram viewer
@@ -136,15 +138,17 @@ export function ShotViewer({
         }}
       >
         <div ref={frame} className="shot-viewer-frame">
-          <Image
-            src={shot.src}
-            alt={shot.alt}
-            fill
-            sizes="94vw"
-            quality={92}
-            className="object-contain"
-            draggable={false}
-          />
+          {shot.content ?? (
+            <Image
+              src={shot.src ?? ""}
+              alt={shot.alt}
+              fill
+              sizes="94vw"
+              quality={92}
+              className="object-contain"
+              draggable={false}
+            />
+          )}
         </div>
       </div>
 

@@ -31,6 +31,46 @@ export const shotSchema = z.object({
 });
 
 /**
+ * A project's system map, as data rather than a picture.
+ *
+ * Columns are read left to right as the path a request takes: who calls, what
+ * receives it, what it talks to. Layout is derived from the column and node
+ * index, so the drawing is deterministic and restyles with the site's tokens
+ * instead of arriving as a foreign screenshot.
+ */
+export const diagramNodeSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1),
+  /** The one clarifying line under the label, for a non-technical reader. */
+  note: z.string().min(1).nullable(),
+  kind: z.enum(["client", "service", "data", "external"]),
+});
+
+export const diagramSchema = z.object({
+  title: z.string().min(1),
+  /** Plain-language summary: what this drawing says, in one sentence. */
+  caption: z.string().min(1),
+  columns: z
+    .array(
+      z.object({
+        title: z.string().min(1),
+        nodes: z.array(diagramNodeSchema).min(1).max(5),
+      }),
+    )
+    .min(2)
+    .max(4),
+  flows: z
+    .array(
+      z.object({
+        from: z.string().min(1),
+        to: z.string().min(1),
+        label: z.string().min(1).nullable(),
+      }),
+    )
+    .min(1),
+});
+
+/**
  * One piece of work — client engagements and personal products in a single
  * shape, because the site presents them as one body of work, not two lists.
  * `kind` is the only thing that tells them apart in the UI.
@@ -66,6 +106,8 @@ export const workSchema = z.object({
     .nullable(),
   /** The captures shown on the project's own page, in reading order. */
   gallery: z.array(shotSchema).default([]),
+  /** How the system is put together, drawn from data. */
+  diagram: diagramSchema.nullable(),
   /** Honest access/status line, e.g. `code private — client work`. */
   access: z.string().min(1),
   links: z.object({
@@ -176,6 +218,8 @@ export const contentSchema = z.object({
 });
 
 export type Shot = z.infer<typeof shotSchema>;
+export type Diagram = z.infer<typeof diagramSchema>;
+export type DiagramNode = z.infer<typeof diagramNodeSchema>;
 export type SectionCopy = z.infer<typeof sectionCopySchema>;
 export type Readout = z.infer<typeof readoutSchema>;
 export type Work = z.infer<typeof workSchema>;

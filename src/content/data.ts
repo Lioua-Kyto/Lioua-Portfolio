@@ -205,6 +205,112 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "cover",
         },
       ],
+      diagram: {
+        title: "How a booking request is answered",
+        caption:
+          "Four kinds of provider, one backend. Every price and every availability window is decided on the server before anything reaches a screen.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "web",
+                label: "Traveller web app",
+                note: "Search, book, review",
+                kind: "client",
+              },
+              {
+                id: "prov",
+                label: "Provider dashboard",
+                note: "Listings, bookings, revenue",
+                kind: "client",
+              },
+              {
+                id: "admin",
+                label: "Admin panel",
+                note: "Moderation and reports",
+                kind: "client",
+              },
+            ],
+          },
+          {
+            title: "The way in",
+            nodes: [
+              {
+                id: "edge",
+                label: "Nginx + Cloudflare",
+                note: "TLS, caching, rate limits",
+                kind: "service",
+              },
+              {
+                id: "auth",
+                label: "JWT middleware",
+                note: "Also guards the WebSocket handshake",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "api",
+                label: "Django REST API",
+                note: "The endpoints the apps talk to",
+                kind: "service",
+              },
+              {
+                id: "svc",
+                label: "Service layer",
+                note: "Pricing, availability, permissions",
+                kind: "service",
+              },
+              {
+                id: "ws",
+                label: "Channels (ASGI)",
+                note: "Live notifications, no refresh",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "One polymorphic model for all four provider types",
+                kind: "data",
+              },
+              {
+                id: "redis",
+                label: "Redis",
+                note: "Response cache and the channel layer",
+                kind: "data",
+              },
+              {
+                id: "fcm",
+                label: "Firebase FCM",
+                note: "Push to devices",
+                kind: "external",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "web", to: "edge", label: null },
+          { from: "prov", to: "edge", label: null },
+          { from: "admin", to: "edge", label: null },
+          { from: "edge", to: "auth", label: null },
+          { from: "auth", to: "api", label: null },
+          { from: "api", to: "svc", label: null },
+          { from: "svc", to: "pg", label: null },
+          { from: "svc", to: "redis", label: "~40ms cached" },
+          { from: "ws", to: "redis", label: null },
+          { from: "ws", to: "fcm", label: null },
+          { from: "auth", to: "ws", label: null },
+        ],
+      },
       access: "code private, production client work",
       links: { live: null, source: null },
       todos: ["TODO(author): admin-panel captures"],
@@ -287,6 +393,93 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "cover",
         },
       ],
+      diagram: {
+        title: "From a vacancy to a hire",
+        caption:
+          "A hiring pipeline with two roles on it: managers raise the need, HR runs the process, and the interview happens in the browser.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "dm",
+                label: "Department manager",
+                note: "Raises the vacancy",
+                kind: "client",
+              },
+              {
+                id: "hr",
+                label: "HR team",
+                note: "Runs the pipeline",
+                kind: "client",
+              },
+              {
+                id: "cand",
+                label: "Candidate",
+                note: "Applies and interviews",
+                kind: "client",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "api",
+                label: "Django API",
+                note: "Requests, posts, applicants, evaluations",
+                kind: "service",
+              },
+              {
+                id: "oauth",
+                label: "Google OAuth2",
+                note: "Sign-in, no passwords stored",
+                kind: "service",
+              },
+              {
+                id: "rtc",
+                label: "WebRTC signalling",
+                note: "Puts the interview in the browser",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "Request to post to applicant to hire",
+                kind: "data",
+              },
+              {
+                id: "files",
+                label: "Résumé storage",
+                note: "Uploads attached to applicants",
+                kind: "data",
+              },
+              {
+                id: "mail",
+                label: "Email + OTP",
+                note: "Verification and notices",
+                kind: "external",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "dm", to: "api", label: "raises request" },
+          { from: "hr", to: "api", label: "approves, posts" },
+          { from: "cand", to: "api", label: "applies" },
+          { from: "cand", to: "rtc", label: "joins interview" },
+          { from: "hr", to: "rtc", label: null },
+          { from: "api", to: "oauth", label: null },
+          { from: "api", to: "pg", label: null },
+          { from: "api", to: "files", label: null },
+          { from: "api", to: "mail", label: null },
+        ],
+      },
       access: "internal tool, code stays with Faderco",
       links: { live: null, source: null },
       todos: [],
@@ -367,6 +560,99 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "contain",
         },
       ],
+      diagram: {
+        title: "What happens at checkout",
+        caption:
+          "The phone never decides a price. Order, stock, cart and loyalty all move inside one database transaction, and the push notification is sent only after it commits.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "app",
+                label: "Flutter app",
+                note: "Guest cart works offline",
+                kind: "client",
+              },
+              {
+                id: "fb",
+                label: "Firebase Auth",
+                note: "Issues the identity token",
+                kind: "external",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "mw",
+                label: "Middleware",
+                note: "Verifies the token, rate limits",
+                kind: "service",
+              },
+              {
+                id: "ctl",
+                label: "Controllers",
+                note: "Validates every request with Zod",
+                kind: "service",
+              },
+              {
+                id: "ord",
+                label: "Checkout service",
+                note: "Recomputes totals, stock and points",
+                kind: "service",
+              },
+              {
+                id: "ai",
+                label: "AI barista",
+                note: "Answers are tied to real catalogue items",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "One transaction: order, stock, cart, ledger",
+                kind: "data",
+              },
+              {
+                id: "redis",
+                label: "Redis",
+                note: "Catalogue cache, purged on any write",
+                kind: "data",
+              },
+              {
+                id: "gem",
+                label: "Google Gemini",
+                note: "Recommendation text",
+                kind: "external",
+              },
+              {
+                id: "fcm",
+                label: "Firebase FCM",
+                note: "Sent after the commit, never inside it",
+                kind: "external",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "app", to: "fb", label: "sign in" },
+          { from: "app", to: "mw", label: "bearer token" },
+          { from: "mw", to: "ctl", label: null },
+          { from: "ctl", to: "ord", label: null },
+          { from: "ctl", to: "ai", label: null },
+          { from: "ord", to: "pg", label: "single transaction" },
+          { from: "ord", to: "redis", label: null },
+          { from: "ai", to: "gem", label: null },
+          { from: "ord", to: "fcm", label: "after commit" },
+        ],
+      },
       access: "public repo, link on its way",
       links: { live: null, source: null },
       todos: [
@@ -450,6 +736,78 @@ export const rawContent: z.input<typeof contentSchema> = {
           fit: "cover",
         },
       ],
+      diagram: {
+        title: "How stock stays honest",
+        caption:
+          "Every movement of stock is written down. The quantity before and after each change is kept, so the number on the shelf can always be explained.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "shop",
+                label: "Storefront",
+                note: "Browse, cart, checkout",
+                kind: "client",
+              },
+              {
+                id: "admin",
+                label: "Admin surface",
+                note: "Catalogue, orders, analytics",
+                kind: "client",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "api",
+                label: "Django API",
+                note: "Catalogue, cart, orders",
+                kind: "service",
+              },
+              {
+                id: "inv",
+                label: "Inventory service",
+                note: "Reserves and releases stock",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "Products, variant SKUs, orders",
+                kind: "data",
+              },
+              {
+                id: "mv",
+                label: "Stock movement ledger",
+                note: "Every change, with before and after",
+                kind: "data",
+              },
+              {
+                id: "media",
+                label: "Media storage",
+                note: "Product imagery",
+                kind: "data",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "shop", to: "api", label: null },
+          { from: "admin", to: "api", label: null },
+          { from: "api", to: "inv", label: null },
+          { from: "inv", to: "pg", label: null },
+          { from: "inv", to: "mv", label: "append-only" },
+          { from: "api", to: "media", label: null },
+        ],
+      },
       access: "live site, repo private",
       links: { live: null, source: null },
       todos: [
@@ -474,6 +832,79 @@ export const rawContent: z.input<typeof contentSchema> = {
       ],
       cover: null,
       gallery: [],
+      diagram: {
+        title: "How two players stay in sync",
+        caption:
+          "Fourteen games, a shared score model, and a socket that keeps two browsers looking at the same match at the same moment.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "p1",
+                label: "Player",
+                note: "Plays, competes, chats",
+                kind: "client",
+              },
+              {
+                id: "p2",
+                label: "Opponent",
+                note: "Joins the same match",
+                kind: "client",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "api",
+                label: "Django API",
+                note: "Games, results, profiles",
+                kind: "service",
+              },
+              {
+                id: "ws",
+                label: "Channels (ASGI)",
+                note: "Match state, chat, presence",
+                kind: "service",
+              },
+              {
+                id: "xp",
+                label: "Scoring service",
+                note: "XP, streaks, ranking",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "Matches, results, best scores, friendships",
+                kind: "data",
+              },
+              {
+                id: "redis",
+                label: "Redis",
+                note: "Channel layer and live presence",
+                kind: "data",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "p1", to: "api", label: null },
+          { from: "p1", to: "ws", label: "joins match" },
+          { from: "p2", to: "ws", label: "joins match" },
+          { from: "ws", to: "redis", label: "fan-out" },
+          { from: "ws", to: "pg", label: null },
+          { from: "api", to: "xp", label: null },
+          { from: "xp", to: "pg", label: null },
+        ],
+      },
       access: "repo private",
       links: { live: null, source: null },
       todos: ["TODO(author): captures (game mid-play, leaderboard, analytics)"],
@@ -510,44 +941,76 @@ export const rawContent: z.input<typeof contentSchema> = {
     // the work is actually organised day to day.
     inventory: [
       {
-        group: "Back-End & APIs",
-        items: ["Django", "DRF", "Node / Express", "Prisma", "REST + RBAC"],
-      },
-      {
-        group: "Data & Caching",
-        items: [
-          "PostgreSQL",
-          "Redis",
-          "Celery",
-          "Atomic transactions",
-          "Append-only ledgers",
-        ],
-      },
-      {
-        group: "Real-Time",
-        items: ["Django Channels", "WebSockets", "WebRTC", "Firebase FCM"],
-      },
-      {
-        group: "Front-End & Mobile",
-        items: ["React", "TypeScript", "Tailwind", "Flutter", "Riverpod"],
-      },
-      {
-        group: "AI Integration",
+        group: "AI-Assisted Engineering",
         items: [
           "Google Gemini",
           "Tool-augmented agents",
           "Prompt + context design",
-          "Catalogue-grounded answers",
+          "Catalogue-grounded responses",
+          "LLM feature integration",
+          "Claude Code",
         ],
       },
       {
-        group: "Ship & Verify",
+        group: "Front-End & UI",
+        items: [
+          "React",
+          "Next.js",
+          "TypeScript",
+          "Tailwind CSS",
+          "GSAP / ScrollTrigger",
+          "TanStack Query",
+          "Redux",
+          "Flutter",
+          "Riverpod",
+          "i18n / RTL mirroring",
+        ],
+      },
+      {
+        group: "Back-End & APIs",
+        items: [
+          "Django",
+          "Django REST Framework",
+          "Node.js / Express",
+          "Prisma",
+          "PostgreSQL",
+          "Redis",
+          "Celery",
+          "Django Channels",
+          "WebSockets",
+          "WebRTC",
+          "Polymorphic models",
+          "REST + RBAC",
+        ],
+      },
+      {
+        group: "Cloud & DevOps",
         items: [
           "Docker",
-          "Nginx / VPS",
+          "Docker Compose",
+          "Nginx",
+          "Linux / VPS",
           "GitHub Actions",
-          "PyTest / Jest",
-          "Postman / OpenAPI",
+          "Cloudflare",
+          "Firebase (Auth, FCM)",
+          "Google Cloud (IAM, OAuth2)",
+        ],
+      },
+      {
+        group: "Languages",
+        items: ["Python", "TypeScript", "JavaScript", "Dart", "SQL"],
+      },
+      {
+        group: "Testing & Tooling",
+        items: [
+          "PyTest",
+          "Jest",
+          "Supertest",
+          "Playwright",
+          "Postman",
+          "Swagger / OpenAPI",
+          "Zod",
+          "Git / code review",
         ],
       },
     ],

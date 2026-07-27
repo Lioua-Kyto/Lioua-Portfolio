@@ -6,69 +6,24 @@
  */
 :root {
   /* Paper palette. */
-  --paper: #f4f1ea; /* warm off-white ground */
-  --surface: #ebe7dc; /* raised mats / image frames */
-  --ink: #14140f; /* near-black text */
-  --slate: #6b6559; /* secondary/muted text (AA on paper) */
-  /* ONE accent, one hue. The site previously ran two — a gold (40°) for fills
-     and a terracotta (20°) for type — which read as two unrelated colours.
-     This is a single burnt amber at hue 31°, 85% saturation, expressed at
-     three strengths so the identity stays one colour while every use still
-     clears contrast:
-       --accent  #BF6A10  3.52:1 on paper (AA large: wordmark, headings)
-                          4.65:1 for ink on top (AA: solid fills)
-       --signal  #a0590d  4.74:1 on paper (AA normal: small text, links)
+  --paper: #f2f2f0; /* neutral off-white ground */
+  --surface: #e6e7e6; /* raised mats / image frames */
+  --ink: #14141a; /* near-black text */
+  --slate: #63636b; /* secondary/muted text (AA on paper) */
+  /* ONE accent, one hue, at three strengths so the identity stays a single
+     colour while every use still clears contrast:
+       --accent  #2b4ecc  ~6.4:1 on paper (AA everywhere; wordmark, headings)
+       --signal  #2440a8  darker step for small text and links
        --accent-soft      light tint of the same hue for washes
-     The hue is the complement of the portrait's royal-blue suit (~235°),
-     pulled warm to sit with the cognac belt and the paper ground. */
-  --accent: #bf6a10;
-  --accent-deep: #bf6a10; /* same colour — kept as an alias for existing use */
-  --accent-soft: #f7cda1;
-  --signal: #a0590d;
-  --ok: #3f7a50; /* form states only */
-  --err: #b23830; /* form states only */
-}
-
-/* ---- Palette variants (temporary, for choosing) ----
-   Every colour on the site derives from the tokens above, so a palette is a
-   token swap and nothing else. `VariantSwitcher` writes `data-theme` on the
-   root; delete these blocks, the switcher, and its mount once a palette is
-   locked in. */
-
-/* Ink ground. The portrait's navy suit reads hardest against near-black, and
-   the amber has to brighten to hold contrast on a dark field. */
-:root[data-theme="ink"] {
-  --paper: #121211;
-  --surface: #1d1d1a;
-  --ink: #f2efe8;
-  --slate: #9d968a;
-  --accent: #e08a2b;
-  --accent-deep: #e08a2b;
-  --accent-soft: #3b2a14;
-  --signal: #f0a75a;
-}
-
-/* Cool bone. The same composition with the warmth taken out of the ground —
-   the amber stops reading as part of a warm-craft palette and starts reading
-   as the one deliberate colour on a neutral page. */
-:root[data-theme="bone"] {
-  --paper: #f1f1ef;
-  --surface: #e6e6e3;
-  --ink: #15151a;
-  --slate: #64646b;
-}
-
-/* Blue ground. Drops the complementary amber for the suit's own hue, which
-   reads engineered rather than artisan. */
-:root[data-theme="cobalt"] {
-  --paper: #f2f2f0;
-  --surface: #e6e7e6;
-  --ink: #14141a;
-  --slate: #63636b;
+     The hue is the portrait's own royal blue rather than its complement, so
+     the page reads as one deliberate colour against a neutral ground instead
+     of the warm cream-and-brass palette every generated portfolio arrives in. */
   --accent: #2b4ecc;
-  --accent-deep: #2b4ecc;
+  --accent-deep: #2b4ecc; /* same colour — kept as an alias for existing use */
   --accent-soft: #ccd6f7;
   --signal: #2440a8;
+  --ok: #3f7a50; /* form states only */
+  --err: #b23830; /* form states only */
 }
 
 :root {
