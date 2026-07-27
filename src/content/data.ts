@@ -998,7 +998,15 @@ export const rawContent: z.input<typeof contentSchema> = {
       },
       {
         group: "Languages",
-        items: ["Python", "TypeScript", "JavaScript", "Dart", "SQL"],
+        items: [
+          "Python",
+          "TypeScript",
+          "JavaScript",
+          "Dart",
+          "SQL",
+          "HTML",
+          "CSS",
+        ],
       },
       {
         group: "Testing & Tooling",
