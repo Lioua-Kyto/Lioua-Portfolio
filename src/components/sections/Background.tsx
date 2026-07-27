@@ -36,7 +36,10 @@ export function Background() {
       {/* The thread weaves down a wide lane on the left; the cards sit to its
           right, each with a dot where the line reaches it. The lane is wide
           enough for the line to swing without crossing under the cards. */}
-      <div data-timeline className="relative mt-16 pl-12 sm:pl-[9rem]">
+      <div
+        data-timeline
+        className="relative mt-16 pb-24 pl-12 sm:pl-[9rem]"
+      >
         <TimelinePath count={timeline.length} />
         <ol className="space-y-10 sm:space-y-16">
           {timeline.map((beat, index) => (

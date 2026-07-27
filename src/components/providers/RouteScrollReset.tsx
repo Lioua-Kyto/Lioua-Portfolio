@@ -27,18 +27,31 @@ export function RouteScrollReset() {
     previous.current = pathname;
     if (first) return;
 
-    const toTop = () => {
-      getLenis()?.scrollTo(0, { immediate: true, force: true });
+    // A hash is a destination, not noise: leaving a project by "All projects"
+    // asks for `/#projects`, and resetting to the top threw that away and
+    // dropped the reader back in the hero.
+    const land = () => {
+      const lenis = getLenis();
+      const hash = window.location.hash;
+      const target =
+        hash.length > 1 ? document.querySelector<HTMLElement>(hash) : null;
+      if (target) {
+        lenis?.scrollTo(target, { offset: 0, immediate: true, force: true });
+        return;
+      }
+      lenis?.scrollTo(0, { immediate: true, force: true });
       window.scrollTo(0, 0);
     };
 
     // Twice, because the incoming page mounts its own pinned sections and
     // refreshes ScrollTrigger, and a refresh deliberately preserves the
-    // current scroll — the very offset being left behind.
-    toTop();
+    // current scroll — the very offset being left behind. The second pass is
+    // also the one that can resolve a hash, since the target only exists once
+    // the new page has laid out.
+    land();
     const frame = requestAnimationFrame(() => {
       ScrollTrigger.refresh();
-      toTop();
+      land();
     });
 
     return () => {

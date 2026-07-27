@@ -92,10 +92,10 @@ export function PortraitBackdrop() {
             src="/img/portrait.webp"
             alt=""
             // The source (re-encoded from assets/portrait/portrait.png) is
-            // 2000x1500. Declaring the real size lets Next serve it crisp on
+            // 2800x2100. Declaring the real size lets Next serve it crisp on
             // high-DPI screens without upscaling.
-            width={2000}
-            height={1500}
+            width={2800}
+            height={2100}
             priority
             fetchPriority="high"
             quality={90}

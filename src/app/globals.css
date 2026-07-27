@@ -848,6 +848,11 @@
     --mx: 50%;
     --my: 50%;
     --spot-r: clamp(70px, 9vw, 150px);
+    display: block;
+    user-select: none;
+  }
+  /* One name per line, each fitted to the full measure on its own. */
+  .footer-mark-line {
     /* Both layers occupy the same grid cell. Absolute positioning put the
        accent copy on its own baseline, so the two outlines sat a few pixels
        apart and the mark read as doubled boxes rather than letters. */
@@ -855,7 +860,6 @@
     /* Content-sized, not stretched: the layers must report the width of the
        text so the fit can measure it. */
     justify-items: start;
-    user-select: none;
   }
   .footer-mark-layer {
     grid-area: 1 / 1;
@@ -890,13 +894,13 @@
     /* No drop-shadow: it threw an amber haze onto the paper around the letters.
        The lit stroke alone carries the effect, so only the outline changes. */
     -webkit-mask-image: radial-gradient(
-      circle var(--spot-r) at var(--mx) var(--my),
+      circle var(--spot-r) at var(--mx) calc(var(--my) - var(--ly, 0px)),
       #000 0%,
       #000 45%,
       transparent 100%
     );
     mask-image: radial-gradient(
-      circle var(--spot-r) at var(--mx) var(--my),
+      circle var(--spot-r) at var(--mx) calc(var(--my) - var(--ly, 0px)),
       #000 0%,
       #000 45%,
       transparent 100%

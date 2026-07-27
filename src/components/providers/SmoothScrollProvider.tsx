@@ -61,7 +61,16 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
     const raf = requestAnimationFrame(() => {
       ScrollTrigger.refresh();
     });
+    // And again once the display face has swapped in. Until then every heading
+    // is measured in the fallback metrics, which shifts each section by tens of
+    // pixels — enough for a reveal start line to end up past the element it
+    // watches, so the heading stayed hidden until a reload measured it again.
+    let stale = false;
+    void document.fonts.ready.then(() => {
+      if (!stale) ScrollTrigger.refresh();
+    });
     return () => {
+      stale = true;
       cancelAnimationFrame(raf);
       unsubscribe();
       lenis.destroy();

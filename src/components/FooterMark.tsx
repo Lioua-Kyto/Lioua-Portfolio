@@ -8,6 +8,11 @@ const BASE_PX = 100;
 /**
  * The closing wordmark: the name drawn as an outline, lit by the cursor.
  *
+ * One line per name, each fitted to the full measure on its own — so the two
+ * words stack and both run edge to edge, which means their sizes differ
+ * slightly. That is the point: justified to the measure, the way a masthead is
+ * set, rather than one line of type with a ragged second.
+ *
  * Two identical layers sit on top of each other — a faint ink outline and an
  * accent one. The accent layer is masked to a soft circle that follows the
  * pointer, so what lights up is the part of the mark under the cursor rather
@@ -16,8 +21,9 @@ const BASE_PX = 100;
  */
 export function FooterMark({ text }: { text: string }) {
   const root = useRef<HTMLDivElement>(null);
+  const lines = text.split(" ");
 
-  // Fit the mark to the measure by measurement, not by a vw guess. The display
+  // Fit each line to the measure by measurement, not by a vw guess. The display
   // face has an optical-size axis, so its glyphs widen as the size drops and no
   // single clamp holds across viewports — at phone widths the guess overflowed
   // the page. Measuring at a fixed size and scaling from the result is exact.
@@ -36,17 +42,27 @@ export function FooterMark({ text }: { text: string }) {
         parseFloat(cs.paddingLeft) -
         parseFloat(cs.paddingRight);
       if (box <= 0) return;
-      el.style.setProperty("--mark-size", `${String(BASE_PX)}px`);
-      // Measure the text itself, not the box around it. `scrollWidth` on the
-      // container reports the container's own width whenever the text is
-      // narrower than it, which pinned the ratio at 1 and left the mark stuck
-      // at the base size on wide screens.
-      const natural = el.firstElementChild?.getBoundingClientRect().width ?? 0;
-      if (natural === 0) return;
-      el.style.setProperty(
-        "--mark-size",
-        `${String((BASE_PX * box) / natural)}px`,
-      );
+
+      const rows = el.querySelectorAll<HTMLElement>("[data-mark-line]");
+      for (const row of rows) {
+        row.style.setProperty("--mark-size", `${String(BASE_PX)}px`);
+        // Measure the text itself, not the box around it. `scrollWidth` on the
+        // container reports the container's own width whenever the text is
+        // narrower than it, which pinned the ratio at 1 and left the mark stuck
+        // at the base size on wide screens.
+        const natural =
+          row.firstElementChild?.getBoundingClientRect().width ?? 0;
+        if (natural === 0) continue;
+        row.style.setProperty(
+          "--mark-size",
+          `${String((BASE_PX * box) / natural)}px`,
+        );
+      }
+      // The spotlight is tracked against the whole mark, so each line has to
+      // know where its own top sits to offset the mask into its own box.
+      for (const row of rows) {
+        row.style.setProperty("--ly", `${String(row.offsetTop)}px`);
+      }
     };
 
     fit();
@@ -81,8 +97,12 @@ export function FooterMark({ text }: { text: string }) {
         root.current?.style.setProperty("--spot", "0");
       }}
     >
-      <span className="footer-mark-layer footer-mark-base">{text}</span>
-      <span className="footer-mark-layer footer-mark-glow">{text}</span>
+      {lines.map((line) => (
+        <div key={line} data-mark-line className="footer-mark-line">
+          <span className="footer-mark-layer footer-mark-base">{line}</span>
+          <span className="footer-mark-layer footer-mark-glow">{line}</span>
+        </div>
+      ))}
     </div>
   );
 }

@@ -50,6 +50,10 @@ export function MaskText({
               start: "top 88%",
               // Reversible: scrolling back drops the words behind the mask.
               toggleActions: "play none none reverse",
+              // The start is remeasured on every refresh — the webfont swap
+              // moves this heading, and a start cached against the fallback
+              // metrics is how a title ended up never revealing.
+              invalidateOnRefresh: true,
             }
           : undefined,
       });
