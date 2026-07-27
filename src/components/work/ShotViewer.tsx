@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSmoothScroll } from "@/components/providers/SmoothScrollProvider";
+import { gsap } from "@/lib/motion/gsap";
 
 /** Either a capture to zoom, or arbitrary vector content (a system map). */
 type Shot = { src?: string; alt: string; content?: ReactNode };
@@ -17,18 +18,35 @@ type Shot = { src?: string; alt: string; content?: ReactNode };
  * off-screen. The transform lives in a ref and is written to the node
  * directly: a pointermove that re-rendered React on every frame would drop
  * frames on a large capture.
+ *
+ * It opens by flying out of the thing that was clicked and closes back into it,
+ * so the reader never loses their place. That travel is animated from JS rather
+ * than in CSS: an earlier CSS-keyframe version was silently flattened to 0.01ms
+ * by the reduced-motion reset on machines with the OS animation setting off —
+ * which is the author's own machine — and the viewer simply appeared. This is a
+ * one-shot, reader-initiated transition, not an autoplaying loop, so it plays
+ * for everyone, like the rest of the site's motion.
  */
 export function ShotViewer({
   shot,
+  origin,
   onClose,
 }: {
   shot: Shot | null;
+  /** The element the reader clicked, so the viewer can grow out of it. */
+  origin?: DOMRect | null;
   onClose: () => void;
 }) {
   const stage = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const scrim = useRef<HTMLButtonElement>(null);
+  /** Where it came from, held so the close can fly back to the same place. */
+  const from = useRef<DOMRect | null>(null);
   const view = useRef({ scale: 1, x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number } | null>(null);
+  /** The drawing's width at 100%, measured once when the viewer opens. */
+  const baseWidth = useRef(0);
   const [zoomLabel, setZoomLabel] = useState(100);
   const { getLenis } = useSmoothScroll();
 
@@ -40,12 +58,18 @@ export function ShotViewer({
     const { scale, x, y } = view.current;
     if (isVector) {
       // Scaling a transformed layer resamples whatever it was rasterised at,
-      // which is exactly why a zoomed diagram went soft. Growing the drawing's
-      // own width makes the browser lay it out and repaint the vector at the
-      // new size, so the text stays as sharp at 400% as it is at 100%. The
-      // transform is left to do the panning only.
+      // which is why a zoomed diagram went soft. Growing the drawing's own
+      // width makes the browser lay it out and repaint the vector at the new
+      // size, so text is as sharp at 400% as at 100%. The width is set in
+      // pixels off a measured base: a percentage resolves against an auto
+      // grid track, which is circular, and the sheet ended up shrinking as the
+      // drawing grew. The transform does the panning and nothing else.
       el.style.transform = `translate(${String(x)}px, ${String(y)}px)`;
-      el.style.setProperty("--zoom", String(scale));
+      const svg = el.querySelector("svg");
+      if (svg && baseWidth.current > 0) {
+        svg.style.width = `${String(baseWidth.current * scale)}px`;
+        svg.style.height = "auto";
+      }
     } else {
       el.style.transform = `translate3d(${String(x)}px, ${String(y)}px, 0) scale(${String(scale)})`;
     }
@@ -82,11 +106,88 @@ export function ShotViewer({
     [clamp, paint],
   );
 
+  /**
+   * The stage's travel to and from the card it was opened out of.
+   *
+   * The scale is capped below 1: a diagram frame is nearly as wide as the
+   * viewer, so honest FLIP geometry alone gave a 0.97 start and the opening
+   * read as a pop again. Capping it keeps the position true to the card while
+   * guaranteeing the sheet is visibly seen to grow.
+   */
+  const flight = useCallback((box: DOMRect | null, target: DOMRect) => {
+    if (!box || box.width === 0) return { x: 0, y: 48, scale: 0.86 };
+    return {
+      x: box.left + box.width / 2 - (target.left + target.width / 2),
+      y: box.top + box.height / 2 - (target.top + target.height / 2),
+      scale: Math.max(0.2, Math.min(0.84, box.width / target.width)),
+    };
+  }, []);
+
+  // `onClose` is an inline arrow in every caller, so anything that depends on
+  // it changes identity on each parent render. Held in a ref, the entrance
+  // effect can key on the shot alone and never replay mid-view.
+  const close = useRef(onClose);
+  close.current = onClose;
+
+  const dismiss = useCallback(() => {
+    const el = stage.current;
+    if (!el) {
+      close.current();
+      return;
+    }
+    const back = flight(from.current, el.getBoundingClientRect());
+    gsap.to(scrim.current, { autoAlpha: 0, duration: 0.28, ease: "power2.in" });
+    gsap.to(bar.current, { autoAlpha: 0, y: 12, duration: 0.2 });
+    gsap.to(el, {
+      ...back,
+      autoAlpha: 0,
+      duration: 0.34,
+      ease: "power2.in",
+      onComplete: () => {
+        close.current();
+      },
+    });
+  }, [flight]);
+
+  // Grow out of the card that was clicked, measured against the stage's real
+  // size. Its own effect, keyed on the shot, so it plays once per opening.
+  useEffect(() => {
+    const el = stage.current;
+    if (!shot || !el) return;
+    from.current = origin ?? null;
+    const start = flight(origin ?? null, el.getBoundingClientRect());
+    gsap.fromTo(
+      scrim.current,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.45, ease: "power2.out" },
+    );
+    gsap.fromTo(
+      el,
+      { ...start, autoAlpha: 0 },
+      {
+        x: 0,
+        y: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.78,
+        ease: "expo.out",
+        clearProps: "transform",
+      },
+    );
+    gsap.fromTo(
+      bar.current,
+      { autoAlpha: 0, y: 18 },
+      { autoAlpha: 1, y: 0, duration: 0.5, delay: 0.22, ease: "power3.out" },
+    );
+  }, [shot, origin, flight]);
+
   useEffect(() => {
     if (!shot) return;
+    baseWidth.current = stage.current?.clientWidth ?? 0;
     reset();
+
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") dismiss();
       if (event.key === "+" || event.key === "=") zoomBy(1.25);
       if (event.key === "-") zoomBy(0.8);
       if (event.key === "0") reset();
@@ -123,22 +224,24 @@ export function ShotViewer({
       document.body.style.overflow = previous;
       lenis?.start();
     };
-  }, [shot, onClose, reset, zoomBy, getLenis]);
+  }, [shot, dismiss, reset, zoomBy, getLenis]);
 
   if (!shot) return null;
 
   return (
     <div
       className="shot-viewer"
+      data-vector={shot.content ? "true" : "false"}
       role="dialog"
       aria-modal="true"
       aria-label={shot.alt}
     >
       <button
+        ref={scrim}
         type="button"
         className="shot-viewer-scrim"
         aria-label="Close the viewer"
-        onClick={onClose}
+        onClick={dismiss}
       />
 
       <div
@@ -181,7 +284,7 @@ export function ShotViewer({
         </div>
       </div>
 
-      <div className="shot-viewer-bar">
+      <div ref={bar} className="shot-viewer-bar">
         <span className="font-mono text-fine text-slate tabular-nums">
           {zoomLabel}%
         </span>
@@ -208,7 +311,7 @@ export function ShotViewer({
         <button type="button" className="shot-viewer-key" onClick={reset}>
           Reset
         </button>
-        <button type="button" className="shot-viewer-key" onClick={onClose}>
+        <button type="button" className="shot-viewer-key" onClick={dismiss}>
           Close
         </button>
       </div>

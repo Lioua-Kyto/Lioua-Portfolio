@@ -33,6 +33,8 @@ export function ArchitectureBlock({
   flow: Flow | null;
 }) {
   const [open, setOpen] = useState<"map" | "erd" | "flow" | null>(null);
+  // Where the viewer should grow from: the frame the reader actually clicked.
+  const [origin, setOrigin] = useState<DOMRect | null>(null);
 
   return (
     <>
@@ -49,7 +51,8 @@ export function ArchitectureBlock({
             <button
               type="button"
               className="system-map-frame"
-              onClick={() => {
+              onClick={(event) => {
+                setOrigin(event.currentTarget.getBoundingClientRect());
                 setOpen("flow");
               }}
               aria-label={`Open ${flow.title} full size`}
@@ -76,7 +79,8 @@ export function ArchitectureBlock({
             <button
               type="button"
               className="system-map-frame"
-              onClick={() => {
+              onClick={(event) => {
+                setOrigin(event.currentTarget.getBoundingClientRect());
                 setOpen("map");
               }}
               aria-label={`Open ${diagram.title} full size`}
@@ -115,7 +119,8 @@ export function ArchitectureBlock({
             <button
               type="button"
               className="system-map-frame"
-              onClick={() => {
+              onClick={(event) => {
+                setOrigin(event.currentTarget.getBoundingClientRect());
                 setOpen("erd");
               }}
               aria-label={`Open ${erd.title} full size`}
@@ -130,6 +135,7 @@ export function ArchitectureBlock({
       ) : null}
 
       <ShotViewer
+        origin={origin}
         shot={
           open === "map" && diagram
             ? {

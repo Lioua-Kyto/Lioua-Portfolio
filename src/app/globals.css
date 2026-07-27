@@ -1411,55 +1411,27 @@
   --accent-soft: #ccd6f7;
   --signal: #2440a8;
 }
-.shot-viewer .system-map-stage {
+/* The sheet is the fixed window, not the moving layer: with the paper on the
+   layer that pans, the sheet slid around and resized with the drawing. */
+.shot-viewer[data-vector="true"] .shot-viewer-stage {
   background: var(--paper);
   border-radius: var(--radius);
-  overflow: hidden;
 }
-.shot-viewer-frame .system-map-stage .system-map {
-  width: calc(100% * var(--zoom, 1));
+.shot-viewer .system-map-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: none;
+}
+.shot-viewer .system-map-stage .system-map {
   max-width: none;
 }
-.shot-viewer-frame {
-  --zoom: 1;
-}
 
-/* Opening is a move, not a cut: the sheet lifts and resolves out of a blur
-   while the ground behind it darkens. */
-.shot-viewer-scrim {
-  animation: viewer-scrim 0.32s var(--ease-out) both;
-}
-.shot-viewer-stage,
-.shot-viewer-bar {
-  animation: viewer-rise 0.5s var(--ease-out) both;
-}
-.shot-viewer-bar {
-  animation-delay: 0.1s;
-}
-@keyframes viewer-scrim {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes viewer-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px) scale(0.965);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .shot-viewer-scrim,
-  .shot-viewer-stage,
-  .shot-viewer-bar {
-    animation-duration: 0.01ms;
-  }
-}
+/* Opening is a move, not a cut: the sheet grows out of the card that was
+   clicked and falls back into it on close. That travel is animated from JS
+   (see ShotViewer) — as CSS keyframes it was flattened to 0.01ms by the
+   reduced-motion reset on machines with the OS animation setting off, and the
+   viewer simply appeared. It is reader-initiated and one-shot, so it plays for
+   everyone, like the rest of the site's motion. */
