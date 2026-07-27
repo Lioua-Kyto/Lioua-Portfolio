@@ -1342,3 +1342,70 @@
   font-size: 8px;
   fill: var(--slate);
 }
+
+/* ---- Swimlane flows ----
+   Same family again: the lane rule is the section hairline, the step card is
+   the system map's node, and the state chip borrows the accent the owned
+   entities use. A gate is a decision, an end is where the story stops. */
+.flow-lane {
+  font-family: var(--font-mono-stack);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  fill: var(--slate);
+}
+.flow-step rect {
+  fill: var(--paper);
+  stroke: color-mix(in oklab, var(--ink) 15%, transparent);
+  stroke-width: 1;
+}
+.flow-step[data-kind="gate"] rect {
+  fill: color-mix(in oklab, var(--accent-soft) 45%, var(--paper));
+  stroke: color-mix(in oklab, var(--accent) 40%, transparent);
+}
+.flow-step[data-kind="end"] rect {
+  fill: color-mix(in oklab, var(--surface) 85%, var(--paper));
+  stroke: color-mix(in oklab, var(--ink) 32%, transparent);
+  stroke-width: 1.5;
+}
+.flow-index {
+  font-family: var(--font-mono-stack);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  fill: color-mix(in oklab, var(--ink) 42%, transparent);
+}
+.flow-label {
+  font-family: var(--font-display-stack);
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+.flow-note {
+  font-family: var(--font-mono-stack);
+  font-size: 7.5px;
+  fill: var(--slate);
+}
+.flow-state {
+  font-family: var(--font-mono-stack);
+  font-size: 7.5px;
+  letter-spacing: 0.04em;
+  fill: var(--signal);
+}
+
+/* The viewer is its own surface. Opened from the hood layer it would otherwise
+   inherit that layer's inverted tokens, which turned the scrim into a pale
+   wash instead of a dark one. It restates the page palette and puts diagrams
+   on a paper sheet so they read the same wherever they were opened from. */
+.shot-viewer {
+  --paper: #f2f2f0;
+  --surface: #e6e7e6;
+  --ink: #14141a;
+  --slate: #63636b;
+  --accent: #2b4ecc;
+  --accent-soft: #ccd6f7;
+  --signal: #2440a8;
+}
+.shot-viewer .system-map-stage {
+  background: var(--paper);
+  border-radius: var(--radius);
+}

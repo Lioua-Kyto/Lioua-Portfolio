@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Diagram, Erd } from "@/content/schemas";
+import type { Diagram, Erd, Flow } from "@/content/schemas";
 import { SystemMap } from "@/components/work/SystemMap";
 import { ErdMap } from "@/components/work/ErdMap";
+import { FlowMap } from "@/components/work/FlowMap";
 import { ShotViewer } from "@/components/work/ShotViewer";
 
 /**
@@ -25,17 +26,45 @@ const LEGEND = [
 export function ArchitectureBlock({
   diagram,
   erd,
+  flow,
 }: {
   diagram: Diagram | null;
   erd: Erd | null;
+  flow: Flow | null;
 }) {
-  const [open, setOpen] = useState<"map" | "erd" | null>(null);
+  const [open, setOpen] = useState<"map" | "erd" | "flow" | null>(null);
 
   return (
     <>
-      {diagram ? (
+      {flow ? (
         <>
           <p className="type-display mt-6 max-w-[46ch] text-title leading-tight font-medium">
+            {flow.title}
+          </p>
+          <p className="mt-3 max-w-[58ch] text-base text-slate">
+            {flow.caption}
+          </p>
+
+          <div className="system-map-frame group mt-8">
+            <div className="system-map-scroll">
+              <FlowMap flow={flow} />
+            </div>
+            <button
+              type="button"
+              className="system-map-open font-mono text-fine uppercase"
+              onClick={() => {
+                setOpen("flow");
+              }}
+            >
+              Open
+            </button>
+          </div>
+        </>
+      ) : null}
+
+      {diagram ? (
+        <>
+          <p className="type-display mt-20 max-w-[46ch] text-title leading-tight font-medium">
             {diagram.title}
           </p>
           <p className="mt-3 max-w-[58ch] text-base text-slate">
@@ -76,7 +105,9 @@ export function ArchitectureBlock({
           <p className="type-display mt-20 max-w-[46ch] text-title leading-tight font-medium">
             {erd.title}
           </p>
-          <p className="mt-3 max-w-[58ch] text-base text-slate">{erd.caption}</p>
+          <p className="mt-3 max-w-[58ch] text-base text-slate">
+            {erd.caption}
+          </p>
 
           <div className="system-map-frame group mt-8">
             <div className="system-map-scroll">
@@ -106,16 +137,25 @@ export function ArchitectureBlock({
                   </div>
                 ),
               }
-            : open === "erd" && erd
+            : open === "flow" && flow
               ? {
-                  alt: `${erd.title}. ${erd.caption}`,
+                  alt: `${flow.title}. ${flow.caption}`,
                   content: (
                     <div className="system-map-stage">
-                      <ErdMap erd={erd} />
+                      <FlowMap flow={flow} />
                     </div>
                   ),
                 }
-              : null
+              : open === "erd" && erd
+                ? {
+                    alt: `${erd.title}. ${erd.caption}`,
+                    content: (
+                      <div className="system-map-stage">
+                        <ErdMap erd={erd} />
+                      </div>
+                    ),
+                  }
+                : null
         }
         onClose={() => {
           setOpen(null);
