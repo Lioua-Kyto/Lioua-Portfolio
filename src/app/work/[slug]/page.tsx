@@ -5,6 +5,7 @@ import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
 import { WorkGallery } from "@/components/work/WorkGallery";
 import { ArchitectureBlock } from "@/components/work/ArchitectureBlock";
+import { HoodCurtain } from "@/components/work/HoodCurtain";
 
 const KIND_LABEL: Record<string, string> = {
   flagship: "flagship build",
@@ -67,6 +68,12 @@ export default async function WorkDetail({
           </Link>
           <Label>{KIND_LABEL[item.kind] ?? item.kind}</Label>
           <Label>{item.period}</Label>
+          <a
+            href="#under-the-hood"
+            className="transition-micro ml-auto font-mono text-label text-signal uppercase underline underline-offset-4 transition-colors hover:text-ink"
+          >
+            Under the hood ↓
+          </a>
         </p>
 
         <header className="mt-10 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-end lg:gap-16">
@@ -151,37 +158,10 @@ export default async function WorkDetail({
           </div>
         </dl>
 
-        {/* The decisions worth defending. */}
-        <ol className="mt-20">
-          {item.highlights.map((line, i) => (
-            <li
-              key={line}
-              className="grid gap-4 border-t border-ink/10 py-8 sm:grid-cols-[4rem_1fr] sm:gap-10"
-            >
-              <span
-                aria-hidden="true"
-                className="type-display text-[clamp(1.75rem,3.5vw,2.75rem)] leading-none font-extrabold text-accent/25"
-              >
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <p className="max-w-[56ch] text-base text-ink">{line}</p>
-            </li>
-          ))}
-        </ol>
-
-        {item.diagram ? (
-          <section className="mt-24" aria-label="Architecture">
-            <h2 className="hairline pt-4">
-              <Label index="A">Architecture</Label>
-            </h2>
-            <ArchitectureBlock diagram={item.diagram} />
-          </section>
-        ) : null}
-
         {item.gallery.length > 0 ? (
           <section className="mt-24" aria-label="Screens">
             <h2 className="hairline pt-4">
-              <Label index="B">Screens</Label>
+              <Label index="A">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
               Click any screen to open it in the zoom viewer. Wheel to zoom, drag
@@ -192,7 +172,7 @@ export default async function WorkDetail({
         ) : (
           <section className="mt-24" aria-label="Screens">
             <h2 className="hairline pt-4">
-              <Label index="B">Screens</Label>
+              <Label index="A">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] text-base text-slate">
               Captures for this one are still to come.
@@ -200,18 +180,83 @@ export default async function WorkDetail({
           </section>
         )}
 
-        <nav
-          aria-label="More work"
-          className="mt-24 border-t border-ink/10 pt-8"
-        >
-          <Label>Next project</Label>
-          <Link
-            href={`/work/${next?.slug ?? ""}`}
-            className="type-display transition-micro mt-3 block text-headline leading-tight font-semibold transition-colors hover:text-accent"
+      </div>
+
+      {/* ---- Layer two: under the hood ----
+          Its own ground, its own accent. One composed switch, at the point the
+          page genuinely changes register: from what a user sees to what runs
+          underneath it. Every component inside is token-driven, so the diagram
+          and the type restyle themselves against the darker ground. */}
+      <HoodCurtain title={item.title} />
+
+      <div id="under-the-hood" className="hood-layer">
+        <div className="shell pt-[clamp(3rem,8vh,6rem)] pb-[clamp(4rem,12vh,9rem)]">
+          {item.diagram ? (
+            <section aria-label="Architecture">
+              <h2 className="hairline pt-4">
+                <Label index="B">Architecture</Label>
+              </h2>
+              <ArchitectureBlock diagram={item.diagram} />
+            </section>
+          ) : null}
+
+          <section className="mt-24" aria-label="Decisions">
+            <h2 className="hairline pt-4">
+              <Label index="C">Decisions</Label>
+            </h2>
+            <p className="type-display mt-6 max-w-[40ch] text-title leading-tight font-medium">
+              The calls that made the difference, and what each one bought.
+            </p>
+            <ol className="mt-12">
+              {item.highlights.map((line, i) => (
+                <li
+                  key={line}
+                  className="grid gap-4 border-t border-ink/10 py-8 sm:grid-cols-[4rem_1fr] sm:gap-10"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="type-display text-[clamp(1.75rem,3.5vw,2.75rem)] leading-none font-extrabold text-accent/30"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="max-w-[56ch] text-base">{line}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          <section className="mt-24" aria-label="Stack">
+            <h2 className="hairline pt-4">
+              <Label index="D">What it runs on</Label>
+            </h2>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {stack.map((tag) => (
+                <li
+                  key={tag}
+                  className="rounded-full border border-ink/20 px-3 py-1 font-mono text-fine"
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 max-w-[52ch] font-mono text-fine text-slate">
+              {item.access}
+            </p>
+          </section>
+
+          <nav
+            aria-label="More work"
+            className="mt-24 border-t border-ink/20 pt-8"
           >
-            {next?.title} →
-          </Link>
-        </nav>
+            <Label>Next project</Label>
+            <Link
+              href={`/work/${next?.slug ?? ""}`}
+              className="type-display transition-micro mt-3 block text-headline leading-tight font-semibold transition-colors hover:text-accent"
+            >
+              {next?.title} →
+            </Link>
+          </nav>
+        </div>
       </div>
     </main>
   );

@@ -1212,3 +1212,100 @@
   height: 100%;
   padding: 2rem;
 }
+
+/* ---- Layer two: under the hood ----
+   The one theme switch on the page, and a motivated one: it marks where a
+   project page stops describing what a user sees and starts describing what
+   runs underneath. Because every component takes its colour from tokens, the
+   whole layer restyles by redeclaring them here. The accent brightens because
+   cobalt at its paper value does not clear contrast on a near-black ground. */
+.hood-layer,
+.hood-curtain {
+  --paper: #121216;
+  --surface: #1c1c22;
+  --ink: #f0f0f2;
+  --slate: #9c9caa;
+  --accent: #6f8cff;
+  --accent-deep: #6f8cff;
+  --accent-soft: #1e2a52;
+  --signal: #9db0ff;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* The seam itself: a full screen the doors sit over. */
+.hood-curtain {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.hood-reveal {
+  padding-inline: var(--pad);
+  text-align: center;
+  color: var(--ink);
+}
+.hood-reveal p:first-child {
+  color: var(--accent);
+}
+
+/* Doors default to open, so with no JavaScript the layer below is simply
+   already visible rather than covered by a panel that never moves. */
+.hood-door {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50.5%;
+  background: #f2f2f0;
+  will-change: transform;
+}
+.hood-curtain.is-armed .hood-door {
+  transform: none;
+}
+.hood-door--top {
+  top: 0;
+  transform: translateY(-100%);
+  border-bottom: 1px solid color-mix(in oklab, #14141a 12%, transparent);
+}
+.hood-door--bottom {
+  bottom: 0;
+  transform: translateY(100%);
+  border-top: 1px solid color-mix(in oklab, #14141a 12%, transparent);
+}
+.hood-seam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(90vw, 72rem);
+  height: 2px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent) 35%,
+    var(--accent) 65%,
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Below the pin breakpoint there is no curtain: the layers simply stack, with
+   a rule and the label doing the work the motion does on a wider screen. */
+@media (max-width: 767.98px) {
+  .hood-curtain {
+    height: auto;
+    padding: clamp(3rem, 12vh, 6rem) 0;
+  }
+  .hood-door,
+  .hood-seam {
+    display: none;
+  }
+}
+
+/* The map frame reads as a lit panel on the darker ground. */
+.hood-layer .system-map-frame {
+  border-color: color-mix(in oklab, var(--ink) 18%, transparent);
+  background: color-mix(in oklab, var(--surface) 70%, transparent);
+}
