@@ -394,7 +394,8 @@ export const rawContent: z.input<typeof contentSchema> = {
       hook: "My first production system. Built it alone, from “what do you need” to “it's live.”",
       summary:
         "An internal HR portal that retired the spreadsheets: candidate intake through offer, 50+ a cycle.",
-      stack: "Django · React · PostgreSQL · Stream · WebRTC · Google OAuth2",
+      stack:
+        "Django · React · PostgreSQL · Bootstrap · Stream · WebRTC · Google OAuth2",
       metric: {
         value: "4h → 15min",
         label: "per interview, once the call moved into the browser",
@@ -761,7 +762,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       summary:
         "Cross-platform coffee ordering: a Flutter client on a layered Node/Express/TypeScript API.",
       stack:
-        "Flutter · Node.js/Express/TS · Prisma · PostgreSQL · Redis · Gemini",
+        "Flutter · Node.js/Express/TS · PostgreSQL · Prisma · Riverpod · Dio · Hive · Redis · Gemini",
       metric: {
         value: "1",
         label:
@@ -1826,6 +1827,10 @@ export const rawContent: z.input<typeof contentSchema> = {
     email: "liwaazeddam@gmail.com",
     linkedin: "linkedin.com/in/lioua",
     github: "github.com/Lioua-Kyto",
+    // Read from .env.local, which is gitignored: the repo is public and the
+    // number should not live in it. Absent or blank, the WhatsApp link simply
+    // is not rendered — see .env.example.
+    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP?.trim() || undefined,
     todos: [],
   },
 };
