@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, type CSSProperties } from "react";
+import { Fragment, useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 import { pin } from "@/lib/motion/tokens";
@@ -492,13 +492,8 @@ export function HeroChrome() {
       {/* Shared: the proof numbers. Each card travels to the rail on its own
           stagger. The accent is spent only on the value and a thin left rule. */}
       <dl className="hero-chrome-stats">
-        {content.intro.proofs.map((proof, index) => (
-          <div
-            key={proof.label}
-            data-morph="stat"
-            className="hero-chrome-stat"
-            style={{ "--i": index } as CSSProperties}
-          >
+        {content.intro.proofs.map((proof) => (
+          <div key={proof.label} data-morph="stat" className="hero-chrome-stat">
             <dd className="type-display font-semibold whitespace-nowrap text-accent">
               {proof.value}
             </dd>
@@ -517,12 +512,8 @@ export function HeroChrome() {
           travels to the rail column independently. */}
       <nav aria-label="Primary" className="hero-chrome-navwrap">
         <ul className="hero-chrome-nav">
-          {NAV.map((item, index) => (
-            <li
-              key={item.href}
-              data-morph="nav"
-              style={{ "--i": index } as CSSProperties}
-            >
+          {NAV.map((item) => (
+            <li key={item.href} data-morph="nav">
               <a
                 href={item.href}
                 data-rail-link={item.href.slice(1)}
@@ -604,7 +595,7 @@ export function HeroChrome() {
         data-chrome-hero
         className="hero-chrome-tagline font-mono text-fine text-slate"
       >
-        <span data-hero-in>{content.about.location}</span>
+        {content.about.location}
       </p>
     </div>
   );

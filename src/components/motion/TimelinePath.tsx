@@ -11,11 +11,11 @@ const DASH_RUN = 11 * 3 + 9 * 2;
 /**
  * The thread running through the journey — a line that weaves down past the
  * cards, drawing itself as you scroll, a dot lighting exactly as the line
- * reaches each beat. Past the last beat the solid line carries on down, turns,
- * and runs out to the right underneath the last card before breaking into three
- * dashes: the present, still being written, leaving the page sideways rather
- * than stopping at a wall. Everything is on one scrubbed timeline, so the dots
- * and the tail can never run ahead of the drawing line.
+ * reaches each beat. Past the last beat the solid line carries on down under
+ * the last card and only then breaks into three dashes: the present, still
+ * being written, rather than a long dotted run to nowhere. Everything is on one
+ * scrubbed timeline, so the dots and the tail can never run ahead of the
+ * drawing line.
  *
  * Decorative — the beats are a real ordered list on their own.
  */
@@ -89,40 +89,27 @@ export function TimelinePath({ count }: { count: number }) {
         const mainLen = line.getTotalLength();
         line.style.strokeDasharray = String(mainLen);
 
-        // Past the last beat the line stays a line: down the lane, then it
-        // turns and runs out to the right underneath the last card, and only
-        // out there does it break into exactly three dashes. The thread leaves
-        // the page sideways rather than stopping at a wall.
+        // Past the last beat the line stays a line: it runs down the lane and
+        // under the last card, and only there breaks into exactly three dashes.
         const last = points[points.length - 1] ?? { x: laneX, y: h * 0.7 };
         const lastNode = nodes[nodes.length - 1];
-        const floorY = Math.min(
-          lastNode ? lastNode.getBoundingClientRect().bottom - box.top + 34 : h,
-          h - 6,
-        );
-        const runX = Math.min(w * 0.42, laneX + 300);
+        const underCard = lastNode
+          ? lastNode.getBoundingClientRect().bottom - box.top + 20
+          : h - DASH_RUN;
+        const solidEnd = Math.min(underCard, h - DASH_RUN);
         tail.setAttribute(
           "d",
-          [
-            `M ${String(last.x)} ${String(last.y)}`,
-            // Down the lane first, so the turn reads as a turn.
-            `C ${String(last.x)} ${String(last.y + (floorY - last.y) * 0.42)},`,
-            `${String(laneX)} ${String(floorY - 4)},`,
-            `${String(Math.min(runX, laneX + 108))} ${String(floorY)}`,
-            `L ${String(runX)} ${String(floorY)}`,
-          ].join(" "),
+          `M ${String(last.x)} ${String(last.y)}${seg({ x: last.x + amp * 0.35, y: last.y }, { x: laneX, y: solidEnd })}`,
         );
         dashes.setAttribute(
           "d",
-          `M ${String(runX)} ${String(floorY)} L ${String(Math.min(runX + DASH_RUN, w))} ${String(floorY)}`,
+          `M ${String(laneX)} ${String(solidEnd)} L ${String(laneX)} ${String(solidEnd + DASH_RUN)}`,
         );
-        const tailLen = tail.getTotalLength();
-        tail.style.strokeDasharray = String(tailLen);
-        // The clip is the dashes alone, opening left to right so the three of
-        // them arrive in turn rather than all at once.
-        clipRect.setAttribute("x", String(runX));
-        clipRect.setAttribute("y", String(floorY - 12));
-        clipRect.setAttribute("width", "0");
-        clipRect.setAttribute("height", "24");
+        // The clip starts at the last beat and grows down to reveal both.
+        clipRect.setAttribute("x", "0");
+        clipRect.setAttribute("y", String(last.y));
+        clipRect.setAttribute("width", String(w));
+        clipRect.setAttribute("height", "0");
 
         // Each dot's fraction of the main draw (measured, not guessed).
         const probe = line.cloneNode() as SVGPathElement;
@@ -163,16 +150,19 @@ export function TimelinePath({ count }: { count: number }) {
           );
         });
         tl.fromTo(
-          tail,
-          { strokeDashoffset: () => tail.getTotalLength() },
-          { strokeDashoffset: 0, ease: "none", duration: 1.4 },
-          8,
-        );
-        tl.fromTo(
           clipRect,
-          { attr: { width: 0 } },
-          { attr: { width: DASH_RUN }, ease: "none", duration: 0.6 },
-          9.4,
+          { attr: { height: 0 } },
+          {
+            attr: {
+              height: () => {
+                const box = container.getBoundingClientRect();
+                return box.height - Number(clipRect.getAttribute("y") ?? 0);
+              },
+            },
+            ease: "none",
+            duration: 2,
+          },
+          8,
         );
         return tl;
       };

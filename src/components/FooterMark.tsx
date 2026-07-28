@@ -1,21 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /** The size the mark is measured at before being scaled to fit. */
 const BASE_PX = 100;
 
-/** The treatments on offer while the choice is still open. */
-const VARIANTS = [
-  { id: "spot", label: "spotlight" },
-  { id: "slip", label: "slip" },
-  { id: "slipinv", label: "slip inverted" },
-  { id: "slipspot", label: "slip + spot" },
-  { id: "shred", label: "shred" },
-  { id: "press", label: "letterpress" },
-] as const;
+/** Every treatment that has CSS behind it, in `globals.css`. */
+type MarkEffect = "spot" | "slip" | "slipinv" | "slipspot" | "shred" | "press";
 
-type VariantId = (typeof VARIANTS)[number]["id"];
+/**
+ * Which treatment the mark uses. Change this one word to switch:
+ *
+ *   "spot"     — the accent outline lights only under a soft circle following
+ *                the cursor. The quietest; reads as pure print.
+ *   "slip"     — the accent copy slides toward the cursor, the way a plate
+ *                slips on press. Same language as the portrait's channel split.
+ *   "slipinv"  — the same slip with the roles swapped: the mark sits in accent
+ *                and the ink copy is the one that moves.            ← in use
+ *   "slipspot" — slip, but masked to the cursor, so the plate misregisters
+ *                only where you are and the rest stays perfectly set.
+ *   "shred"    — each letter tears into horizontal bands that pull apart in
+ *                opposite directions, like a sheet torn off mid-run.
+ *   "press"    — the letters push into the paper, a hard accent deboss below
+ *                and a paper highlight above.
+ */
+const MARK_EFFECT: MarkEffect = "slipinv";
 
 /** Latin display type, one grapheme per span. */
 const glyphsOf = (word: string) =>
@@ -30,12 +39,11 @@ const glyphsOf = (word: string) =>
  * set, rather than one line of type with a ragged second.
  *
  * Every letter is its own span carrying `--n`, how near the cursor it is from
- * 0 to 1. That one number drives every treatment from CSS, so switching
- * between them costs nothing and none of them re-render React.
+ * 0 to 1. That one number drives every treatment from CSS, so the effect is a
+ * word in `MARK_EFFECT` above and nothing in here changes when it does.
  */
 export function FooterMark({ text }: { text: string }) {
   const root = useRef<HTMLDivElement>(null);
-  const [variant, setVariant] = useState<VariantId>("spot");
   const lines = text.split(" ");
 
   // Fit each line to the measure by measurement, not by a vw guess. The display
@@ -127,67 +135,46 @@ export function FooterMark({ text }: { text: string }) {
   };
 
   return (
-    <>
-      {/* Temporary while the treatment is still being chosen — it comes out
-          with the variants once one is locked in. */}
-      <div className="mark-variants font-mono text-fine uppercase">
-        <span className="text-slate">wordmark hover</span>
-        {VARIANTS.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            data-on={option.id === variant ? "true" : "false"}
-            className="mark-variant"
-            onClick={() => {
-              setVariant(option.id);
-            }}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <div
-        ref={root}
-        aria-hidden="true"
-        className="footer-mark"
-        data-mark-fx={variant}
-        onPointerMove={move}
-        onPointerEnter={(event) => {
-          move(event);
-          root.current?.style.setProperty("--spot", "1");
-        }}
-        onPointerLeave={clear}
-      >
-        {lines.map((line) => (
-          <div key={line} data-mark-line className="footer-mark-line">
-            <span className="footer-mark-layer footer-mark-base">
-              {glyphsOf(line).map((glyph, index) => (
-                <span
-                  key={`${glyph}-${String(index)}`}
-                  data-mark-glyph
-                  data-glyph={glyph}
-                  className="footer-mark-glyph"
-                >
-                  {glyph}
-                </span>
-              ))}
-            </span>
-            <span className="footer-mark-layer footer-mark-glow">
-              {glyphsOf(line).map((glyph, index) => (
-                <span
-                  key={`${glyph}-${String(index)}`}
-                  data-mark-glyph
-                  data-glyph={glyph}
-                  className="footer-mark-glyph"
-                >
-                  {glyph}
-                </span>
-              ))}
-            </span>
-          </div>
-        ))}
-      </div>
-    </>
+    <div
+      ref={root}
+      aria-hidden="true"
+      className="footer-mark"
+      data-mark-fx={MARK_EFFECT}
+      onPointerMove={move}
+      onPointerEnter={(event) => {
+        move(event);
+        root.current?.style.setProperty("--spot", "1");
+      }}
+      onPointerLeave={clear}
+    >
+      {lines.map((line) => (
+        <div key={line} data-mark-line className="footer-mark-line">
+          <span className="footer-mark-layer footer-mark-base">
+            {glyphsOf(line).map((glyph, index) => (
+              <span
+                key={`${glyph}-${String(index)}`}
+                data-mark-glyph
+                data-glyph={glyph}
+                className="footer-mark-glyph"
+              >
+                {glyph}
+              </span>
+            ))}
+          </span>
+          <span className="footer-mark-layer footer-mark-glow">
+            {glyphsOf(line).map((glyph, index) => (
+              <span
+                key={`${glyph}-${String(index)}`}
+                data-mark-glyph
+                data-glyph={glyph}
+                className="footer-mark-glyph"
+              >
+                {glyph}
+              </span>
+            ))}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
