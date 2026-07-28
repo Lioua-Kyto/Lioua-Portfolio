@@ -65,7 +65,7 @@ void main() {
   float ring = mix(0.55, 1.0, smoothstep(0.0, radius * 0.30, d));
   vec2 dir = normalize(px - uPointer + vec2(0.0001));
   float breath = 0.5 + 0.5 * sin(uTime * 1.3 + d * 0.018);
-  vec2 push = dir * fall * ring * floored * (5.0 + 13.0 * breath) / uRes;
+  vec2 push = dir * fall * ring * floored * (2.5 + 6.5 * breath) / uRes;
 
   // Channel split, the way a plate slips on press.
   float split = fall * 0.006;

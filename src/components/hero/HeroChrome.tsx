@@ -154,7 +154,9 @@ export function HeroChrome() {
       const title = document.querySelector<HTMLElement>("[data-hero='title']");
       const h1 = title?.querySelector<HTMLElement>("h1") ?? null;
       const caps = document.querySelector<HTMLElement>(".hero-chrome-caps");
-      const firstMark = document.querySelector<HTMLElement>("[data-chrome-first]");
+      const firstMark = document.querySelector<HTMLElement>(
+        "[data-chrome-first]",
+      );
       const role = document.querySelector<HTMLElement>(".hero-chrome-role");
       const statLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="stat"]');
       const navLeaves = gsap.utils.toArray<HTMLElement>('[data-morph="nav"]');
@@ -167,12 +169,10 @@ export function HeroChrome() {
       // rasterises soft). These carry the settled crisp form between builds.
       let titleTl: gsap.core.Timeline | null = null;
       let landedFont = 0;
-      let crisped = false;
 
       const build = () => {
         tl?.kill();
         titleTl?.kill();
-        crisped = false;
         gsap.set(morphLeaves, { clearProps: "transform" });
         if (h1) gsap.set(h1, { clearProps: "transform,width,fontSize" });
         for (const el of [caps, role]) {
@@ -318,46 +318,44 @@ export function HeroChrome() {
       const apply = (p: number) => {
         tl?.progress(p);
 
-          // The wordmark travels over p [0.04, 0.86]. At settle it hands off to
-          // the chrome-layer copy sitting at the same spot: the travelling
-          // element lives under the portrait (so it is never seen in front of
-          // it) but is therefore also under the glass panel, which blurs it.
-          // The copy is above the panel, so the mark comes to rest sharp.
-          if (h1 && titleTl) {
-            const tp = gsap.utils.clamp(0, 1, (p - 0.04) / 0.82);
-            if (tp >= 0.999) {
-              if (!crisped) {
-                crisped = true;
-                gsap.set(h1, { autoAlpha: 0 });
-                if (firstMark) gsap.set(firstMark, { autoAlpha: 1 });
-              }
-            } else {
-              if (crisped) {
-                crisped = false;
-                gsap.set(h1, { autoAlpha: 1 });
-                if (firstMark) gsap.set(firstMark, { autoAlpha: 0 });
-              }
-              titleTl.progress(tp);
-            }
-          }
+        // The wordmark travels over p [0.04, 0.86]. At settle it hands off to
+        // the chrome-layer copy sitting at the same spot: the travelling
+        // element lives under the portrait (so it is never seen in front of
+        // it) but is therefore also under the glass panel, which blurs it.
+        // The copy is above the panel, so the mark comes to rest sharp.
+        if (h1 && titleTl) {
+          const tp = gsap.utils.clamp(0, 1, (p - 0.04) / 0.82);
+          titleTl.progress(tp);
+          // Once the mark has left the hero it no longer needs the portrait
+          // to occlude it, and staying under the chrome meant the last of
+          // its travel happened behind the glass — dimmed and soft beside a
+          // sharp surname. It rises above the panel instead.
+          if (title) title.style.zIndex = tp > 0.42 ? "40" : "";
+          // The handover to the crisp copy is a crossfade across the end of
+          // the travel, not a swap in a single frame. The swap is what made
+          // the given name look like it faded out and popped back in.
+          const k = gsap.utils.clamp(0, 1, (tp - 0.9) / 0.1);
+          gsap.set(h1, { autoAlpha: 1 - k });
+          if (firstMark) gsap.set(firstMark, { autoAlpha: k });
+        }
 
-          if (panel) {
-            gsap.set(panel, {
-              autoAlpha: gsap.utils.clamp(0, 1, (p - 0.3) / 0.3),
-            });
-          }
-          gsap.set(railOnly, {
-            autoAlpha: gsap.utils.clamp(0, 1, (p - 0.62) / 0.26),
+        if (panel) {
+          gsap.set(panel, {
+            autoAlpha: gsap.utils.clamp(0, 1, (p - 0.3) / 0.3),
           });
-          gsap.set(heroOnly, {
-            autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.4),
-          });
-          // The route numbers belong to the rail only; `data-state` stays
-          // "hero" (the morph is pure transform), so the rail look is flagged
-          // separately.
-          root.dataset.rail = p > 0.62 ? "true" : "false";
-          resolveRoute();
-        };
+        }
+        gsap.set(railOnly, {
+          autoAlpha: gsap.utils.clamp(0, 1, (p - 0.62) / 0.26),
+        });
+        gsap.set(heroOnly, {
+          autoAlpha: gsap.utils.clamp(0, 1, 1 - p / 0.4),
+        });
+        // The route numbers belong to the rail only; `data-state` stays
+        // "hero" (the morph is pure transform), so the rail look is flagged
+        // separately.
+        root.dataset.rail = p > 0.62 ? "true" : "false";
+        resolveRoute();
+      };
 
       const st = ScrollTrigger.create({
         trigger: hero,
@@ -377,9 +375,8 @@ export function HeroChrome() {
         },
       });
 
-      const threadFill = document.querySelector<HTMLElement>(
-        "[data-thread-fill]",
-      );
+      const threadFill =
+        document.querySelector<HTMLElement>("[data-thread-fill]");
       const tracker = ScrollTrigger.create({
         trigger: document.documentElement,
         start: 0,
@@ -470,6 +467,11 @@ export function HeroChrome() {
         <span data-rail-clock>--:--</span> local · Algeria
       </p>
 
+      {/* Rail-only: the hero's closing line, restated small under the clock. */}
+      <p data-chrome-rail className="hero-chrome-line text-fine">
+        {content.intro.philosophy}
+      </p>
+
       {/* Rail-only: the module rules. Hairlines group the rail into masthead
           blocks — identity, proof, routes, contact. */}
       <div data-chrome-rail className="hero-chrome-rule hero-chrome-rule--a" />
@@ -481,7 +483,10 @@ export function HeroChrome() {
       <p className="hero-chrome-philosophy type-display font-medium text-ink">
         {philoWords.map((word, i) => (
           <Fragment key={`${word}-${String(i)}`}>
-            <span data-philo-word className="inline-block will-change-transform">
+            <span
+              data-philo-word
+              className="inline-block will-change-transform"
+            >
               {word}
             </span>
             {i < philoWords.length - 1 ? " " : ""}
@@ -568,7 +573,11 @@ export function HeroChrome() {
         <span data-copy-label className="truncate">
           {content.contact.email}
         </span>
-        <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3 w-3 shrink-0">
+        <svg
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          className="h-3 w-3 shrink-0"
+        >
           <path
             fill="none"
             stroke="currentColor"

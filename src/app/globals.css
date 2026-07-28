@@ -291,14 +291,18 @@
     --r-caps: 4.5rem;
     --r-status: 7.6rem;
     --r-clock: 9.5rem;
-    --r-rule-a: 11.9rem;
-    --r-stats: 13.3rem;
-    --r-rule-b: 28.6rem;
-    --r-nav: 30rem;
-    --r-rule-c: 42.4rem;
-    --r-email: 43.9rem;
-    --r-socials: 47.4rem;
-    --r-stat-pad: 0.28rem;
+    --r-line: 11.3rem;
+    --r-rule-a: 14.6rem;
+    --r-stats: 15.9rem;
+    --r-rule-b: 28.9rem;
+    --r-nav: 30.3rem;
+    --r-rule-c: 42.7rem;
+    --r-email: 44.2rem;
+    --r-socials: 47.6rem;
+    --r-stat-pad: 0.2rem;
+    --stat-w: 13rem;
+    --stat-h: 5.3125rem;
+    --stat-scale: 0.72;
     --r-nav-gap: 0.5rem;
     --r-cta-bottom: 5vh;
     /* eases in once the name has begun to land */
@@ -310,14 +314,16 @@
       --r-caps: 3.6rem;
       --r-status: 6.6rem;
       --r-clock: 8.3rem;
-      --r-rule-a: 9.9rem;
-      --r-stats: 11.1rem;
-      --r-rule-b: 25.4rem;
-      --r-nav: 26.6rem;
-      --r-rule-c: 36.4rem;
-      --r-email: 37.6rem;
-      --r-socials: 40.3rem;
-      --r-stat-pad: 0.2rem;
+      --r-line: 9.9rem;
+      --r-rule-a: 12.7rem;
+      --r-stats: 13.9rem;
+      --r-rule-b: 24.9rem;
+      --r-nav: 26.1rem;
+      --r-rule-c: 35.9rem;
+      --r-email: 37.1rem;
+      --r-socials: 39.8rem;
+      --r-stat-pad: 0.15rem;
+      --stat-scale: 0.63;
       --r-nav-gap: 0.3rem;
       --r-cta-bottom: 4vh;
     }
@@ -344,6 +350,7 @@
   .hero-chrome-clock,
   .hero-chrome-rule,
   .hero-chrome-philosophy,
+  .hero-chrome-line,
   .hero-chrome-email,
   .hero-chrome-cta,
   .hero-chrome-socials,
@@ -536,6 +543,19 @@
     display: inline-block;
   }
 
+  /* The hero's closing line, restated small on the rail under the clock. A
+     second copy rather than a morph: the corner sets it at title size across
+     twenty characters and the rail wants three tight lines, which is a
+     different piece of typesetting, not the same one moved. */
+  .hero-chrome-line {
+    left: 2.75rem;
+    top: var(--r-line);
+    width: 11rem;
+    color: var(--slate);
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
   /* Shared: proofs. Gold in both states, compact on the rail. */
   .hero-chrome-stats {
     display: flex;
@@ -556,7 +576,8 @@
     gap: 0.5rem;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-stat {
-    width: 13rem;
+    width: var(--stat-w);
+    height: var(--stat-h);
     padding: 0.4rem 0.5rem 0.4rem 0.85rem;
   }
   .hero-chrome[data-state="hero"] .hero-chrome-stat dd {
@@ -565,19 +586,20 @@
   .hero-chrome[data-state="rail"] .hero-chrome-stats {
     left: 2.75rem;
     top: var(--r-stats);
-    gap: 0.3rem;
+    /* The gap is measured, and the cards render at exactly the measured
+       height, so this is the gap a reader sees. */
+    gap: 0.5rem;
   }
+  /* Smaller than it was, and an exact scale of the hero card in both
+     dimensions so the measured spacing matches what actually renders. The
+     typography inside is never seen at this size — the morph paints the hero
+     card scaled down — so only the box matters here. */
   .hero-chrome[data-state="rail"] .hero-chrome-stat {
-    width: 11rem;
+    width: calc(var(--stat-w) * var(--stat-scale));
+    height: calc(var(--stat-h) * var(--stat-scale));
     gap: 0;
     padding: var(--r-stat-pad) 0.5rem var(--r-stat-pad) 0.65rem;
-  }
-  .hero-chrome[data-state="rail"] .hero-chrome-stat dd {
-    font-size: var(--text-base);
-  }
-  .hero-chrome[data-state="rail"] .hero-chrome-stat dt {
-    font-size: var(--text-fine);
-    line-height: 1.3;
+    overflow: hidden;
   }
 
   /* Shared: routes. One list — a single row under the wordmark in the hero,
@@ -951,6 +973,36 @@
   }
   .footer-mark[data-mark-fx="slipspot"] .footer-mark-glow .footer-mark-glyph {
     transform: translate(calc(var(--n) * 0.07em), calc(var(--n) * -0.06em));
+    transition: transform 0.16s var(--ease-out);
+  }
+
+  /* --- D2 · slip inverted + spotlight: the inverted slip, but the moving ink
+   copy is masked to the cursor, so the mark reads solid accent everywhere and
+   only misregisters where you actually are. --- */
+  .footer-mark[data-mark-fx="slipinvspot"] .footer-mark-base {
+    -webkit-text-stroke-color: var(--accent);
+  }
+  .footer-mark[data-mark-fx="slipinvspot"] .footer-mark-glow {
+    -webkit-text-stroke-color: color-mix(in oklab, var(--ink) 55%, transparent);
+    -webkit-mask-image: radial-gradient(
+      circle calc(var(--spot-r) * 1.35) at var(--mx)
+        calc(var(--my) - var(--ly, 0px)),
+      #000 0%,
+      #000 55%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      circle calc(var(--spot-r) * 1.35) at var(--mx)
+        calc(var(--my) - var(--ly, 0px)),
+      #000 0%,
+      #000 55%,
+      transparent 100%
+    );
+  }
+  .footer-mark[data-mark-fx="slipinvspot"]
+    .footer-mark-glow
+    .footer-mark-glyph {
+    transform: translate(calc(var(--n) * -0.07em), calc(var(--n) * 0.06em));
     transition: transform 0.16s var(--ease-out);
   }
 

@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
 const BASE_PX = 100;
 
 /** Every treatment that has CSS behind it, in `globals.css`. */
-type MarkEffect = "spot" | "slip" | "slipinv" | "slipspot" | "shred" | "press";
+type MarkEffect =
+  "spot" | "slip" | "slipinv" | "slipspot" | "slipinvspot" | "shred" | "press";
 
 /**
  * Which treatment the mark uses. Change this one word to switch:
@@ -19,6 +20,8 @@ type MarkEffect = "spot" | "slip" | "slipinv" | "slipspot" | "shred" | "press";
  *                and the ink copy is the one that moves.            ← in use
  *   "slipspot" — slip, but masked to the cursor, so the plate misregisters
  *                only where you are and the rest stays perfectly set.
+ *   "slipinvspot" — the inverted slip, masked the same way: solid accent
+ *                everywhere, misregistering only under the cursor.
  *   "shred"    — each letter tears into horizontal bands that pull apart in
  *                opposite directions, like a sheet torn off mid-run.
  *   "press"    — the letters push into the paper, a hard accent deboss below
