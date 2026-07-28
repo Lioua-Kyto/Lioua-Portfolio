@@ -74,6 +74,17 @@ export function WorkRail() {
         }
       };
 
+      // An `overflow: hidden` box still has a scroll offset, and focusing a
+      // card's link on click makes the browser scroll it into view. Because the
+      // track is translated rather than scrolled, that offset is nowhere near
+      // where the card is drawn, and the rail jumped sideways by two cards on
+      // every click. Any scroll here is undone on the spot.
+      const unscroll = () => {
+        if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+        if (viewport.scrollTop !== 0) viewport.scrollTop = 0;
+      };
+      viewport.addEventListener("scroll", unscroll, { passive: true });
+
       // Durations are in scroll pixels, so the travel maps 1:1 and the trailing
       // hold consumes exactly `dwell` of scroll with the track standing still.
       const tl = gsap.timeline({
@@ -94,6 +105,10 @@ export function WorkRail() {
         { x: () => endX(), ease: "none", duration: () => travel() },
         0,
       ).to({}, { duration: () => dwell() });
+
+      return () => {
+        viewport.removeEventListener("scroll", unscroll);
+      };
     });
 
     mm.add("(max-width: 1023.98px)", () => {
