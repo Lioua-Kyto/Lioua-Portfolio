@@ -138,15 +138,14 @@
      `data-hero` nodes; these touch only the inner ones, so the two never
      write to the same property. */
 
-  /* The name falls letter by letter from above the screen. Through the whole
-     descent the letters run big-to-small across the word (--i is the letter's
-     index); the sizes only equalise once they have landed, so the arrival is
-     two moves and not one. `both` fill holds them off-screen from first paint
-     — no pre-animation flash, no layout shift. */
+  /* The name falls letter by letter from above the screen. Mid-flight the
+     letters run big-to-small across the word (--i is the letter's index) and
+     resolve to a single uniform size as they land. `both` fill holds them
+     off-screen from first paint — no pre-animation flash, no layout shift. */
   [data-title-letter] {
     transform-origin: 50% 100%;
-    animation: letter-fall 1.25s cubic-bezier(0.19, 1, 0.22, 1) both;
-    animation-delay: calc(var(--i, 0) * 0.085s);
+    animation: letter-fall 1.05s cubic-bezier(0.19, 1, 0.22, 1) both;
+    animation-delay: calc(var(--i, 0) * 0.07s);
   }
 
   /* The portrait resolves in from blur once the name has landed — the art
@@ -154,22 +153,42 @@
      in behind it. It is the LCP element, so the hold is as tight as the
      effect allows. */
   [data-portrait] {
-    animation: hero-portrait 1.05s 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: hero-portrait 1.05s 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* The supporting matter arrives with the portrait, each group from its own
+     side over its own duration, so the composition assembles rather than
+     appearing in one block. */
+  [data-hero="nav"] [data-hero-in] {
+    animation: hero-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(1.15s + var(--i, 0) * 0.05s);
+  }
+
+  [data-hero="stats"] [data-hero-in] {
+    animation: hero-left 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(1.25s + var(--i, 0) * 0.08s);
+  }
+
+  [data-hero="lede"] [data-hero-in] {
+    animation: hero-up-far 1s 1.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  [data-hero="capabilities"] [data-hero-in] {
+    animation: hero-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(1.4s + var(--i, 0) * 0.06s);
+  }
+
+  [data-hero="tagline"] [data-hero-in] {
+    animation: hero-fade 1s 1.7s ease-out both;
   }
 
   @keyframes letter-fall {
     from {
       opacity: 0;
-      transform: translateY(-118vh) scale(calc(1 - var(--i, 0) * 0.19));
+      transform: translateY(-118vh) scale(calc(1 - var(--i, 0) * 0.16));
     }
-    20% {
+    28% {
       opacity: 1;
-    }
-    /* Still small, still falling. The growth starts here and runs the rest of
-       the descent, so the letters resolve as they arrive rather than landing
-       first and resizing afterwards. */
-    38% {
-      transform: translateY(-46vh) scale(calc(1 - var(--i, 0) * 0.19));
     }
     to {
       opacity: 1;
@@ -187,6 +206,59 @@
       opacity: 1;
       transform: scale(1);
       filter: blur(0);
+    }
+  }
+
+  @keyframes hero-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-up-far {
+    from {
+      opacity: 0;
+      transform: translateY(44px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes hero-left {
+    from {
+      opacity: 0;
+      transform: translateX(-48px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes hero-right {
+    from {
+      opacity: 0;
+      transform: translateX(48px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes hero-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
     }
   }
 
@@ -229,6 +301,8 @@
     --r-stat-pad: 0.28rem;
     --r-nav-gap: 0.5rem;
     --r-cta-bottom: 5vh;
+    /* eases in once the name has begun to land */
+    animation: chrome-in 0.8s 0.95s both;
   }
   /* Laptop heights: the same modules, tightened so nothing runs off the rail. */
   @media (max-height: 899px) {
@@ -248,58 +322,18 @@
       --r-cta-bottom: 4vh;
     }
   }
-  /* The hero entrance order: name, portrait, routes, proofs, then the two
-     lines of copy that close the composition. Opacity and the standalone
-     `translate` property only — GSAP owns `transform` on these same nodes for
-     the hero-to-rail morph, and the two must never write to one property. */
-  .hero-chrome-nav li {
-    animation: chrome-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(2s + var(--i, 0) * 0.07s);
-  }
-  .hero-chrome-stat {
-    animation: chrome-slide 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(2.5s + var(--i, 0) * 0.1s);
-  }
-  .hero-chrome-philosophy {
-    animation: chrome-rise 0.9s 2.95s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  .hero-chrome-tagline [data-hero-in] {
-    animation: chrome-rise 0.9s 3.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  @keyframes chrome-rise {
+  @keyframes chrome-in {
     from {
       opacity: 0;
-      translate: 0 16px;
     }
     to {
       opacity: 1;
-      translate: 0 0;
-    }
-  }
-  @keyframes chrome-slide {
-    from {
-      opacity: 0;
-      translate: -28px 0;
-    }
-    to {
-      opacity: 1;
-      translate: 0 0;
     }
   }
   .hero-chrome a,
   .hero-chrome ul,
   .hero-chrome button {
     pointer-events: auto;
-  }
-
-  /* The rail belongs to the scrolled state. Painted from the first frame it
-     appeared for half a second and then vanished the moment GSAP hydrated and
-     claimed it. It starts hidden; GSAP writes opacity inline, which wins over
-     this, so the rail still arrives on scroll exactly as before. */
-  [data-chrome-rail],
-  [data-chrome-panel],
-  [data-chrome-first] {
-    opacity: 0;
   }
   .hero-chrome-panel,
   .hero-chrome-first,
@@ -972,38 +1006,6 @@
     transition:
       transform 0.25s var(--ease-out),
       text-shadow 0.25s var(--ease-out);
-  }
-
-  /* The variant switcher — temporary, and styled as a tool rather than as
-     part of the page. */
-  .mark-variants {
-    position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 60;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.6rem;
-    border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
-    border-radius: var(--radius);
-    background: color-mix(in oklab, var(--paper) 88%, transparent);
-    backdrop-filter: blur(8px);
-    letter-spacing: 0.08em;
-  }
-  .mark-variant {
-    padding: 0.15rem 0.4rem;
-    border-radius: var(--radius-xs, 4px);
-    color: var(--slate);
-    cursor: pointer;
-    transition: color var(--dur-micro) var(--ease-out);
-  }
-  .mark-variant:hover {
-    color: var(--ink);
-  }
-  .mark-variant[data-on="true"] {
-    background: var(--ink);
-    color: var(--paper);
   }
 
   .footer-mark-glow {

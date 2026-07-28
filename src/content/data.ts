@@ -1739,17 +1739,6 @@ export const rawContent: z.input<typeof contentSchema> = {
     // the work is actually organised day to day.
     inventory: [
       {
-        group: "AI-Assisted Engineering",
-        items: [
-          "Google Gemini",
-          "Tool-augmented agents",
-          "Prompt + context design",
-          "Catalogue-grounded responses",
-          "LLM feature integration",
-          "Claude Code",
-        ],
-      },
-      {
         group: "Front-End & UI",
         items: [
           "React",
@@ -1773,12 +1762,11 @@ export const rawContent: z.input<typeof contentSchema> = {
           "Prisma",
           "PostgreSQL",
           "Redis",
-          "Celery",
+          "REST + RBAC",
           "Django Channels",
           "WebSockets",
           "WebRTC",
           "Polymorphic models",
-          "REST + RBAC",
         ],
       },
       {
@@ -1792,6 +1780,16 @@ export const rawContent: z.input<typeof contentSchema> = {
           "Cloudflare",
           "Firebase (Auth, FCM)",
           "Google Cloud (IAM, OAuth2)",
+        ],
+      },
+      {
+        group: "AI-Assisted Engineering",
+        items: [
+          "Claude Code",
+          "Tool-augmented agents",
+          "Google Gemini",
+          "Prompt + context design",
+          "LLM feature integration",
         ],
       },
       {
