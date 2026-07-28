@@ -191,15 +191,6 @@ export default async function WorkDetail({
 
       <div id="under-the-hood" className="hood-layer">
         <div className="shell pt-[clamp(3rem,8vh,6rem)] pb-[clamp(4rem,12vh,9rem)]">
-          <p className="hairline flex pt-4">
-            <a
-              href="#back-to-the-surface"
-              className="transition-micro ml-auto font-mono text-label text-signal uppercase underline underline-offset-4 transition-colors hover:text-ink"
-            >
-              ↑ Back to the surface
-            </a>
-          </p>
-
           {item.diagram ?? item.erd ?? item.flow ? (
             <section aria-label="Architecture">
               <h2 className="hairline pt-4">
@@ -269,6 +260,16 @@ export default async function WorkDetail({
               {next?.title} →
             </Link>
           </nav>
+
+          {/* The way out, at the point a reader has finished and wants it. */}
+          <p className="hairline mt-16 flex">
+            <a
+              href="#back-to-the-surface"
+              className="transition-micro ml-auto font-mono text-label text-signal uppercase underline underline-offset-4 transition-colors hover:text-ink"
+            >
+              ↑ Back to the surface
+            </a>
+          </p>
         </div>
       </div>
     </main>
