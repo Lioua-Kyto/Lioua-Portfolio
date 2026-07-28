@@ -522,6 +522,29 @@
     border-color: color-mix(in oklab, var(--ink) 38%, transparent);
   }
 
+  /* On a tall rail the contact block was stranded partway up, dropping a slab
+     of empty space between the social links and the pinned CTA. Anchoring the
+     address, the links and their divider to the bottom instead — clustered
+     just above the button — carries that breathing room up between the site
+     map and the ways to reach me, which reads as a deliberate seam rather than
+     a hole under the last row. Guarded to tall viewports: on a short one the
+     block would ride up into the routes, and there the top-anchored layout
+     already sits tight with no gap to fix. */
+  @media (min-height: 820px) {
+    .hero-chrome-rule--c {
+      top: auto;
+      bottom: calc(var(--r-cta-bottom) + 9.2rem);
+    }
+    .hero-chrome-email {
+      top: auto;
+      bottom: calc(var(--r-cta-bottom) + 6.9rem);
+    }
+    .hero-chrome-socials {
+      top: auto;
+      bottom: calc(var(--r-cta-bottom) + 4rem);
+    }
+  }
+
   /* Hero-only footnote — always at its hero spot, opacity JS-driven. */
   .hero-chrome-tagline {
     left: var(--pad);
@@ -1161,6 +1184,39 @@
     gap: 0.5rem;
     margin-top: 1rem;
     max-width: 56ch;
+  }
+
+  /* ---- The way into a project ----
+     The cover the reader clicked grows to fill the screen while a paper ground
+     rises under it; the route changes behind that opaque screen and the cover
+     then clears to reveal the project. Inert until a card asks for it. The
+     motion itself lives in ProjectTransition; this only positions the layers.
+     (This block was lost in an unrelated edit — its absence is why the open
+     animated invisibly.) */
+  .project-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .project-transition[data-on="true"] {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .project-transition-ground {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+  }
+  .project-transition-shot {
+    position: absolute;
+    background-position: center top;
+    background-size: cover;
+    border-radius: var(--radius);
+    box-shadow: 0 40px 120px -40px
+      color-mix(in oklab, var(--ink) 55%, transparent);
+    will-change: transform, opacity;
   }
 
   /* ---- The zoom viewer ---- */

@@ -70,10 +70,13 @@ export function ProjectTransition() {
       gsap.set(image, { top: pad, left: pad, width: w, height: h });
 
       const tl = gsap.timeline();
+      // The ground closes first and a little faster than the image grows, so by
+      // the time the route is pushed the screen is genuinely opaque. The image
+      // keeps expanding over that opaque ground, landing as the project's hero.
       tl.fromTo(
         ground,
         { yPercent: 100 },
-        { yPercent: 0, duration: 0.3, ease: "power3.inOut" },
+        { yPercent: 0, duration: 0.42, ease: "power2.inOut" },
         0,
       );
       tl.fromTo(
@@ -91,8 +94,10 @@ export function ProjectTransition() {
           y: 0,
           scaleX: 1,
           scaleY: 1,
-          duration: 0.38,
-          ease: "power3.inOut",
+          duration: 0.56,
+          // A settle, not a slam: quick to leave the card, easing into the
+          // full frame. This is the moment that reads as "opening".
+          ease: "power3.out",
         },
         0,
       );
@@ -104,7 +109,7 @@ export function ProjectTransition() {
           router.push(href);
         },
         undefined,
-        0.3,
+        0.42,
       );
     };
 
@@ -133,16 +138,18 @@ export function ProjectTransition() {
       gsap.set(image, { clearProps: "all" });
     };
 
-    // One frame for the new page to paint, then let go.
+    // Two frames for the new page to commit and paint its priority hero, then
+    // let go. The cover the reader grew fades to the identical real image
+    // underneath while the ground lifts away to uncover the rest of the page.
     const start = window.setTimeout(() => {
       const tl = gsap.timeline({ onComplete: clear });
-      tl.to(image, { autoAlpha: 0, duration: 0.22, ease: "power2.out" }, 0);
+      tl.to(image, { autoAlpha: 0, duration: 0.32, ease: "power2.out" }, 0);
       tl.to(
         ground,
-        { yPercent: -100, duration: 0.36, ease: "power3.inOut" },
-        0.04,
+        { yPercent: -100, duration: 0.44, ease: "power2.inOut" },
+        0.06,
       );
-    }, 40);
+    }, 80);
 
     // If the exit never runs — a slow render, a back button mid-flight — the
     // screen must not stay covered.
