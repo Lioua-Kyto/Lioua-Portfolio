@@ -26,7 +26,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       data-work-card
       data-index={index}
       data-active={index === 0 ? "true" : "false"}
-      className="work-card transition-micro relative flex w-[min(88vw,34rem)] shrink-0 flex-col opacity-40 transition-opacity duration-500 data-[active=true]:opacity-100"
+      className="work-card relative flex w-[min(88vw,34rem)] shrink-0 flex-col"
     >
       <div className="flex items-center justify-between gap-4">
         <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">

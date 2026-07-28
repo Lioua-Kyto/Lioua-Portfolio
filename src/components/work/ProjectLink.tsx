@@ -27,6 +27,16 @@ export function ProjectLink({
     <Link
       href={href}
       className={className}
+      // Pressing a link focuses it, and the browser then scrolls every
+      // scrollable ancestor — the rail's overflow box and the document — until
+      // it is in view. The work section is pinned and its track is translated
+      // rather than scrolled, so that scroll dragged the rail sideways past a
+      // couple of cards before the transition had even started. Take the focus
+      // deliberately instead, without the scrolling.
+      onMouseDown={(event) => {
+        event.preventDefault();
+        event.currentTarget.focus({ preventScroll: true });
+      }}
       onClick={(event) => {
         if (
           !cover ||

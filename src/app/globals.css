@@ -1092,6 +1092,23 @@
 
   /* ---- Project pages ---- */
 
+  /* Every card reads at full strength. Nothing is singled out for sitting in
+     the middle of the screen — a reader picks what they are interested in, and
+     the rail should not decide that for them. Hovering the row is what dims
+     the rest, so the highlight only ever answers an actual intent. */
+  .work-card {
+    opacity: 1;
+    transition: opacity var(--dur-base, 0.35s) var(--ease-out);
+  }
+  @media (hover: hover) and (min-width: 1024px) {
+    [data-rail-track]:hover .work-card {
+      opacity: 0.42;
+    }
+    [data-rail-track]:hover .work-card:hover {
+      opacity: 1;
+    }
+  }
+
   /* The card's title link stretches over the whole card, so the image and the
      hook are clickable without nesting the card's own links inside it. */
   .work-card-link::after {

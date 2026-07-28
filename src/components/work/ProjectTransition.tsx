@@ -9,16 +9,19 @@ import { gsap } from "@/lib/motion/gsap";
  *
  * A card is a picture of a thing you are about to open, so opening it should
  * look like that and not like a page swap. The cover the reader clicked lifts
- * off the rail and grows while the ground rises under it; once the screen is
- * genuinely covered the route changes, and the cover clears when the new page
- * says it has arrived.
+ * off the rail and grows to fill the screen while the ground rises under it;
+ * once the screen is genuinely covered the route changes, and the cover clears
+ * the moment the new page reports for duty.
  *
- * The order matters more than it looks. Pushing while the ground was still
- * rising meant the home page tore down its pins in full view — the work rail
- * un-pinned and slid back across the screen — and the new page's first render
- * competed with the tween for the same frames, which is what made the whole
- * thing feel sluggish. The push now happens behind an opaque screen, and
- * nothing animates while React is doing its heaviest work.
+ * Two things this has to keep getting right. The push waits for an opaque
+ * screen: pushing earlier let the home page tear down its pins in full view.
+ * And the growth is transform-only — the first version animated width, height,
+ * top and left, which forces a layout on every single frame and is why the
+ * whole thing felt like it was dragging.
+ *
+ * It is also deliberately short. The project page has its heading and its
+ * first capture on screen inside about 550ms; an overlay that runs longer than
+ * that is not covering work, it is just making the reader wait.
  *
  * Mounted once in the root layout so it outlives the navigation. Work cards
  * ask for it by dispatching `project:open`; anything that cannot be measured
@@ -58,34 +61,38 @@ export function ProjectTransition() {
       box.dataset.on = "true";
       image.style.backgroundImage = `url("${src}")`;
 
-      // Where it ends: a full-bleed frame with the page's own gutter, so the
-      // cover lands where a reader expects a project to live rather than
-      // stretching edge to edge and distorting.
+      // The shot's box is fixed — a full-bleed frame inset by the page's own
+      // gutter — and never changes. Only its transform does, which keeps the
+      // whole travel on the compositor.
       const pad = Math.min(window.innerWidth, window.innerHeight) * 0.06;
-
-      gsap.set(image, {
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height,
-        borderRadius: 12,
-        autoAlpha: 1,
-        scale: 1,
-      });
-      gsap.set(ground, { yPercent: 100 });
+      const w = window.innerWidth - pad * 2;
+      const h = window.innerHeight - pad * 2;
+      gsap.set(image, { top: pad, left: pad, width: w, height: h });
 
       const tl = gsap.timeline();
-      tl.to(ground, { yPercent: 0, duration: 0.5, ease: "expo.inOut" }, 0);
-      tl.to(
+      tl.fromTo(
+        ground,
+        { yPercent: 100 },
+        { yPercent: 0, duration: 0.3, ease: "power3.inOut" },
+        0,
+      );
+      tl.fromTo(
         image,
         {
-          top: pad,
-          left: pad,
-          width: window.innerWidth - pad * 2,
-          height: window.innerHeight - pad * 2,
-          borderRadius: 4,
-          duration: 0.56,
-          ease: "expo.inOut",
+          x: rect.left - pad,
+          y: rect.top - pad,
+          scaleX: rect.width / w,
+          scaleY: rect.height / h,
+          transformOrigin: "left top",
+          autoAlpha: 1,
+        },
+        {
+          x: 0,
+          y: 0,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 0.38,
+          ease: "power3.inOut",
         },
         0,
       );
@@ -97,7 +104,7 @@ export function ProjectTransition() {
           router.push(href);
         },
         undefined,
-        0.5,
+        0.3,
       );
     };
 
@@ -107,9 +114,8 @@ export function ProjectTransition() {
     };
   }, [router]);
 
-  // The exit waits for the arrival rather than running on a fixed clock: the
-  // new page's first render is the expensive part, and animating through it is
-  // what dropped frames. A timeout is only the safety net.
+  // The exit waits for the arrival rather than a fixed clock: the new page's
+  // first render is the expensive part, and animating through it drops frames.
   useEffect(() => {
     const want = target.current;
     const box = layer.current;
@@ -130,17 +136,13 @@ export function ProjectTransition() {
     // One frame for the new page to paint, then let go.
     const start = window.setTimeout(() => {
       const tl = gsap.timeline({ onComplete: clear });
-      tl.to(
-        image,
-        { autoAlpha: 0, scale: 1.05, duration: 0.42, ease: "power2.out" },
-        0,
-      );
+      tl.to(image, { autoAlpha: 0, duration: 0.22, ease: "power2.out" }, 0);
       tl.to(
         ground,
-        { yPercent: -100, duration: 0.6, ease: "expo.inOut" },
-        0.08,
+        { yPercent: -100, duration: 0.36, ease: "power3.inOut" },
+        0.04,
       );
-    }, 90);
+    }, 40);
 
     // If the exit never runs — a slow render, a back button mid-flight — the
     // screen must not stay covered.
@@ -148,7 +150,7 @@ export function ProjectTransition() {
       gsap.killTweensOf([image, ground]);
       gsap.set(ground, { yPercent: -100 });
       clear();
-    }, 2600);
+    }, 2200);
 
     return () => {
       clearTimeout(start);
