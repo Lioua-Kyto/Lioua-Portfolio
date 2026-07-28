@@ -162,12 +162,14 @@
       opacity: 0;
       transform: translateY(-118vh) scale(calc(1 - var(--i, 0) * 0.19));
     }
-    24% {
+    20% {
       opacity: 1;
     }
-    /* Landed, still at their own sizes. */
-    64% {
-      transform: translateY(0) scale(calc(1 - var(--i, 0) * 0.19));
+    /* Still small, still falling. The growth starts here and runs the rest of
+       the descent, so the letters resolve as they arrive rather than landing
+       first and resizing afterwards. */
+    38% {
+      transform: translateY(-46vh) scale(calc(1 - var(--i, 0) * 0.19));
     }
     to {
       opacity: 1;
@@ -288,6 +290,16 @@
   .hero-chrome ul,
   .hero-chrome button {
     pointer-events: auto;
+  }
+
+  /* The rail belongs to the scrolled state. Painted from the first frame it
+     appeared for half a second and then vanished the moment GSAP hydrated and
+     claimed it. It starts hidden; GSAP writes opacity inline, which wins over
+     this, so the rail still arrives on scroll exactly as before. */
+  [data-chrome-rail],
+  [data-chrome-panel],
+  [data-chrome-first] {
+    opacity: 0;
   }
   .hero-chrome-panel,
   .hero-chrome-first,
@@ -850,96 +862,116 @@
   }
 
   /* --- A · spotlight: the accent outline is revealed under a soft circle, so
-     what lights is the part of the mark under the cursor, not a whole letter.
-     The quietest of the four and the one that reads as pure print. --- */
+   what lights is the part of the mark under the cursor, not a whole letter.
+   The quietest of the set and the one that reads as pure print. Its CSS is
+   the shared default on .footer-mark-glow above. --- */
 
-  /* --- B · plate slip: the accent copy slides toward the cursor, the way a
-     plate slips on press. Same language as the portrait's channel split, so
-     the top and the bottom of the page answer each other. --- */
-  .footer-mark[data-mark-fx="slip"] .footer-mark-glow {
+  /* Every treatment that is not the spotlight drops the mask and lights the
+   whole accent layer; each then does its own thing with --n. */
+  .footer-mark:not([data-mark-fx="spot"]) .footer-mark-glow {
     opacity: 1;
     -webkit-mask-image: none;
     mask-image: none;
   }
+
+  /* --- B · slip: the accent copy slides toward the cursor, the way a plate
+   slips on press. The same language as the portrait's channel split, so the
+   top and the bottom of the page answer each other. --- */
   .footer-mark[data-mark-fx="slip"] .footer-mark-glow .footer-mark-glyph {
     transform: translate(calc(var(--n) * 0.055em), calc(var(--n) * -0.045em));
     transition: transform 0.18s var(--ease-out);
   }
 
-  /* --- C · rise: letters lift and fill as the cursor nears, and settle back.
-     The kinetic option — the mark behaves like a keyboard. --- */
-  .footer-mark[data-mark-fx="rise"] .footer-mark-glow {
-    opacity: 1;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-  .footer-mark[data-mark-fx="rise"] .footer-mark-glow .footer-mark-glyph {
-    transform: translateY(calc(var(--n) * -0.09em));
-    color: color-mix(
-      in oklab,
-      var(--accent) calc(var(--n) * 100%),
-      transparent
-    );
-    -webkit-text-stroke-color: color-mix(
-      in oklab,
-      var(--accent) calc(var(--n) * 100%),
-      transparent
-    );
-    transition:
-      transform 0.24s var(--ease-out),
-      color 0.24s var(--ease-out);
-  }
-  .footer-mark[data-mark-fx="rise"] .footer-mark-base .footer-mark-glyph {
-    transform: translateY(calc(var(--n) * -0.09em));
-    transition: transform 0.24s var(--ease-out);
-  }
-
-  /* --- D · ruled: hairlines cut through the letterforms near the cursor and
-     the mark reads as a technical drawing of itself. --- */
-  .footer-mark[data-mark-fx="rule"] .footer-mark-glow {
-    opacity: 1;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-  .footer-mark[data-mark-fx="rule"] .footer-mark-glow .footer-mark-glyph {
-    color: transparent;
+  /* --- C · slip inverted: the same slip with the roles swapped. The mark sits
+   in accent and the ink copy is the one that moves, so the letters read as
+   solid colour breaking apart rather than an outline gaining one. --- */
+  .footer-mark[data-mark-fx="slipinv"] .footer-mark-base {
     -webkit-text-stroke-color: var(--accent);
-    opacity: var(--n);
-    background-image: repeating-linear-gradient(
-      to bottom,
-      var(--accent) 0 1px,
-      transparent 1px 7px
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    transition: opacity 0.2s var(--ease-out);
+  }
+  .footer-mark[data-mark-fx="slipinv"] .footer-mark-glow {
+    -webkit-text-stroke-color: color-mix(in oklab, var(--ink) 55%, transparent);
+  }
+  .footer-mark[data-mark-fx="slipinv"] .footer-mark-glow .footer-mark-glyph {
+    transform: translate(calc(var(--n) * -0.055em), calc(var(--n) * 0.045em));
+    transition: transform 0.18s var(--ease-out);
   }
 
-  /* The way into a project: the cover the reader clicked grows to fill the
-     screen while the second layer's ground rises under it, and the route
-     change happens behind that. Inert until a card asks for it. */
-  .project-transition {
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-    pointer-events: none;
-    visibility: hidden;
+  /* --- D · slip + spotlight: the slipped copy keeps the circle, so the plate
+   only misregisters where the cursor actually is and the rest of the mark
+   stays perfectly set. The most controlled of the loud ones. --- */
+  .footer-mark[data-mark-fx="slipspot"] .footer-mark-glow {
+    -webkit-mask-image: radial-gradient(
+      circle calc(var(--spot-r) * 1.35) at var(--mx)
+        calc(var(--my) - var(--ly, 0px)),
+      #000 0%,
+      #000 55%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      circle calc(var(--spot-r) * 1.35) at var(--mx)
+        calc(var(--my) - var(--ly, 0px)),
+      #000 0%,
+      #000 55%,
+      transparent 100%
+    );
   }
-  .project-transition[data-on="true"] {
-    visibility: visible;
-    pointer-events: auto;
+  .footer-mark[data-mark-fx="slipspot"] .footer-mark-glow .footer-mark-glyph {
+    transform: translate(calc(var(--n) * 0.07em), calc(var(--n) * -0.06em));
+    transition: transform 0.16s var(--ease-out);
   }
-  .project-transition-ground {
+
+  /* --- E · shred: the letter is cut into horizontal bands that pull apart in
+   opposite directions, like a sheet torn off the press mid-run. Two extra
+   clipped copies do the tearing; the base stays put so the word never stops
+   being readable. --- */
+  .footer-mark[data-mark-fx="shred"] .footer-mark-glow .footer-mark-glyph {
+    position: relative;
+    color: transparent;
+    -webkit-text-stroke-color: transparent;
+  }
+  .footer-mark[data-mark-fx="shred"]
+    .footer-mark-glow
+    .footer-mark-glyph::before,
+  .footer-mark[data-mark-fx="shred"]
+    .footer-mark-glow
+    .footer-mark-glyph::after {
+    content: attr(data-glyph);
     position: absolute;
     inset: 0;
-    background: var(--paper);
+    color: var(--paper);
+    paint-order: stroke fill;
+    -webkit-text-stroke: 2px var(--accent);
+    /* Only the letters the cursor is near tear. Left ungated the copies are
+       painted at rest and the whole mark simply reads as accent. */
+    opacity: var(--n);
+    will-change: transform, clip-path;
   }
-  .project-transition-shot {
-    position: absolute;
-    background-position: center top;
-    background-size: cover;
-    box-shadow: 0 40px 120px -40px
-      color-mix(in oklab, var(--ink) 55%, transparent);
+  .footer-mark[data-mark-fx="shred"]
+    .footer-mark-glow
+    .footer-mark-glyph::before {
+    clip-path: polygon(0 0, 100% 0, 100% 34%, 0 34%);
+    transform: translateX(calc(var(--n) * 0.09em));
+  }
+  .footer-mark[data-mark-fx="shred"]
+    .footer-mark-glow
+    .footer-mark-glyph::after {
+    clip-path: polygon(0 58%, 100% 58%, 100% 100%, 0 100%);
+    transform: translateX(calc(var(--n) * -0.11em));
+  }
+
+  /* --- F · letterpress: the letters near the cursor push into the paper. A
+   hard accent shadow below and a paper highlight above give the deboss, and
+   the glyph itself sinks a hair. Quiet at a glance, expensive up close. --- */
+  .footer-mark[data-mark-fx="press"] .footer-mark-glow .footer-mark-glyph {
+    transform: translateY(calc(var(--n) * 0.018em))
+      scale(calc(1 - var(--n) * 0.012));
+    text-shadow:
+      calc(var(--n) * 0.022em) calc(var(--n) * 0.026em) 0
+        color-mix(in oklab, var(--accent) 78%, transparent),
+      calc(var(--n) * -0.014em) calc(var(--n) * -0.016em) 0 var(--paper);
+    transition:
+      transform 0.25s var(--ease-out),
+      text-shadow 0.25s var(--ease-out);
   }
 
   /* The variant switcher — temporary, and styled as a tool rather than as
@@ -1533,13 +1565,21 @@
 [data-portrait-field][data-ready="true"] {
   opacity: 1;
 }
-/* The image holds until the canvas has reached full opacity. Crossfading them
-   together left a window where both were part-way out and the portrait
-   thinned; delaying this one means there is always a portrait on screen. */
+/* The image holds at full opacity until the canvas has arrived, then goes.
+   A keyframe, not a transition: dropping the entrance animation makes the base
+   value the transition's starting point, so opacity went straight to zero and
+   left a frame with no portrait on screen at all. */
 [data-portrait][data-replaced="true"] {
-  animation: none;
-  opacity: 0;
-  transition: opacity 0.45s 0.5s var(--ease-out);
+  animation: portrait-handover 0.95s linear both;
+}
+@keyframes portrait-handover {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Opening is a move, not a cut: the sheet grows out of the card that was

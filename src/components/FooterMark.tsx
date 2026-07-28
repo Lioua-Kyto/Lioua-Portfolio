@@ -5,12 +5,14 @@ import { useEffect, useRef, useState } from "react";
 /** The size the mark is measured at before being scaled to fit. */
 const BASE_PX = 100;
 
-/** The four treatments on offer while the choice is still open. */
+/** The treatments on offer while the choice is still open. */
 const VARIANTS = [
   { id: "spot", label: "spotlight" },
-  { id: "slip", label: "plate slip" },
-  { id: "rise", label: "rise" },
-  { id: "rule", label: "ruled" },
+  { id: "slip", label: "slip" },
+  { id: "slipinv", label: "slip inverted" },
+  { id: "slipspot", label: "slip + spot" },
+  { id: "shred", label: "shred" },
+  { id: "press", label: "letterpress" },
 ] as const;
 
 type VariantId = (typeof VARIANTS)[number]["id"];
@@ -28,7 +30,7 @@ const glyphsOf = (word: string) =>
  * set, rather than one line of type with a ragged second.
  *
  * Every letter is its own span carrying `--n`, how near the cursor it is from
- * 0 to 1. That one number drives all four treatments from CSS, so switching
+ * 0 to 1. That one number drives every treatment from CSS, so switching
  * between them costs nothing and none of them re-render React.
  */
 export function FooterMark({ text }: { text: string }) {
@@ -164,6 +166,7 @@ export function FooterMark({ text }: { text: string }) {
                 <span
                   key={`${glyph}-${String(index)}`}
                   data-mark-glyph
+                  data-glyph={glyph}
                   className="footer-mark-glyph"
                 >
                   {glyph}
@@ -175,6 +178,7 @@ export function FooterMark({ text }: { text: string }) {
                 <span
                   key={`${glyph}-${String(index)}`}
                   data-mark-glyph
+                  data-glyph={glyph}
                   className="footer-mark-glyph"
                 >
                   {glyph}

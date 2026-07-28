@@ -134,7 +134,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       summary:
         "A live multi-provider booking platform (hotels, hostels, agencies, hosts) on one backend that's mine end to end.",
       stack:
-        "Django · React · PostgreSQL · Redis · Channels · TanStack Query · DRF",
+        "Django · React · PostgreSQL · Redis · Channels · TanStack Query · TypeScript · DRF",
       metric: {
         value: "~40ms",
         label: "cached responses, down from 176ms",
