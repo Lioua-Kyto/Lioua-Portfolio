@@ -106,8 +106,17 @@ export function WorkRail() {
         0,
       ).to({}, { duration: () => dwell() });
 
+      // Opening a project freezes the rail where it stands. The click lands a
+      // scrub impulse that slid the track a couple of cards left before the
+      // transition's cover had closed; disabling the trigger without reverting
+      // holds the track still, and the reader last saw it where they clicked.
+      // The home page unmounts moments later, so there is nothing to re-enable.
+      const freeze = () => tl.scrollTrigger?.disable(false);
+      window.addEventListener("project:open", freeze);
+
       return () => {
         viewport.removeEventListener("scroll", unscroll);
+        window.removeEventListener("project:open", freeze);
       };
     });
 

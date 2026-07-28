@@ -83,6 +83,11 @@ export function WorkStory({
                 fill
                 sizes="(max-width: 767px) 92vw, (max-width: 1279px) 88vw, 77rem"
                 quality={90}
+                // The first capture is above the fold on the project page, and
+                // it is the image the opening transition dissolves into. Lazy,
+                // it started loading only after the overlay lifted — the delay
+                // the reader saw. Priority so it is on its way during the push.
+                priority={index === 0}
                 className={
                   shot.fit === "contain" ? "object-contain" : "object-cover"
                 }
