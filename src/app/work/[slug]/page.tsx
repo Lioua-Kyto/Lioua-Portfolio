@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { content } from "@/content";
 import { Label } from "@/components/primitives/Label";
 import { WorkGallery } from "@/components/work/WorkGallery";
 import { ArchitectureBlock } from "@/components/work/ArchitectureBlock";
 import { HoodCurtain } from "@/components/work/HoodCurtain";
+import { SlideLink } from "@/components/work/SlideLink";
 
 const KIND_LABEL: Record<string, string> = {
   flagship: "flagship build",
@@ -60,12 +60,12 @@ export default async function WorkDetail({
     <main>
       <div id="back-to-the-surface" className="shell">
         <p className="hairline flex flex-wrap items-center gap-x-4 gap-y-1 pt-4">
-          <Link
+          <SlideLink
             href="/#projects"
             className="transition-micro font-mono text-label text-slate uppercase transition-colors hover:text-ink"
           >
             ← All projects
-          </Link>
+          </SlideLink>
           <Label>{KIND_LABEL[item.kind] ?? item.kind}</Label>
           <Label>{item.period}</Label>
           <a
@@ -253,12 +253,12 @@ export default async function WorkDetail({
             className="mt-24 border-t border-ink/20 pt-8"
           >
             <Label>Next project</Label>
-            <Link
+            <SlideLink
               href={`/work/${next?.slug ?? ""}`}
               className="type-display transition-micro mt-3 block text-headline leading-tight font-semibold transition-colors hover:text-accent"
             >
               {next?.title} →
-            </Link>
+            </SlideLink>
           </nav>
 
           {/* The way out, at the point a reader has finished and wants it. */}

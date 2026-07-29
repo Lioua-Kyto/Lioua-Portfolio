@@ -292,17 +292,20 @@
     --r-status: 7.6rem;
     --r-clock: 9.5rem;
     --r-line: 11.3rem;
-    --r-rule-a: 14.6rem;
-    --r-stats: 15.9rem;
-    --r-rule-b: 28.9rem;
-    --r-nav: 30.3rem;
+    --r-rule-a: 14.7rem;
+    --r-stats: 16rem;
+    --r-rule-b: 30.3rem;
+    --r-nav: 31.6rem;
     --r-rule-c: 42.7rem;
     --r-email: 44.2rem;
     --r-socials: 47.6rem;
     --r-stat-pad: 0.2rem;
-    --stat-w: 13rem;
-    --stat-h: 5.3125rem;
-    --stat-scale: 0.72;
+    /* The proof card, stated once. The rail copy is an exact scale of the
+       hero copy, and the scale is chosen so the rail card lands on the rail's
+       13rem measure — the same width as the rules, the address and the CTA. */
+    --stat-w: 17rem;
+    --stat-h: 5.23rem;
+    --stat-scale: 0.7647;
     --r-nav-gap: 0.5rem;
     --r-cta-bottom: 5vh;
     /* eases in once the name has begun to land */
@@ -315,15 +318,16 @@
       --r-status: 6.6rem;
       --r-clock: 8.3rem;
       --r-line: 9.9rem;
-      --r-rule-a: 12.7rem;
-      --r-stats: 13.9rem;
-      --r-rule-b: 24.9rem;
-      --r-nav: 26.1rem;
+      --r-rule-a: 13.4rem;
+      --r-stats: 14.6rem;
+      --r-rule-b: 27.1rem;
+      --r-nav: 28.4rem;
       --r-rule-c: 35.9rem;
       --r-email: 37.1rem;
       --r-socials: 39.8rem;
       --r-stat-pad: 0.15rem;
-      --stat-scale: 0.63;
+      /* Shorter cards on a short screen — the width stays on the measure. */
+      --stat-h: 4.45rem;
       --r-nav-gap: 0.3rem;
       --r-cta-bottom: 4vh;
     }
@@ -531,6 +535,10 @@
      block would ride up into the routes, and there the top-anchored layout
      already sits tight with no gap to fix. */
   @media (min-height: 820px) {
+    .hero-chrome[data-state="rail"] .hero-chrome-nav {
+      bottom: calc(var(--r-cta-bottom) + 10.45rem);
+      justify-content: space-between;
+    }
     .hero-chrome-rule--c {
       top: auto;
       bottom: calc(var(--r-cta-bottom) + 9.2rem);
@@ -573,7 +581,7 @@
   .hero-chrome-line {
     left: 2.75rem;
     top: var(--r-line);
-    width: 11rem;
+    width: 13rem;
     color: var(--slate);
     line-height: 1.45;
     text-wrap: pretty;
@@ -718,6 +726,10 @@
     .hero-chrome-status,
     .hero-chrome-clock,
     .hero-chrome-rule,
+    /* The rail's restatement of the closing line — below this width there is
+       no rail to hold it, and left in it landed on top of the wordmark. The
+       hero already says the same sentence in its own place. */
+    .hero-chrome-line,
     .hero-chrome-email,
     .hero-chrome-socials,
     .hero-chrome-cta {
@@ -1186,39 +1198,6 @@
     max-width: 56ch;
   }
 
-  /* ---- The way into a project ----
-     The cover the reader clicked grows to fill the screen while a paper ground
-     rises under it; the route changes behind that opaque screen and the cover
-     then clears to reveal the project. Inert until a card asks for it. The
-     motion itself lives in ProjectTransition; this only positions the layers.
-     (This block was lost in an unrelated edit — its absence is why the open
-     animated invisibly.) */
-  .project-transition {
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-    pointer-events: none;
-    visibility: hidden;
-  }
-  .project-transition[data-on="true"] {
-    visibility: visible;
-    pointer-events: auto;
-  }
-  .project-transition-ground {
-    position: absolute;
-    inset: 0;
-    background: var(--paper);
-  }
-  .project-transition-shot {
-    position: absolute;
-    background-position: center top;
-    background-size: cover;
-    border-radius: var(--radius);
-    box-shadow: 0 40px 120px -40px
-      color-mix(in oklab, var(--ink) 55%, transparent);
-    will-change: transform, opacity;
-  }
-
   /* ---- The zoom viewer ---- */
   .shot-viewer {
     position: fixed;
@@ -1498,11 +1477,16 @@
 
 /* Doors default to open, so with no JavaScript the layer below is simply
    already visible rather than covered by a panel that never moves. */
+.hood-curtain {
+  /* Slightly over half each, so the two doors overlap rather than risk a
+     transparent hairline between them on a fractional viewport height. */
+  --hood-door: 50.5%;
+}
 .hood-door {
   position: absolute;
   left: 0;
   right: 0;
-  height: 50.5%;
+  height: var(--hood-door);
   background: #f2f2f0;
   will-change: transform;
 }
@@ -1522,7 +1506,9 @@
 .hood-seam {
   position: absolute;
   left: 50%;
-  top: 50%;
+  /* On the join the reader can see: the bottom door paints over the top one,
+     so the visible line is the bottom door's top edge. */
+  top: calc(100% - var(--hood-door));
   width: min(90vw, 72rem);
   height: 2px;
   transform: translate(-50%, -50%);

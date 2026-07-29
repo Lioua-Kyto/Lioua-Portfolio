@@ -268,7 +268,7 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "ws",
                 label: "Channels (ASGI)",
-                note: "Live notifications, no refresh",
+                note: "WebSocket notifications to the browser",
                 kind: "service",
               },
             ],
@@ -291,7 +291,7 @@ export const rawContent: z.input<typeof contentSchema> = {
               {
                 id: "fcm",
                 label: "Firebase FCM",
-                note: "Push to devices",
+                note: "Push to phones, app closed or open",
                 kind: "external",
               },
             ],
@@ -367,7 +367,7 @@ export const rawContent: z.input<typeof contentSchema> = {
             id: "r6",
             lane: "api",
             label: "Pushes the change",
-            note: "Channels and FCM, nobody refreshes",
+            note: "Sockets to the browser, FCM to phones",
             state: null,
             kind: "step",
           },

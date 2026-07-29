@@ -1,8 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Support both VPS/Docker and Vercel deploys.
-  output: "standalone",
+  // Standalone only when a VPS or Docker build asks for it. Left on
+  // unconditionally, `next start` warns that it is serving the wrong output
+  // and Vercel does not want it either — the bundle it produces is meant to be
+  // run with `node .next/standalone/server.js`. Set STANDALONE=1 for that
+  // build; leave it unset for Vercel and for local `npm start`.
+  output: process.env.STANDALONE === "1" ? "standalone" : undefined,
   images: {
     // Next 16 requires every quality used to be declared. UI captures are read
     // for their text, so they are served well above the 75 default — at 75 the

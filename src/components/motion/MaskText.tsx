@@ -73,7 +73,12 @@ export function MaskText({
   );
 
   return (
-    <Tag ref={ref} className={className} aria-label={text}>
+    <Tag ref={ref} className={className}>
+      {/* The accessible copy. `aria-label` used to carry it, but that attribute
+         is only permitted on elements with a role that supports naming — on a
+         plain <p> it is prohibited, and the heading was announced twice on
+         some readers. A visually hidden copy works on every tag. */}
+      <span className="sr-only">{text}</span>
       {words.map((word, index) => (
         <Fragment key={`${word}-${String(index)}`}>
           <span

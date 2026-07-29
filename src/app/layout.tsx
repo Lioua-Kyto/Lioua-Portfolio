@@ -5,7 +5,7 @@ import localFont from "next/font/local";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { RouteScrollReset } from "@/components/providers/RouteScrollReset";
 import { AnchorScroll } from "@/components/providers/AnchorScroll";
-import { ProjectTransition } from "@/components/work/ProjectTransition";
+import { PageTransition } from "@/components/providers/PageTransition";
 import { content } from "@/content";
 import "./globals.css";
 
@@ -103,8 +103,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SmoothScrollProvider>
           <RouteScrollReset />
           <AnchorScroll />
-          <ProjectTransition />
-          {children}
+          <PageTransition>{children}</PageTransition>
         </SmoothScrollProvider>
       </body>
     </html>
