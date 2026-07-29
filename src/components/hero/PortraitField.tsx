@@ -101,10 +101,14 @@ export function PortraitField({ src }: { src: string }) {
     if (!el || !image) return;
 
     // A cursor effect has nothing to say to a finger, and the shader is not
-    // worth its frame cost on a phone. Both are checked once, not watched.
+    // worth its frame cost on a phone. A reader who has asked for less motion
+    // gets the plain portrait: this one is continuous and pointer-driven, so
+    // unlike the site's one-shot entrance it genuinely is the kind of motion
+    // that setting is about. All checked once, not watched.
     if (
       !window.matchMedia("(pointer: fine)").matches ||
-      !window.matchMedia("(min-width: 1024px)").matches
+      !window.matchMedia("(min-width: 1024px)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return;
     }

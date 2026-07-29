@@ -4,22 +4,19 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 /**
- * The card's title link, which asks the transition layer to open the project
- * rather than letting the router cut straight to it.
+ * The card's title link.
  *
- * It measures the card's own cover at the moment of the click and hands that
- * rectangle over, so the image that grows is the one the reader aimed at. Any
- * click the transition cannot honour — a new tab, a modified click, a card
- * with no capture — falls through to the ordinary navigation untouched.
+ * The navigation itself is ordinary — the page slides up from below once the
+ * router has swapped it in. What this adds is the signal the work rail needs
+ * to freeze where it stands, and the focus handling that stops a click from
+ * dragging the pinned track sideways.
  */
 export function ProjectLink({
   href,
-  cover,
   className,
   children,
 }: {
   href: string;
-  cover: string | null;
   className?: string;
   children: ReactNode;
 }) {
@@ -39,7 +36,6 @@ export function ProjectLink({
       }}
       onClick={(event) => {
         if (
-          !cover ||
           event.metaKey ||
           event.ctrlKey ||
           event.shiftKey ||
@@ -48,27 +44,9 @@ export function ProjectLink({
         ) {
           return;
         }
-        const card = event.currentTarget.closest("[data-work-card]");
-        const box = card
-          ?.querySelector("[data-card-cover]")
-          ?.getBoundingClientRect();
-        if (!box) return;
-
-        event.preventDefault();
-        window.dispatchEvent(
-          new CustomEvent("project:open", {
-            detail: {
-              href,
-              src: cover,
-              rect: {
-                top: box.top,
-                left: box.left,
-                width: box.width,
-                height: box.height,
-              },
-            },
-          }),
-        );
+        // Not preventing the navigation — only telling the rail to hold still
+        // while the page changes underneath it.
+        window.dispatchEvent(new CustomEvent("project:open"));
       }}
     >
       {children}

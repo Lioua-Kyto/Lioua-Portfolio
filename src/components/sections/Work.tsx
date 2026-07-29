@@ -87,11 +87,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         {/* The whole card reads as one target: the link stretches over it so
             the image and the hook are clickable too, without nesting the
             card's own links inside an anchor. */}
-        <ProjectLink
-          href={`/work/${item.slug}`}
-          cover={item.cover?.src ?? null}
-          className="work-card-link"
-        >
+        <ProjectLink href={`/work/${item.slug}`} className="work-card-link">
           {item.title}
         </ProjectLink>
       </h3>

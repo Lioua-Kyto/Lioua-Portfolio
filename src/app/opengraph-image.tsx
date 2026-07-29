@@ -2,26 +2,32 @@ import { ImageResponse } from "next/og";
 import { content } from "@/content";
 import { fetchGoogleFont } from "@/lib/og/fonts";
 
-export const runtime = "edge";
+// Node, not edge: on edge this route cannot be statically generated, and it
+// renders the same picture on every request.
+export const runtime = "nodejs";
 export const alt = "Lioua Zeddam · Full Stack Developer";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Paper palette mirror — satori can't read CSS custom props.
-const paper = "#f4f1ea";
-const ink = "#14140f";
-const slate = "#6b6559";
-const signal = "#a63c26";
+// Palette mirror — satori cannot read CSS custom properties, so these track
+// tokens.css by hand. Cobalt on neutral paper, which is what the site has been
+// since the redesign; this card had been left on the old amber.
+const paper = "#f2f2f0";
+const ink = "#14141a";
+const slate = "#63636b";
+const accent = "#2b4ecc";
 
 /** Editorial OG card (v3 brief §7, Phase 4): paper ground, serif name, mono
  * label, the three proof numbers. */
 export default async function OpengraphImage() {
-  const [serif, mono] = await Promise.all([
-    fetchGoogleFont("Fraunces", 600),
+  const [display, mono] = await Promise.all([
+    fetchGoogleFont("Bricolage Grotesque", 800),
     fetchGoogleFont("Martian Mono", 500),
   ]);
   const fonts = [
-    serif ? { name: "Fraunces", data: serif, weight: 600 as const } : null,
+    display
+      ? { name: "Bricolage Grotesque", data: display, weight: 800 as const }
+      : null,
     mono ? { name: "Martian Mono", data: mono, weight: 500 as const } : null,
   ].filter((f): f is NonNullable<typeof f> => f !== null);
 
@@ -47,15 +53,18 @@ export default async function OpengraphImage() {
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div
           style={{
-            fontFamily: "Fraunces, serif",
-            fontSize: 128,
-            color: ink,
-            lineHeight: 1,
+            fontFamily: "Bricolage Grotesque, sans-serif",
+            fontSize: 132,
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+            textTransform: "uppercase",
+            color: accent,
+            lineHeight: 0.92,
           }}
         >
           {intro.name}
         </div>
-        <div style={{ marginTop: 20, fontSize: 30, color: slate }}>
+        <div style={{ marginTop: 22, fontSize: 30, color: ink }}>
           {intro.line}
         </div>
       </div>
@@ -75,9 +84,9 @@ export default async function OpengraphImage() {
           >
             <span
               style={{
-                fontFamily: "Fraunces, serif",
+                fontFamily: "Bricolage Grotesque, sans-serif",
                 fontSize: 40,
-                color: signal,
+                color: accent,
               }}
             >
               {proof.value}
