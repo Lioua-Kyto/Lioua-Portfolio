@@ -1466,13 +1466,16 @@
   display: grid;
   place-items: center;
 }
+/* The card sits over the gap, and the machine rising behind it is the dark
+   hood ground — so the type is light, not the page's ink, or it vanishes into
+   the dark exactly as the doors finish parting. Matches the hood layer below. */
 .hood-reveal {
   padding-inline: var(--pad);
   text-align: center;
-  color: var(--ink);
+  color: #f2f2f0;
 }
 .hood-reveal p:first-child {
-  color: var(--accent);
+  color: #6f8cff;
 }
 
 /* Doors default to open, so with no JavaScript the layer below is simply

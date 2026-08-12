@@ -272,6 +272,20 @@ export const contentSchema = z.object({
     .max(3),
   /** 03 — Work: client engagements and personal products, one merged list. */
   work: z.array(workSchema).min(3).max(6),
+  /** 04 — Delivery: how the work gets shipped and handed over. */
+  delivery: z.object({
+    heading: z.string().min(1),
+    lede: z.string().min(1),
+    practices: z
+      .array(
+        z.object({
+          title: z.string().min(1),
+          body: z.string().min(1),
+        }),
+      )
+      .min(3)
+      .max(4),
+  }),
   skills: z.object({
     capabilities: z.array(capabilitySchema).length(6),
     inventory: z

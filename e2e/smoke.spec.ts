@@ -24,6 +24,7 @@ const SECTION_IDS = [
   "background",
   "principles",
   "projects",
+  "ship",
   "toolkit",
   "contact",
 ];
@@ -55,7 +56,7 @@ test("the site has no top header — the routes live in the hero chrome", async 
   // becomes the rail. Exactly one nav, five routes.
   const nav = page.locator('[data-chrome] nav[aria-label="Primary"]');
   await expect(nav).toHaveCount(1);
-  await expect(nav.getByRole("link")).toHaveCount(6);
+  await expect(nav.getByRole("link")).toHaveCount(7);
 
   // It sits below the wordmark on load. (The nav wrapper is display:contents,
   // so measure the actual route list.)
@@ -140,7 +141,7 @@ test("the hero chrome morphs into the side rail (one set of elements)", async ({
   // On load the rail panel is not shown (the chrome reads as the hero), and
   // there are six routes. (The data-state attribute stays "rail" throughout —
   // Flip drives the hero look via transforms, so panel opacity is the signal.)
-  await expect(routes).toHaveCount(6);
+  await expect(routes).toHaveCount(7);
   expect(await panelAlpha()).toBeLessThan(0.1);
 
   // Scroll through the pin: the panel forms as the shared items arrive.
@@ -151,7 +152,7 @@ test("the hero chrome morphs into the side rail (one set of elements)", async ({
   expect(await panelAlpha()).toBeGreaterThan(0.9);
 
   // Crucially: it is the SAME six routes, not a duplicated second set.
-  await expect(routes).toHaveCount(6);
+  await expect(routes).toHaveCount(7);
 
   // Reversible: back at the top the panel recedes and the hero returns.
   await wheelUntil(page, async () => (await panelAlpha()) < 0.1, {

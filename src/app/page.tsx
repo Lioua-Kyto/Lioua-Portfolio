@@ -10,6 +10,7 @@ import { Intro } from "@/components/sections/Intro";
 import { Background } from "@/components/sections/Background";
 import { Principles } from "@/components/sections/Principles";
 import { Work } from "@/components/sections/Work";
+import { Ship } from "@/components/sections/Ship";
 import { Toolkit } from "@/components/sections/Toolkit";
 import { Contact } from "@/components/sections/Contact";
 
@@ -36,6 +37,7 @@ export default function HomePage() {
           <Principles />
           <Work />
           <Marquee items={marqueeItems} />
+          <Ship />
           <Toolkit />
           <Contact />
         </main>

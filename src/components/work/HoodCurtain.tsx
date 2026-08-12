@@ -60,17 +60,24 @@ export function HoodCurtain({ title }: { title: string }) {
           )
           // The seam is the light in the gap: brightest as the doors part, gone
           // once they are out of the way.
+          // Centred, and gone the moment the doors lift — a flash in the join,
+          // not a line that lingers as the gap opens.
           .fromTo(
             "[data-hood-seam]",
-            { scaleX: 0.12, autoAlpha: 1 },
-            { scaleX: 1, autoAlpha: 0, ease: "power2.out", duration: 0.7 },
+            { autoAlpha: 1 },
+            { autoAlpha: 0, ease: "power2.in", duration: 0.12 },
             0,
           )
+          // Fades and scales in place, dead centre — no y-travel. The old
+          // version started the card 24px low and slid it up to centre as it
+          // settled, which read as the title "teleporting" to the middle once
+          // the doors were fully open. It now simply resolves where it sits,
+          // early, so it is legible while the gap is still opening.
           .fromTo(
             "[data-hood-reveal]",
-            { scale: 0.72, autoAlpha: 0, y: 24 },
-            { scale: 1, autoAlpha: 1, y: 0, ease: "power3.out", duration: 0.9 },
-            0.15,
+            { scale: 0.92, autoAlpha: 0 },
+            { scale: 1, autoAlpha: 1, ease: "power2.out", duration: 0.5 },
+            0.1,
           );
 
         ScrollTrigger.refresh();
