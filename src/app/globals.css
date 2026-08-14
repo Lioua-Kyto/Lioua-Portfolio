@@ -694,10 +694,20 @@
   }
   .hero-chrome[data-state="hero"] .hero-chrome-nav {
     left: var(--pad);
+    /* Full width so the routes can split around the portrait. */
+    right: var(--pad);
     top: calc(var(--name-bottom) + 1.1rem);
     flex-direction: row;
     align-items: baseline;
     gap: 1.5rem;
+  }
+  /* home → projects sit left of the figure; ship/toolkit/contact are pushed to
+     its right so they stop landing over the portrait. Scoped to the hero state
+     only — the rail measures its column with data-state="rail", where this auto
+     margin must not apply. On scroll they simply sweep in from the right into
+     the rail column, which the Flip handles the same as any other route. */
+  .hero-chrome[data-state="hero"] .hero-chrome-nav li:nth-child(5) {
+    margin-left: auto;
   }
   .hero-chrome[data-state="rail"] .hero-chrome-nav {
     left: 4.35rem;
