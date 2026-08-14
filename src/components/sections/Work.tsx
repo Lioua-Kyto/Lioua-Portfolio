@@ -19,14 +19,20 @@ const KIND_LABEL: Record<WorkItem["kind"], string> = {
  * the eye always knows which one it is reading.
  */
 function Card({ item, index }: { item: WorkItem; index: number }) {
-  const tags = item.stack.split(" · ").slice(0, 3);
+  // A phone app's cover is a tall screenshot (fit:contain marks it); it gets a
+  // native 9:19 frame in a narrow card. Everything else is a desktop 16:9. The
+  // rail measures each card, so the two widths live side by side happily.
+  const isPhone = item.cover?.fit === "contain";
+  const tags = item.stack.split(" · ").slice(0, isPhone ? 2 : 3);
 
   return (
     <article
       data-work-card
       data-index={index}
       data-active={index === 0 ? "true" : "false"}
-      className="work-card relative flex w-[min(88vw,34rem)] shrink-0 flex-col"
+      className={`work-card group relative flex shrink-0 flex-col ${
+        isPhone ? "w-[min(64vw,15rem)]" : "w-[min(88vw,34rem)]"
+      }`}
     >
       <div className="flex items-center justify-between gap-4">
         <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">
@@ -44,24 +50,29 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         </span>
       </div>
 
-      {/* The capture, when there is one. Phone screens are contained rather
-          than cropped — cover would show a sliver of a 1080×2400 screen. The
-          initial stays as the fallback so a project without shots is still a
-          designed box, never a bare one. */}
+      {/* The capture, in its native frame. Desktop 16:9, phone 9:19 — both
+          filled edge to edge (the phone screenshot exactly fills the phone
+          frame). Muted to greyscale so the rail reads as one palette, resolving
+          to full colour with a small lift as the card is hovered. The initial
+          is the fallback so a project without shots is still a designed box. */}
       <div
         data-card-cover
-        className="group relative mt-3 aspect-[16/10] max-h-[34vh] overflow-hidden rounded-xs bg-surface"
+        className={`relative mt-3 overflow-hidden rounded-xs bg-surface ${
+          isPhone ? "aspect-[9/19]" : "aspect-[16/9]"
+        }`}
       >
         {item.cover ? (
           <Image
             src={item.cover.src}
             alt={item.cover.alt}
             fill
-            sizes="(max-width: 1023px) 88vw, 34rem"
+            sizes={
+              isPhone
+                ? "(max-width: 1023px) 64vw, 15rem"
+                : "(max-width: 1023px) 88vw, 34rem"
+            }
             quality={90}
-            className={`transition-transform duration-500 group-hover:scale-[1.04] ${
-              item.cover.fit === "contain" ? "object-contain" : "object-cover"
-            } object-top`}
+            className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0"
           />
         ) : (
           <div
@@ -172,7 +183,7 @@ export function Work() {
       <div data-rail-viewport className="mt-8 overflow-hidden lg:ml-[18.5rem]">
         <div
           data-rail-track
-          className="flex w-max gap-8 px-[clamp(1.25rem,4.5vw,3.5rem)] lg:gap-12"
+          className="flex w-max items-start gap-8 px-[clamp(1.25rem,4.5vw,3.5rem)] lg:gap-12"
         >
           {work.map((item, index) => (
             <Card key={item.slug} item={item} index={index} />
