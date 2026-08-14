@@ -173,10 +173,16 @@ export function PortraitField({ src }: { src: string }) {
     let stop: (() => void) | null = null;
 
     const size = () => {
-      const box = el.getBoundingClientRect();
+      // Layout size, not getBoundingClientRect: the portrait layer carries a
+      // scroll-scrub scale, and coming back to the page mounted mid-scroll
+      // baked that scaled size into the buffer. A transform doesn't fire the
+      // ResizeObserver, so scrolling back to the un-transformed hero left the
+      // buffer ~12% off and the effect drifted up-left of the cursor.
+      // `clientWidth`/`clientHeight` ignore ancestor transforms, so the buffer
+      // always matches the identity state where the effect is actually used.
       const dpr = Math.min(window.devicePixelRatio, 2);
-      el.width = Math.max(1, Math.round(box.width * dpr));
-      el.height = Math.max(1, Math.round(box.height * dpr));
+      el.width = Math.max(1, Math.round(el.clientWidth * dpr));
+      el.height = Math.max(1, Math.round(el.clientHeight * dpr));
       gl.viewport(0, 0, el.width, el.height);
       gl.uniform2f(uRes, el.width, el.height);
     };
