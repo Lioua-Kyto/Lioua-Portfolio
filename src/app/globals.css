@@ -1161,7 +1161,9 @@
     position: relative;
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 10;
+    /* Matches the desktop screenshots' native 16:9 — a 16:10 frame cropped
+       their sides. Tall phone shots use fit:contain and simply pillarbox. */
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: var(--radius);
     background: var(--surface);
@@ -1476,6 +1478,24 @@
 }
 .hood-reveal p:first-child {
   color: #6f8cff;
+}
+
+/* The backend's own title, sticky at the top of the hood layer. Opaque dark
+   ground so the sections pass cleanly underneath; the curtain reveal dissolves
+   and this carries the name from there on. */
+.hood-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-block: clamp(0.9rem, 2.4vh, 1.5rem);
+  margin-bottom: clamp(1.5rem, 5vh, 3rem);
+  background: var(--paper);
+}
+.hood-heading-eyebrow {
+  color: var(--accent);
 }
 
 /* Doors default to open, so with no JavaScript the layer below is simply

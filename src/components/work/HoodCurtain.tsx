@@ -46,38 +46,61 @@ export function HoodCurtain({ title }: { title: string }) {
           },
         });
 
+        // Three beats, in order, so the seam is its own moment before the
+        // doors move: a hairline of light appears on the shut join, widens to
+        // full span, and only once it has gone do the doors part. Everything
+        // is on one scrubbed timeline (total ~1), so the beats can't overlap
+        // however fast the reader scrolls.
+
+        // A — the seam: grows from a point and brightens, then fades, doors
+        // still shut. One keyframed tween, not a fromTo-then-to: under scrub
+        // the second tween's start value is ambiguous and the fade never ran.
+        tl.fromTo(
+          "[data-hood-seam]",
+          { scaleX: 0.04, autoAlpha: 0 },
+          {
+            keyframes: {
+              "0%": { scaleX: 0.04, autoAlpha: 0 },
+              "55%": { scaleX: 1, autoAlpha: 1 },
+              "100%": { scaleX: 1, autoAlpha: 0 },
+            },
+            ease: "none",
+            duration: 0.26,
+          },
+          0,
+        );
+
+        // B — the doors part, revealing the machine behind. They only begin
+        // once the seam is gone.
         tl.fromTo(
           "[data-hood-door='top']",
           { yPercent: 0 },
-          { yPercent: -100, ease: "power2.inOut", duration: 1 },
-          0,
+          { yPercent: -100, ease: "power2.inOut", duration: 0.66 },
+          0.28,
+        ).fromTo(
+          "[data-hood-door='bottom']",
+          { yPercent: 0 },
+          { yPercent: 100, ease: "power2.inOut", duration: 0.66 },
+          0.28,
+        );
+
+        // C — the title resolves in place, dead centre, as the gap opens. No
+        // y-travel: sliding it up to centre was the "teleport" the reveal used
+        // to read as.
+        tl.fromTo(
+          "[data-hood-reveal]",
+          { scale: 0.94, autoAlpha: 0 },
+          { scale: 1, autoAlpha: 1, ease: "power2.out", duration: 0.4 },
+          0.4,
         )
-          .fromTo(
-            "[data-hood-door='bottom']",
-            { yPercent: 0 },
-            { yPercent: 100, ease: "power2.inOut", duration: 1 },
-            0,
-          )
-          // The seam is the light in the gap: brightest as the doors part, gone
-          // once they are out of the way.
-          // Centred, and gone the moment the doors lift — a flash in the join,
-          // not a line that lingers as the gap opens.
-          .fromTo(
-            "[data-hood-seam]",
-            { autoAlpha: 1 },
-            { autoAlpha: 0, ease: "power2.in", duration: 0.12 },
-            0,
-          )
-          // Fades and scales in place, dead centre — no y-travel. The old
-          // version started the card 24px low and slid it up to centre as it
-          // settled, which read as the title "teleporting" to the middle once
-          // the doors were fully open. It now simply resolves where it sits,
-          // early, so it is legible while the gap is still opening.
-          .fromTo(
+          // …then dissolves in place before the pin lets go. Left up, it
+          // scrolled away with the curtain as the pin released — the "drift,
+          // then teleport" the reader saw. The backend layer carries its own
+          // title, pinned at the top, once you are reading it.
+          .to(
             "[data-hood-reveal]",
-            { scale: 0.92, autoAlpha: 0 },
-            { scale: 1, autoAlpha: 1, ease: "power2.out", duration: 0.5 },
-            0.1,
+            { autoAlpha: 0, ease: "power1.in", duration: 0.16 },
+            0.86,
           );
 
         ScrollTrigger.refresh();

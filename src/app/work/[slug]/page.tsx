@@ -191,6 +191,18 @@ export default async function WorkDetail({
 
       <div id="under-the-hood" className="hood-layer">
         <div className="shell pt-[clamp(3rem,8vh,6rem)] pb-[clamp(4rem,12vh,9rem)]">
+          {/* The backend's own title, pinned at the top as its sections scroll
+              under it — so the reader always knows whose internals these are.
+              The curtain's centred reveal hands off to this. */}
+          <div className="hood-heading">
+            <p className="hood-heading-eyebrow font-mono text-fine tracking-[0.24em] uppercase">
+              Under the hood
+            </p>
+            <p className="type-display text-title leading-none font-semibold">
+              {item.title}
+            </p>
+          </div>
+
           {item.diagram ?? item.erd ?? item.flow ? (
             <section aria-label="Architecture">
               <h2 className="hairline pt-4">
