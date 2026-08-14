@@ -84,24 +84,18 @@ export function HoodCurtain({ title }: { title: string }) {
           0.28,
         );
 
-        // C — the title resolves in place, dead centre, as the gap opens. No
-        // y-travel: sliding it up to centre was the "teleport" the reveal used
-        // to read as.
+        // C — the title resolves in place, dead centre, as the gap opens, and
+        // then simply stays. It used to dissolve before the pin released, which
+        // read as the title "fading away" mid-scroll; now it holds full and
+        // rides up with the curtain into the backend, where the sticky header
+        // carries the same name on from the top. No y-travel — sliding it up to
+        // centre was the older "teleport".
         tl.fromTo(
           "[data-hood-reveal]",
           { scale: 0.94, autoAlpha: 0 },
           { scale: 1, autoAlpha: 1, ease: "power2.out", duration: 0.4 },
           0.4,
-        )
-          // …then dissolves in place before the pin lets go. Left up, it
-          // scrolled away with the curtain as the pin released — the "drift,
-          // then teleport" the reader saw. The backend layer carries its own
-          // title, pinned at the top, once you are reading it.
-          .to(
-            "[data-hood-reveal]",
-            { autoAlpha: 0, ease: "power1.in", duration: 0.16 },
-            0.86,
-          );
+        );
 
         ScrollTrigger.refresh();
       });

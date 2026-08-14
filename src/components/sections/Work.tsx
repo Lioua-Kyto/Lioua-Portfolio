@@ -19,73 +19,72 @@ const KIND_LABEL: Record<WorkItem["kind"], string> = {
  * the eye always knows which one it is reading.
  */
 function Card({ item, index }: { item: WorkItem; index: number }) {
-  // A phone app's cover is a tall screenshot (fit:contain marks it); it gets a
-  // native 9:19 frame in a narrow card. Everything else is a desktop 16:9. The
-  // rail measures each card, so the two widths live side by side happily.
+  // A phone app's cover is a tall screenshot (fit:contain marks it). It gets a
+  // native 9:19 frame, and — because that frame is tall — the type sits beside
+  // it rather than under it, so nothing runs off the bottom of the pinned rail.
+  // Desktop covers stay 16:9 with the type stacked below. The rail measures
+  // each card, so the two shapes live side by side happily.
   const isPhone = item.cover?.fit === "contain";
-  const tags = item.stack.split(" · ").slice(0, isPhone ? 2 : 3);
+  const tags = item.stack.split(" · ").slice(0, 3);
 
-  return (
-    <article
-      data-work-card
-      data-index={index}
-      data-active={index === 0 ? "true" : "false"}
-      className={`work-card group relative flex shrink-0 flex-col ${
-        isPhone ? "w-[min(64vw,15rem)]" : "w-[min(88vw,34rem)]"
+  const header = (
+    <div className="flex items-center justify-between gap-4">
+      <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span className="flex flex-wrap justify-end gap-1.5">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-ink/12 px-2.5 py-0.5 font-mono text-fine text-slate"
+          >
+            {tag}
+          </span>
+        ))}
+      </span>
+    </div>
+  );
+
+  // The capture, in its native frame. Muted to greyscale so the rail reads as
+  // one palette, resolving to full colour with a small lift on hover. The
+  // initial letter is the fallback so a shot-less project is still a box.
+  const cover = (
+    <div
+      data-card-cover
+      className={`relative overflow-hidden rounded-xs bg-surface ${
+        isPhone
+          ? "aspect-[9/19] h-[min(62vh,30rem)] shrink-0"
+          : "mt-3 aspect-[16/9]"
       }`}
     >
-      <div className="flex items-center justify-between gap-4">
-        <span className="type-display text-title leading-none font-semibold text-accent tabular-nums">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-        <span className="flex flex-wrap justify-end gap-1.5">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-ink/12 px-2.5 py-0.5 font-mono text-fine text-slate"
-            >
-              {tag}
-            </span>
-          ))}
-        </span>
-      </div>
+      {item.cover ? (
+        <Image
+          src={item.cover.src}
+          alt={item.cover.alt}
+          fill
+          sizes={
+            isPhone
+              ? "(max-width: 1023px) 40vw, 14rem"
+              : "(max-width: 1023px) 88vw, 34rem"
+          }
+          quality={90}
+          className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0"
+        />
+      ) : (
+        <div
+          aria-hidden="true"
+          className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.04]"
+        >
+          <span className="type-display text-display font-semibold text-accent/20">
+            {item.title.charAt(0)}
+          </span>
+        </div>
+      )}
+    </div>
+  );
 
-      {/* The capture, in its native frame. Desktop 16:9, phone 9:19 — both
-          filled edge to edge (the phone screenshot exactly fills the phone
-          frame). Muted to greyscale so the rail reads as one palette, resolving
-          to full colour with a small lift as the card is hovered. The initial
-          is the fallback so a project without shots is still a designed box. */}
-      <div
-        data-card-cover
-        className={`relative mt-3 overflow-hidden rounded-xs bg-surface ${
-          isPhone ? "aspect-[9/19]" : "aspect-[16/9]"
-        }`}
-      >
-        {item.cover ? (
-          <Image
-            src={item.cover.src}
-            alt={item.cover.alt}
-            fill
-            sizes={
-              isPhone
-                ? "(max-width: 1023px) 64vw, 15rem"
-                : "(max-width: 1023px) 88vw, 34rem"
-            }
-            quality={90}
-            className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0"
-          />
-        ) : (
-          <div
-            aria-hidden="true"
-            className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.04]"
-          >
-            <span className="type-display text-display font-semibold text-accent/20">
-              {item.title.charAt(0)}
-            </span>
-          </div>
-        )}
-      </div>
-
+  const meta = (
+    <>
       <p className="mt-3 flex items-center gap-3 font-mono text-fine tracking-wide text-slate uppercase">
         <span className="text-accent">{KIND_LABEL[item.kind]}</span>
         <span aria-hidden="true" className="text-ink/20">
@@ -140,6 +139,36 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
           </a>
         ) : null}
       </p>
+    </>
+  );
+
+  if (isPhone) {
+    return (
+      <article
+        data-work-card
+        data-index={index}
+        data-active={index === 0 ? "true" : "false"}
+        className="work-card group relative flex w-[min(92vw,32rem)] shrink-0 items-stretch gap-6"
+      >
+        {cover}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {header}
+          {meta}
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <article
+      data-work-card
+      data-index={index}
+      data-active={index === 0 ? "true" : "false"}
+      className="work-card group relative flex w-[min(88vw,34rem)] shrink-0 flex-col"
+    >
+      {header}
+      {cover}
+      {meta}
     </article>
   );
 }

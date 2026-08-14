@@ -1179,11 +1179,12 @@
     background: var(--surface);
     cursor: zoom-in;
   }
-  /* The media is taller than its frame so the parallax has room to travel
-     without exposing an edge. */
+  /* The media fills the frame exactly — no overflow. A 16:9 capture in the
+     16:9 frame then shows in full with object-cover; the -6% inset used for
+     the old parallax was cropping ~12% off the top and bottom. */
   .work-shot-media {
     position: absolute;
-    inset: -6% 0;
+    inset: 0;
     display: block;
   }
   .work-shot-zoom {

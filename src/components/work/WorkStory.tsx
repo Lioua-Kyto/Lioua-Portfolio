@@ -31,14 +31,13 @@ export function WorkStory({
 
       mm.add("(min-width: 768px)", () => {
         for (const figure of gsap.utils.toArray<HTMLElement>("[data-shot]")) {
-          const media = figure.querySelector<HTMLElement>("[data-shot-media]");
-          if (!media) continue;
-
           // Reveal as the figure's top crosses into the lower viewport, and
           // hold — no reverse — so a shot never blinks out on the way back.
           // `invalidateOnRefresh` re-reads the start whenever an image finishes
           // decoding and shifts the layout, which is what stopped the reveal
           // firing late (its start had been measured against a shorter page).
+          // No parallax on the media any more: it needed the frame to overflow
+          // the image, which cropped the 16:9 captures. The entrance is enough.
           gsap.fromTo(
             figure,
             { autoAlpha: 0, y: 32 },
@@ -50,22 +49,6 @@ export function WorkStory({
               scrollTrigger: {
                 trigger: figure,
                 start: "top 92%",
-                invalidateOnRefresh: true,
-              },
-            },
-          );
-
-          gsap.fromTo(
-            media,
-            { yPercent: -4 },
-            {
-              yPercent: 4,
-              ease: "none",
-              scrollTrigger: {
-                trigger: figure,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: 0.6,
                 invalidateOnRefresh: true,
               },
             },
