@@ -6,13 +6,6 @@ import { MaskText } from "@/components/motion/MaskText";
 import { WorkRail } from "@/components/motion/WorkRail";
 import { ProjectLink } from "@/components/work/ProjectLink";
 
-const KIND_LABEL: Record<WorkItem["kind"], string> = {
-  flagship: "flagship build",
-  client: "client work",
-  apprenticeship: "apprenticeship",
-  product: "personal product",
-};
-
 /**
  * One card on the rail: numbered, tagged, and led by the spoken hook. Every
  * card reads at full strength — the covers' greyscale-to-colour hover is the
@@ -80,7 +73,12 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
           // A tall phone capture is contained and centred — pillarboxed on the
           // card's own surface, which reads as the screen sitting on a plinth.
           // Cropping it to 16:9 instead would show a band of one screen.
-          className={`grayscale transition-[filter,transform] duration-500 group-hover/cover:scale-[1.04] group-hover/cover:grayscale-0 ${
+          //
+          // Plain `transition`, not `transition-[filter,transform]`: Tailwind
+          // v4 compiles `scale-*` to the standalone CSS `scale` property, not
+          // to `transform`, so naming `transform` transitioned nothing and the
+          // zoom snapped. The default list covers filter and scale both.
+          className={`grayscale transition duration-700 ease-out group-hover/cover:scale-[1.04] group-hover/cover:grayscale-0 ${
             contained
               ? "object-contain object-center"
               : "object-cover object-top"
@@ -89,7 +87,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       ) : (
         <div
           aria-hidden="true"
-          className="flex h-full items-center justify-center transition-transform duration-500 group-hover/cover:scale-[1.04]"
+          className="flex h-full items-center justify-center transition duration-700 ease-out group-hover/cover:scale-[1.04]"
         >
           <span className="type-display text-display font-semibold text-accent/20">
             {item.title.charAt(0)}
@@ -101,27 +99,29 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
 
   const meta = (
     <>
-      <p className="mt-3 flex items-center gap-3 font-mono text-fine tracking-wide text-slate uppercase">
-        <span className="text-accent">{KIND_LABEL[item.kind]}</span>
-        <span aria-hidden="true" className="text-ink/20">
-          /
+      {/* Title and year on one line, held apart. The kind label ("flagship
+          build", "personal product") is gone: it graded the work for the
+          reader before they had looked at it, and a card that has to announce
+          its own importance is doing the hook's job badly. The year is the one
+          piece of filing a reader actually wants here. */}
+      <div className="mt-4 flex items-baseline justify-between gap-4">
+        <h3 className="type-display text-title leading-tight font-semibold">
+          {/* The whole card reads as one target: the link stretches over it so
+              the image and the hook are clickable too, without nesting the
+              card's own links inside an anchor. */}
+          <ProjectLink
+            href={`/work/${item.slug}`}
+            className="work-card-link"
+            data-track="project_viewed"
+            data-track-label={item.slug}
+          >
+            {item.title}
+          </ProjectLink>
+        </h3>
+        <span className="shrink-0 font-mono text-fine tracking-wide text-slate tabular-nums">
+          {item.period}
         </span>
-        <span>{item.period}</span>
-      </p>
-
-      <h3 className="type-display mt-1.5 text-title leading-tight font-semibold">
-        {/* The whole card reads as one target: the link stretches over it so
-            the image and the hook are clickable too, without nesting the
-            card's own links inside an anchor. */}
-        <ProjectLink
-          href={`/work/${item.slug}`}
-          className="work-card-link"
-          data-track="project_viewed"
-          data-track-label={item.slug}
-        >
-          {item.title}
-        </ProjectLink>
-      </h3>
+      </div>
 
       {/* The hook carries the card — the line said out loud. The longer
           summary is deliberately left off here: on a pinned rail the card has
@@ -141,8 +141,11 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         </p>
       ) : null}
 
-      <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1">
-        <Label>{item.access}</Label>
+      {/* Only real destinations. The access line ("live site", "internal
+          tool") described what the buttons already prove by existing or not:
+          a project with a live link has one, a private client build has
+          neither and says so on its own page. */}
+      <p className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 empty:mt-0">
         {item.links.live ? (
           <a
             href={item.links.live}

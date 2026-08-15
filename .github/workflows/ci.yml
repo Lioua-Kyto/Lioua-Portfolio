@@ -16,8 +16,16 @@ jobs:
           node-version: 22
           cache: npm
 
+      # `npm install`, not `npm ci`. Next pulls sharp, whose wasm32 fallback
+      # (@img/sharp-wasm32 → @napi-rs/wasm-runtime) declares optional @emnapi
+      # deps. npm prunes that subtree on a Windows host, so a lockfile written
+      # from this machine can never contain the entries `npm ci` then demands
+      # on Linux — it fails on a lockfile npm itself refuses to complete.
+      # `install` still honours every pin the lock does carry.
+      # To restore `npm ci`: regenerate the lock once on Linux or WSL
+      # (`rm package-lock.json && npm install`), commit it, and swap this back.
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Typecheck
         run: npm run typecheck

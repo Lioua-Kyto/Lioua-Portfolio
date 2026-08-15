@@ -132,11 +132,14 @@ export const rawContent: z.input<typeof contentSchema> = {
       slug: "rezervitoo",
       title: "Rezervitoo",
       kind: "flagship",
-      context: "Backend architect · the project I'm proudest of",
+      context: "Backend architect · admin panel front end",
       period: "2026",
       hook: "The one I'm proudest of. The architecture finally caught up to the ambition.",
+      // The split is stated up front rather than left to be inferred. Claiming
+      // a whole product you built most of is the fastest way to have the part
+      // you did build doubted — and the backend is the harder half anyway.
       summary:
-        "A live multi-provider booking platform (hotels, hostels, agencies, hosts) on one backend that's mine end to end.",
+        "A live multi-provider booking platform (hotels, hostels, agencies, hosts). The backend is mine end to end — schema, API, caching, real-time — and on the front end I built the admin panel. Another developer built the public-facing site against my API.",
       stack:
         "Django · React · PostgreSQL · Redis · Channels · TanStack Query · TypeScript · DRF",
       metric: {
@@ -386,7 +389,9 @@ export const rawContent: z.input<typeof contentSchema> = {
         ],
       },
       access: "code private, production client work",
-      links: { live: null, source: null },
+      // rezervitoo.com is the running product, not a repository — the code is
+      // private client work, so `source` stays null.
+      links: { live: "https://rezervitoo.com/", source: null },
       todos: ["TODO(author): admin-panel captures"],
     },
     {
@@ -753,7 +758,10 @@ export const rawContent: z.input<typeof contentSchema> = {
         ],
       },
       access: "internal tool, code stays with Faderco",
-      links: { live: null, source: null },
+      links: {
+        live: null,
+        source: "https://github.com/Zeddam-Lioua/Job-Portal",
+      },
       todos: [],
     },
     {
@@ -1119,7 +1127,7 @@ export const rawContent: z.input<typeof contentSchema> = {
         ],
       },
       access: "public repo, link on its way",
-      links: { live: null, source: null },
+      links: { live: null, source: "https://github.com/Lioua-Kyto/Brewphoria" },
       todos: [
         "TODO(author): screens",
         "TODO(author): source link — repo currently private",
@@ -1431,7 +1439,10 @@ export const rawContent: z.input<typeof contentSchema> = {
         ],
       },
       access: "live site, repo private",
-      links: { live: null, source: null },
+      links: {
+        live: "https://fitguild.deviumx.com",
+        source: "https://github.com/Lioua-Kyto/FitGuild",
+      },
       todos: [
         "TODO(author): live URL + captures (catalog, variants, order-status mid-update)",
         "TODO(author): source link — repo currently private",
