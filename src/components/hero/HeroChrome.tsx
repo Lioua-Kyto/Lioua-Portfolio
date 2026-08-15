@@ -45,6 +45,21 @@ function WhatsappIcon() {
   );
 }
 
+function ResumeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4">
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+      />
+    </svg>
+  );
+}
+
 /**
  * The hero chrome that becomes the side rail.
  *
@@ -552,6 +567,8 @@ export function HeroChrome() {
           href={`https://${content.contact.linkedin}`}
           aria-label="LinkedIn"
           rel="me noopener"
+          data-track="clicked_linkedin"
+          data-track-label="rail"
           className="hero-chrome-social transition-micro"
         >
           <LinkedinIcon />
@@ -561,11 +578,27 @@ export function HeroChrome() {
             href={`https://wa.me/${content.contact.whatsapp.replace(/\D/g, "")}`}
             aria-label="WhatsApp"
             rel="me noopener"
+            data-track="clicked_whatsapp"
+            data-track-label="rail"
             className="hero-chrome-social transition-micro"
           >
             <WhatsappIcon />
           </a>
         ) : null}
+        {/* The résumé, beside the channels rather than buried in the contact
+            section — a recruiter reaching the rail is usually there for
+            exactly this. `download` names the file on disk instead of handing
+            over a tab-title-length URL. */}
+        <a
+          href="/lioua-zeddam-resume.pdf"
+          download="Lioua-Zeddam-CV.pdf"
+          aria-label="Download résumé (PDF)"
+          data-track="download_resume"
+          data-track-label="rail"
+          className="hero-chrome-social transition-micro"
+        >
+          <ResumeIcon />
+        </a>
       </div>
 
       {/* Rail-only: the address, one click away. Recruiters copy it far more
@@ -573,6 +606,8 @@ export function HeroChrome() {
       <button
         data-chrome-rail
         data-copy-email
+        data-track="copied_email"
+        data-track-label="rail"
         type="button"
         className="hero-chrome-email transition-micro font-mono text-fine text-slate transition-colors hover:text-ink"
       >
@@ -597,6 +632,8 @@ export function HeroChrome() {
       <a
         data-chrome-rail
         href="#contact"
+        data-track="clicked_cta"
+        data-track-label="rail"
         className="hero-chrome-cta transition-micro rounded-xs font-mono text-fine"
       >
         <span>Let&apos;s talk</span>

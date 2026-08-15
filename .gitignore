@@ -27,10 +27,13 @@ npm-debug.log*
 # source footage from the abandoned video concept (kept on disk, not in git)
 assets/
 
-# résumé PDFs — kept on disk, deliberately never published. The repo is
-# public and a full ATS résumé carries more personal data (phone, address)
-# than a portfolio needs to hand out.
+# PDFs stay out by default — the repo is public and a full ATS résumé carries
+# more personal data (phone, address) than a portfolio needs to hand out. The
+# one in `public/` is the deliberate exception: it is the copy offered from the
+# rail, so check what is in it before replacing it. Working drafts at the repo
+# root are still ignored.
 *.pdf
+!public/*.pdf
 
 # local tooling and working notes — kept on disk, not part of the project
 .agents/

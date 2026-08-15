@@ -14,17 +14,18 @@ const KIND_LABEL: Record<WorkItem["kind"], string> = {
 };
 
 /**
- * One card on the rail: numbered, tagged, and led by the spoken hook. Only the
- * card at the centre of the track is at full strength — the rest sit back, so
- * the eye always knows which one it is reading.
+ * One card on the rail: numbered, tagged, and led by the spoken hook. Every
+ * card reads at full strength — the covers' greyscale-to-colour hover is the
+ * rail's only emphasis.
  */
 function Card({ item, index }: { item: WorkItem; index: number }) {
-  // A phone app's cover is a tall screenshot (fit:contain marks it). It gets a
-  // native 9:19 frame, and — because that frame is tall — the type sits beside
-  // it rather than under it, so nothing runs off the bottom of the pinned rail.
-  // Desktop covers stay 16:9 with the type stacked below. The rail measures
-  // each card, so the two shapes live side by side happily.
-  const isPhone = item.cover?.fit === "contain";
+  // Every card is one shape: a 16:9 frame with the type stacked under it. A
+  // phone app's cover is a tall screenshot, and it is now contained inside that
+  // same frame rather than given a 9:19 one of its own. A rail where one card
+  // is a different shape reads as a layout that could not decide, and the odd
+  // card pulls the eye for a reason that says nothing about the work. `fit`
+  // chooses only how the image meets the frame, never the frame itself.
+  const contained = item.cover?.fit === "contain";
   const tags = item.stack.split(" · ").slice(0, 3);
 
   const header = (
@@ -55,9 +56,7 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
   // the image and takes every pointer event landing there — a plain div could
   // never receive `:hover` at all. As an anchor the cover is lifted above that
   // overlay by the existing `.work-card a:not(.work-card-link)` rule, so it
-  // hovers on its own and keeps the click the overlay was giving it. Removed
-  // from the tab order and hidden from assistive tech, because the title link
-  // beside it already goes to the same place and two would just be two.
+  // hovers on its own and keeps the click the overlay was giving it.
   const cover = (
     <ProjectLink
       href={`/work/${item.slug}`}
@@ -69,24 +68,23 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       data-card-cover
       data-track="project_viewed"
       data-track-label={item.slug}
-      className={`group/cover relative block overflow-hidden rounded-xs bg-surface ${
-        isPhone
-          ? "aspect-[9/19] h-[min(62vh,30rem)] shrink-0"
-          : "mt-3 aspect-[16/9] w-full"
-      }`}
+      className="group/cover relative mt-3 block aspect-[16/9] w-full overflow-hidden rounded-xs bg-surface"
     >
       {item.cover ? (
         <Image
           src={item.cover.src}
           alt={item.cover.alt}
           fill
-          sizes={
-            isPhone
-              ? "(max-width: 1023px) 40vw, 14rem"
-              : "(max-width: 1023px) 88vw, 34rem"
-          }
+          sizes="(max-width: 1023px) 88vw, 34rem"
           quality={90}
-          className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover/cover:scale-[1.04] group-hover/cover:grayscale-0"
+          // A tall phone capture is contained and centred — pillarboxed on the
+          // card's own surface, which reads as the screen sitting on a plinth.
+          // Cropping it to 16:9 instead would show a band of one screen.
+          className={`grayscale transition-[filter,transform] duration-500 group-hover/cover:scale-[1.04] group-hover/cover:grayscale-0 ${
+            contained
+              ? "object-contain object-center"
+              : "object-cover object-top"
+          }`}
         />
       ) : (
         <div
@@ -148,6 +146,8 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         {item.links.live ? (
           <a
             href={item.links.live}
+            data-track="clicked_live_site"
+            data-track-label={item.slug}
             className="transition-micro font-mono text-label text-signal underline underline-offset-4 transition-colors hover:text-ink"
           >
             visit live site →
@@ -156,6 +156,8 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         {item.links.source ? (
           <a
             href={item.links.source}
+            data-track="clicked_github"
+            data-track-label={item.slug}
             className="transition-micro font-mono text-label text-signal underline underline-offset-4 transition-colors hover:text-ink"
           >
             read the source →
@@ -164,23 +166,6 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
       </p>
     </>
   );
-
-  if (isPhone) {
-    return (
-      <article
-        data-work-card
-        data-index={index}
-        data-active={index === 0 ? "true" : "false"}
-        className="work-card group relative flex w-[min(92vw,32rem)] shrink-0 items-stretch gap-6"
-      >
-        {cover}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {header}
-          {meta}
-        </div>
-      </article>
-    );
-  }
 
   return (
     <article

@@ -1,5 +1,7 @@
 "use client";
 
+import { track } from "@/lib/analytics";
+
 const fieldClasses =
   "w-full rounded-xs border border-ink/20 bg-transparent px-3 py-2.5 text-base text-ink placeholder:text-slate/70 focus:border-signal focus:outline-none";
 
@@ -25,6 +27,11 @@ export function ContactForm({ email }: { email: string }) {
     const message = field("message");
     const subject = encodeURIComponent(`Hello from ${name}`);
     const body = encodeURIComponent(`${message}\n\n${name} · ${from}`);
+    // Fired on submit rather than on the button, so it counts a form that
+    // actually passed validation — a click on a submit that the browser then
+    // rejects for an empty field is not a message sent. Nothing the visitor
+    // typed goes with it; the event is the fact that it happened.
+    track("contact_submitted");
     window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
   };
 
