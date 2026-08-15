@@ -48,7 +48,11 @@ const COL_GAP = 104;
 const PAD_X = 8;
 const HEADER_H = 34;
 
-type Placed = { x: number; y: number; node: Diagram["columns"][number]["nodes"][number] };
+type Placed = {
+  x: number;
+  y: number;
+  node: Diagram["columns"][number]["nodes"][number];
+};
 
 function layout(diagram: Diagram) {
   const placed = new Map<string, Placed>();
@@ -67,7 +71,10 @@ function layout(diagram: Diagram) {
     });
   });
 
-  const width = PAD_X * 2 + diagram.columns.length * NODE_W + (diagram.columns.length - 1) * COL_GAP;
+  const width =
+    PAD_X * 2 +
+    diagram.columns.length * NODE_W +
+    (diagram.columns.length - 1) * COL_GAP;
   const height = HEADER_H + tallest + 8;
   return { placed, width, height, tallest };
 }
@@ -142,7 +149,13 @@ export function SystemMap({ diagram }: { diagram: Diagram }) {
         <g key={node.id} data-kind={node.kind} className="system-map-node">
           <rect x={x} y={y} width={NODE_W} height={NODE_H} rx={2} />
           {/* The accent edge marks what this project actually owns. */}
-          <line x1={x} y1={y} x2={x} y2={y + NODE_H} className="system-map-edge" />
+          <line
+            x1={x}
+            y1={y}
+            x2={x}
+            y2={y + NODE_H}
+            className="system-map-edge"
+          />
           <text x={x + 12} y={y + 24} className="system-map-label">
             {node.label}
           </text>

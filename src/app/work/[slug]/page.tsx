@@ -164,8 +164,8 @@ export default async function WorkDetail({
               <Label index="A">Screens</Label>
             </h2>
             <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
-              Click any screen to open it in the zoom viewer. Wheel to zoom, drag
-              to pan.
+              Click any screen to open it in the zoom viewer. Wheel to zoom,
+              drag to pan.
             </p>
             <WorkGallery shots={item.gallery} />
           </section>
@@ -179,7 +179,6 @@ export default async function WorkDetail({
             </p>
           </section>
         )}
-
       </div>
 
       {/* ---- Layer two: under the hood ----
@@ -203,7 +202,7 @@ export default async function WorkDetail({
             </p>
           </div>
 
-          {item.diagram ?? item.erd ?? item.flow ? (
+          {(item.diagram ?? item.erd ?? item.flow) ? (
             <section aria-label="Architecture">
               <h2 className="hairline pt-4">
                 <Label index="B">Architecture</Label>

@@ -560,24 +560,31 @@
   }
 
   /* Hero-only: the philosophy. It keeps one position in both states (it never
-     goes to the rail); on scroll its words lift and fade left to right. */
+     goes to the rail); on scroll its words lift and fade left to right.
+
+     Set at lede rather than title: the sentence is now a three-clause argument,
+     and at title size it read as a second headline competing with the wordmark
+     for the same screen. The wordmark is the only display-size thing in the
+     hero. `max-width` is a vw guard — the column would otherwise grow into the
+     centred portrait at 1440 and narrower. */
   .hero-chrome-philosophy {
     right: var(--pad);
     bottom: 10vh;
-    width: 20ch;
+    width: 32ch;
+    max-width: 33vw;
     text-align: right;
-    font-size: var(--text-title);
-    line-height: 1.25;
-    text-wrap: balance;
+    font-size: var(--text-lede);
+    line-height: 1.4;
+    text-wrap: pretty;
   }
   .hero-chrome-philosophy [data-philo-word] {
     display: inline-block;
   }
 
-  /* The hero's closing line, restated small on the rail under the clock. A
-     second copy rather than a morph: the corner sets it at title size across
-     twenty characters and the rail wants three tight lines, which is a
-     different piece of typesetting, not the same one moved. */
+  /* The identity line, small on the rail under the clock. Its own sentence
+     rather than a morph of the hero's: the corner runs a three-clause argument
+     across thirty-two characters and the rail wants two tight lines, which is
+     a different piece of typesetting, not the same one moved. */
   .hero-chrome-line {
     left: 2.75rem;
     top: var(--r-line);
@@ -649,11 +656,20 @@
   /* The route's colour lives here rather than on utilities: the active state
      has to win over the resting one, and a utility class would always beat a
      base-layer rule no matter how specific. */
+  /* The size lives here, not on a `text-label` utility, because it differs
+     per state: the hero row is set larger so the routes carry the width under
+     the wordmark, while the rail column stays label-sized. The Flip measures
+     both and scales by the width ratio, so the two sizes are the morph. */
   .hero-chrome-link {
     display: block;
+    font-size: var(--text-label);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--ink);
+  }
+  .hero-chrome[data-state="hero"] .hero-chrome-link {
+    font-size: clamp(0.875rem, 0.78rem + 0.35vw, 1.0625rem);
+    letter-spacing: 0.08em;
   }
   .hero-chrome-link:hover {
     color: var(--signal);
@@ -699,7 +715,7 @@
     top: calc(var(--name-bottom) + 1.1rem);
     flex-direction: row;
     align-items: baseline;
-    gap: 1.5rem;
+    gap: clamp(1.75rem, 3.2vw, 3.25rem);
   }
   /* home → projects sit left of the figure; ship/toolkit/contact are pushed to
      its right so they stop landing over the portrait. Scoped to the hero state
@@ -792,10 +808,11 @@
     }
     .hero-chrome-philosophy {
       order: 2;
-      width: min(30ch, 100%);
+      width: min(38ch, 100%);
+      max-width: none;
       text-align: left;
-      font-size: var(--text-title);
-      line-height: 1.2;
+      font-size: var(--text-base);
+      line-height: 1.45;
     }
     .hero-chrome-tagline {
       order: 3;
@@ -1137,24 +1154,15 @@
 
   /* ---- Project pages ---- */
 
-  /* Every card reads at full strength. Nothing is singled out for sitting in
-     the middle of the screen — a reader picks what they are interested in, and
-     the rail should not decide that for them. Hovering the row is what dims
-     the rest, so the highlight only ever answers an actual intent. */
-  .work-card {
-    opacity: 1;
-    transition: opacity var(--dur-base, 0.35s) var(--ease-out);
-  }
-  @media (hover: hover) and (min-width: 1024px) {
-    [data-rail-track]:hover .work-card {
-      opacity: 0.42;
-    }
-    [data-rail-track]:hover .work-card:hover {
-      opacity: 1;
-    }
-  }
+  /* Every card reads at full strength, always. The rail already answers
+     "which one am I looking at" with colour: the covers are greyscale until
+     hovered, which unifies four unrelated product palettes into one rail and
+     resolves the one under the cursor. Dimming the siblings on top of that was
+     a second answer to a question already asked — two effects competing over
+     the same intent, and the type went pale for no reason while only the
+     thumbnail was being asked about.
 
-  /* The card's title link stretches over the whole card, so the image and the
+     The card's title link stretches over the whole card, so the image and the
      hook are clickable without nesting the card's own links inside it. */
   .work-card-link::after {
     content: "";
@@ -1735,3 +1743,73 @@
    reduced-motion reset on machines with the OS animation setting off, and the
    viewer simply appeared. It is reader-initiated and one-shot, so it plays for
    everyone, like the rest of the site's motion. */
+
+/* ---- Consent banner ---- */
+
+/* A rule across the bottom, not a modal. On desktop it starts clear of the
+   fixed rail so it reads as part of the page's own column rather than a sheet
+   thrown over the whole window. Unlayered: the paddings and the accent fill
+   have to beat the utilities sitting alongside them on the same elements. */
+.consent-bar {
+  position: fixed;
+  z-index: 90;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  padding: 1rem var(--pad);
+  /* Opaque, not the site's `glass`. The banner lands over the portrait, and at
+     92% paper the figure read straight through the type — a consent notice you
+     have to squint past is the pattern this one is trying not to be. The shade
+     lifts it off the page instead of tinting it. */
+  background: var(--paper);
+  border-top: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  box-shadow: 0 -18px 40px -24px
+    color-mix(in oklab, var(--ink) 30%, transparent);
+  animation: consent-rise 0.5s var(--ease-out) both;
+}
+@media (min-width: 1024px) {
+  .consent-bar {
+    left: 17.5rem;
+    right: 17.5rem;
+  }
+}
+@keyframes consent-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Both answers are the same shape and the same size. Only the accept carries
+   the accent — the difference is emphasis, never affordance. */
+.consent-button {
+  font-family: var(--font-martian-mono), monospace;
+  font-size: var(--text-fine);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in oklab, var(--ink) 20%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.consent-button:hover {
+  border-color: var(--ink);
+}
+.consent-button--accept {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--paper);
+}
+.consent-button--accept:hover {
+  background: var(--signal);
+  border-color: var(--signal);
+}

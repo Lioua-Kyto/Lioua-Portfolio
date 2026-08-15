@@ -41,6 +41,8 @@ export function Contact() {
               <a
                 href={`https://${contact.github}`}
                 rel="me noopener"
+                data-track="clicked_github"
+                data-track-label="contact"
                 className="transition-micro block py-3 font-mono text-label text-ink transition-colors hover:text-signal"
               >
                 {contact.github}

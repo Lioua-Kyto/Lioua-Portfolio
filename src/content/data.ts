@@ -19,25 +19,29 @@ export const rawContent: z.input<typeof contentSchema> = {
     role: "Full Stack Developer",
     line: "I build the systems behind the screens.",
     // The hook shown lower-right in the hero — the one line that has to land.
+    // Every clause is a claim that can be checked, not an adjective: schemas
+    // hold or they don't, caches invalidate correctly or they serve stale
+    // reads. "Absolute performance" would say less than "under real load".
     philosophy:
-      "I ship whole products, with backends that stay fast under real load.",
+      "I engineer end-to-end systems. No bloated architecture: schemas that hold, caches that invalidate correctly, backends that stay fast under real load.",
     // Framed for what they say about the work, not lifted off a résumé:
-    // breadth, performance, and real backend scale. (§5)
+    // breadth, measured performance, and documented backend surface. The
+    // reader is a hiring manager scanning for whether this is weekend code.
     proofs: [
       {
         value: "6",
-        label: "products shipped end to end",
-        short: "products shipped",
+        label: "production-ready applications shipped end-to-end",
+        short: "shipped end-to-end",
       },
       {
         value: "~40ms",
-        label: "cached responses, effectively instant",
-        short: "cached responses",
+        label: "average cached API latency under load",
+        short: "avg cached latency",
       },
       {
         value: "400+",
-        label: "API endpoints across projects",
-        short: "API endpoints",
+        label: "REST API endpoints engineered and documented",
+        short: "REST endpoints",
       },
     ],
   },
@@ -1816,7 +1820,7 @@ export const rawContent: z.input<typeof contentSchema> = {
       },
       access: "personal product, source public on GitHub",
       links: {
-        live: "https://github.com/Lioua-Kyto/PraxisOS/releases",
+        live: "https://praxisos.deviumx.com",
         source: "https://github.com/Lioua-Kyto/PraxisOS",
       },
       todos: [],

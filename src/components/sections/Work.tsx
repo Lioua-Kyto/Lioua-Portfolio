@@ -46,15 +46,33 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
   );
 
   // The capture, in its native frame. Muted to greyscale so the rail reads as
-  // one palette, resolving to full colour with a small lift on hover. The
-  // initial letter is the fallback so a shot-less project is still a box.
+  // one palette, resolving to full colour on hovering the thumbnail — the
+  // thumbnail alone, not the card. The initial letter is the fallback so a
+  // shot-less project is still a box.
+  //
+  // It is a link rather than a div for a hover reason, not a navigation one:
+  // the title's stretched `::after` covers the whole card, so it paints over
+  // the image and takes every pointer event landing there — a plain div could
+  // never receive `:hover` at all. As an anchor the cover is lifted above that
+  // overlay by the existing `.work-card a:not(.work-card-link)` rule, so it
+  // hovers on its own and keeps the click the overlay was giving it. Removed
+  // from the tab order and hidden from assistive tech, because the title link
+  // beside it already goes to the same place and two would just be two.
   const cover = (
-    <div
+    <ProjectLink
+      href={`/work/${item.slug}`}
+      // Out of the tab order — the title link beside it is the card's one stop
+      // — but not `aria-hidden`, which would take the capture's alt text with
+      // it. A screen reader still gets "Rezervitoo dashboard, listings and
+      // bookings"; it just does not get a second tab stop to reach it.
+      tabIndex={-1}
       data-card-cover
-      className={`relative overflow-hidden rounded-xs bg-surface ${
+      data-track="project_viewed"
+      data-track-label={item.slug}
+      className={`group/cover relative block overflow-hidden rounded-xs bg-surface ${
         isPhone
           ? "aspect-[9/19] h-[min(62vh,30rem)] shrink-0"
-          : "mt-3 aspect-[16/9]"
+          : "mt-3 aspect-[16/9] w-full"
       }`}
     >
       {item.cover ? (
@@ -68,19 +86,19 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
               : "(max-width: 1023px) 88vw, 34rem"
           }
           quality={90}
-          className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.04] group-hover:grayscale-0"
+          className="object-cover object-top grayscale transition-[filter,transform] duration-500 group-hover/cover:scale-[1.04] group-hover/cover:grayscale-0"
         />
       ) : (
         <div
           aria-hidden="true"
-          className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-[1.04]"
+          className="flex h-full items-center justify-center transition-transform duration-500 group-hover/cover:scale-[1.04]"
         >
           <span className="type-display text-display font-semibold text-accent/20">
             {item.title.charAt(0)}
           </span>
         </div>
       )}
-    </div>
+    </ProjectLink>
   );
 
   const meta = (
@@ -97,7 +115,12 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
         {/* The whole card reads as one target: the link stretches over it so
             the image and the hook are clickable too, without nesting the
             card's own links inside an anchor. */}
-        <ProjectLink href={`/work/${item.slug}`} className="work-card-link">
+        <ProjectLink
+          href={`/work/${item.slug}`}
+          className="work-card-link"
+          data-track="project_viewed"
+          data-track-label={item.slug}
+        >
           {item.title}
         </ProjectLink>
       </h3>
@@ -163,7 +186,6 @@ function Card({ item, index }: { item: WorkItem; index: number }) {
     <article
       data-work-card
       data-index={index}
-      data-active={index === 0 ? "true" : "false"}
       className="work-card group relative flex w-[min(88vw,34rem)] shrink-0 flex-col"
     >
       {header}

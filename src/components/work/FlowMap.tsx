@@ -64,13 +64,7 @@ export function FlowMap({ flow }: { flow: Flow }) {
         const y = HEADER_H + li * LANE_H;
         return (
           <g key={lane.id}>
-            <line
-              x1={0}
-              y1={y}
-              x2={width}
-              y2={y}
-              className="system-map-rule"
-            />
+            <line x1={0} y1={y} x2={width} y2={y} className="system-map-rule" />
             <text x={0} y={y + 22} className="flow-lane">
               {lane.label}
             </text>
@@ -128,7 +122,12 @@ export function FlowMap({ flow }: { flow: Flow }) {
             : null}
           {/* The state the record lands in, pinned to the card's own corner. */}
           {step.state ? (
-            <text x={x + STEP_W - 11} y={y + 17} className="flow-state" textAnchor="end">
+            <text
+              x={x + STEP_W - 11}
+              y={y + 17}
+              className="flow-state"
+              textAnchor="end"
+            >
               {step.state}
             </text>
           ) : null}

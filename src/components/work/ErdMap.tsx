@@ -35,8 +35,10 @@ export function ErdMap({ erd }: { erd: Erd }) {
 
   const columnHeights = erd.columns.map(
     (c) =>
-      c.entities.reduce((sum, e) => sum + height(e.fields.length) + ENT_GAP, 0) -
-      ENT_GAP,
+      c.entities.reduce(
+        (sum, e) => sum + height(e.fields.length) + ENT_GAP,
+        0,
+      ) - ENT_GAP,
   );
   const tallest = Math.max(...columnHeights);
 
@@ -79,7 +81,9 @@ export function ErdMap({ erd }: { erd: Erd }) {
               : from.x
             : from.x + ENT_W;
           const x2 = sameCol ? (dir === 1 ? to.x + ENT_W : to.x) : to.x;
-          const bow = sameCol ? 64 * dir : Math.max(40, Math.abs(x2 - x1) * 0.5);
+          const bow = sameCol
+            ? 64 * dir
+            : Math.max(40, Math.abs(x2 - x1) * 0.5);
           const d = sameCol
             ? `M ${String(x1)} ${String(y1)} C ${String(x1 + bow)} ${String(y1)}, ${String(x2 + bow)} ${String(y2)}, ${String(x2)} ${String(y2)}`
             : `M ${String(x1)} ${String(y1)} C ${String(x1 + bow)} ${String(y1)}, ${String(x2 - bow)} ${String(y2)}, ${String(x2)} ${String(y2)}`;
@@ -107,7 +111,13 @@ export function ErdMap({ erd }: { erd: Erd }) {
             <text x={x} y={12} className="system-map-column">
               {column.title}
             </text>
-            <line x1={x} y1={20} x2={x + ENT_W} y2={20} className="system-map-rule" />
+            <line
+              x1={x}
+              y1={20}
+              x2={x + ENT_W}
+              y2={20}
+              className="system-map-rule"
+            />
           </g>
         );
       })}
@@ -117,7 +127,13 @@ export function ErdMap({ erd }: { erd: Erd }) {
           <rect x={x} y={y} width={ENT_W} height={h} rx={2} />
           {/* The table name sits on its own banded row, the way a schema tool
               would show it, so the fields below read as the table's contents. */}
-          <rect x={x} y={y} width={ENT_W} height={HEAD_H} className="erd-head" />
+          <rect
+            x={x}
+            y={y}
+            width={ENT_W}
+            height={HEAD_H}
+            className="erd-head"
+          />
           <text x={x + 11} y={y + 17} className="erd-name">
             {entity.name}
           </text>

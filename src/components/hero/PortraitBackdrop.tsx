@@ -1,10 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "@/lib/motion/gsap";
 import { pin, scrub } from "@/lib/motion/tokens";
-import { PortraitField } from "@/components/hero/PortraitField";
+
+// The shader is ~280 lines of GLSL and WebGL setup that a phone, a touch
+// screen, or a reader who asked for less motion will never execute. Split out,
+// those clients never download it either — and the effect draws over an image
+// that is already painted, so arriving a tick late costs nothing visible.
+const PortraitField = dynamic(
+  () => import("@/components/hero/PortraitField").then((m) => m.PortraitField),
+  { ssr: false },
+);
 
 /**
  * The portrait as a fixed backdrop: it resolves in behind the name on load,
@@ -16,6 +26,19 @@ import { PortraitField } from "@/components/hero/PortraitField";
  * neither overwrites the other's opacity and both can be built at mount.
  */
 export function PortraitBackdrop() {
+  // The same three gates the shader itself checks, hoisted to render so the
+  // chunk is never even requested when they fail. Read in an effect rather
+  // than during render: a media query has no server answer, and deciding this
+  // at first paint would be a hydration mismatch.
+  const [shader, setShader] = useState(false);
+  useEffect(() => {
+    setShader(
+      window.matchMedia("(pointer: fine)").matches &&
+        window.matchMedia("(min-width: 1024px)").matches &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+  }, []);
+
   useGSAP(() => {
     const layer = document.querySelector<HTMLElement>("[data-portrait-layer]");
     const hero = document.querySelector<HTMLElement>("#intro");
@@ -102,7 +125,7 @@ export function PortraitBackdrop() {
             sizes="(max-width: 768px) 150vw, 90vw"
             className="h-[92vh] w-auto max-w-none object-contain sm:h-[96vh]"
           />
-          <PortraitField src="/img/portrait.webp" />
+          {shader ? <PortraitField src="/img/portrait.webp" /> : null}
         </div>
       </div>
     </div>

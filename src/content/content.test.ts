@@ -15,7 +15,7 @@ describe("content", () => {
       "faderco",
       "brewphoria",
       "fitguild",
-      "cognitive-training",
+      "praxisos",
     ]);
     expect(new Set(slugs).size).toBe(slugs.length);
   });

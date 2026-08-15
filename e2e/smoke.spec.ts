@@ -162,7 +162,7 @@ test("the hero chrome morphs into the side rail (one set of elements)", async ({
   expect(await panelAlpha()).toBeLessThan(0.1);
 });
 
-test("work shows one project at a time and advances on scroll", async ({
+test("the work rail travels on scroll and never dims a project", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -180,30 +180,34 @@ test("work shows one project at a time and advances on scroll", async ({
   );
   await page.waitForTimeout(400);
 
-  // Assert on the focus state rather than raw opacity: the dim/brighten is a
-  // 500ms transition, so mid-hand-over two cards legitimately read above any
-  // opacity threshold. `data-active` is the deterministic signal.
-  const activeCount = () =>
-    page.locator('[data-work-card][data-active="true"]').count();
-  const activeIndex = () =>
+  // Where the first card sits on screen. The track is translated rather than
+  // scrolled, so its own left edge is the measurement that moves.
+  const trackX = () =>
     page.evaluate(
       () =>
-        document
-          .querySelector('[data-work-card][data-active="true"]')
-          ?.getAttribute("data-index") ?? null,
+        document.querySelector("[data-rail-track]")?.getBoundingClientRect()
+          .left ?? 0,
     );
 
-  // Exactly one project is the focused one to begin with.
-  expect(await activeCount()).toBe(1);
-  const first = await activeIndex();
+  const start = await trackX();
 
-  // Scrolling inside the pin advances to a different project — still just one.
-  await wheelUntil(page, async () => (await activeIndex()) !== first, {
+  // Scrolling inside the pin pulls the track right to left.
+  await wheelUntil(page, async () => (await trackX()) < start - 200, {
     step: 350,
     max: 24,
   });
-  expect(await activeIndex()).not.toBe(first);
-  expect(await activeCount()).toBe(1);
+  expect(await trackX()).toBeLessThan(start - 200);
+
+  // And no card is ever dimmed to make a point about which one to read. The
+  // covers' greyscale-to-colour hover is the rail's only emphasis, so a card
+  // sitting off-centre must still be at full strength.
+  const opacities = await page
+    .locator("[data-work-card]")
+    .evaluateAll((els) =>
+      els.map((el) => Number(getComputedStyle(el).opacity)),
+    );
+  expect(opacities.length).toBeGreaterThan(1);
+  for (const o of opacities) expect(o).toBe(1);
 });
 
 test("the section navigation highlights the section you are in", async ({

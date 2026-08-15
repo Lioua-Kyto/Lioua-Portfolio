@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ComponentProps } from "react";
 
 /**
  * The card's title link.
@@ -13,17 +13,13 @@ import type { ReactNode } from "react";
  */
 export function ProjectLink({
   href,
-  className,
   children,
-}: {
-  href: string;
-  className?: string;
-  children: ReactNode;
-}) {
+  ...rest
+}: ComponentProps<typeof Link>) {
   return (
     <Link
       href={href}
-      className={className}
+      {...rest}
       // Pressing a link focuses it, and the browser then scrolls every
       // scrollable ancestor — the rail's overflow box and the document — until
       // it is in view. The work section is pinned and its track is translated

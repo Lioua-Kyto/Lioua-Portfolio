@@ -467,9 +467,13 @@ export function HeroChrome() {
         <span data-rail-clock>--:--</span> local · Algeria
       </p>
 
-      {/* Rail-only: the hero's closing line, restated small under the clock. */}
+      {/* Rail-only: the identity line, small under the clock. Not the hero's
+          philosophy — that is a three-clause argument, and a masthead sidebar
+          set at 11px is the wrong instrument for an argument (it also overran
+          its slot into the rule beneath it). The hero makes the case; the rail
+          just says who is making it. */}
       <p data-chrome-rail className="hero-chrome-line text-fine">
-        {content.intro.philosophy}
+        {content.intro.line}
       </p>
 
       {/* Rail-only: the module rules. Hairlines group the rail into masthead
@@ -523,7 +527,7 @@ export function HeroChrome() {
                 href={item.href}
                 data-rail-link={item.href.slice(1)}
                 data-active="false"
-                className="hero-chrome-link transition-micro font-mono text-label transition-colors"
+                className="hero-chrome-link transition-micro font-mono transition-colors"
               >
                 {item.label}
               </a>
@@ -538,6 +542,8 @@ export function HeroChrome() {
           href={`https://${content.contact.github}`}
           aria-label="GitHub"
           rel="me noopener"
+          data-track="clicked_github"
+          data-track-label="rail"
           className="hero-chrome-social transition-micro"
         >
           <GithubIcon />
