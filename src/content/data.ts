@@ -12,7 +12,10 @@ export const rawContent: z.input<typeof contentSchema> = {
     title: "Lioua Zeddam · Full Stack Developer",
     description:
       "I build the systems behind the screens. Django · React · Flutter · PostgreSQL.",
-    domain: "liouazeddam.dev",
+    // The production domain. Everything canonical derives from this one
+    // string — metadataBase, the sitemap, robots, and both JSON-LD nodes — so
+    // a move is this line and nothing else.
+    domain: "lioua.deviumx.com",
   },
   intro: {
     name: "Lioua Zeddam",

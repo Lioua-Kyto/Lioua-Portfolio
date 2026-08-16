@@ -76,11 +76,23 @@ export const metadata: Metadata = {
     description: content.site.description,
     url: "/",
     locale: "en_GB",
+    images: [
+      {
+        url: "/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Lioua Zeddam",
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
+    // Square art in a `summary_large_image` slot gets letterboxed or centre
+    // cropped. `summary` is the card built for a square thumbnail, so the
+    // image is shown whole beside the text instead of being cut to 1.91:1.
+    card: "summary",
     title: content.site.title,
     description: content.site.description,
+    images: ["/android-chrome-512x512.png"],
   },
   // No `google-site-verification` here by design — it is issued per property
   // and belongs in Search Console's DNS or file method, not committed to a
