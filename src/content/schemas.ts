@@ -34,12 +34,20 @@ export const shotSchema = z.object({
    * framed capture, small caption beneath.
    *
    * `left`/`right` put the image on that side with its argument opposite, at
-   * heading size. `facing` is a pair — two consecutive `facing` shots are
-   * grouped into one block, images on the outside turned toward each other
-   * with the text held between them. Device renders on transparent grounds
-   * earn this; a flat screenshot does not, and should stay `null`.
+   * heading size, and are for device renders on transparent grounds. `facing`
+   * is a pair — two consecutive `facing` shots are grouped into one block,
+   * turned toward each other with the text held between them.
+   *
+   * `note-left`/`note-right` are for flat 16:9 captures: the capture takes two
+   * thirds inside a browser frame and the claim runs as a slim column in the
+   * margin. A wide capture in a fifty-fifty split renders at about 46vw and
+   * reads as the smaller artefact, which is backwards — the screenshot is the
+   * evidence and should be the widest thing on the page.
    */
-  side: z.enum(["left", "right", "facing"]).nullable().default(null),
+  side: z
+    .enum(["left", "right", "facing", "note-left", "note-right"])
+    .nullable()
+    .default(null),
   /** The spread's heading. Only read when `side` is set. */
   title: z.string().min(1).nullable().default(null),
 });

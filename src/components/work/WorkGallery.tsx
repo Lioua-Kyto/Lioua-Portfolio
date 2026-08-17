@@ -9,7 +9,13 @@ import { ShotViewer } from "@/components/work/ShotViewer";
  * Owns which capture is open. Kept apart from the story so the scroll
  * animations are not rebuilt every time the viewer opens or closes.
  */
-export function WorkGallery({ shots }: { shots: readonly Shot[] }) {
+export function WorkGallery({
+  shots,
+  host,
+}: {
+  shots: readonly Shot[];
+  host?: string | null;
+}) {
   const [open, setOpen] = useState<Shot | null>(null);
   // Where the viewer should grow from: the capture the reader actually clicked.
   const [origin, setOrigin] = useState<DOMRect | null>(null);
@@ -18,6 +24,7 @@ export function WorkGallery({ shots }: { shots: readonly Shot[] }) {
     <>
       <WorkStory
         shots={shots}
+        host={host}
         onOpen={(shot, box) => {
           setOrigin(box);
           setOpen(shot);

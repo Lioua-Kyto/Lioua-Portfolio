@@ -1873,15 +1873,20 @@
   }
 }
 
-/* ---- Wide-capture treatments (variant candidates) ----
+/* ---- Wide captures: the margin note ----
 
-   A 16:9 desktop capture wants width. Dropped into the 50/50 spread the
-   phone renders use, it renders at ~46vw and reads as the smaller, lesser
-   artefact — which is the opposite of what these projects deserve. All three
-   treatments below give the width back and put the argument somewhere other
-   than directly beside the image. The chrome carries the real URL rather than
-   three fake traffic-light dots: a frame that shows actual information is a
-   frame, one that mimics macOS is a sticker. */
+   A 16:9 desktop capture wants width. Dropped into the 50/50 spread the phone
+   renders use, it lands at about 46vw and reads as the smaller, lesser
+   artefact, which is backwards: the screenshot is the evidence. So the capture
+   keeps two thirds and the claim runs as a slim column in the margin beside
+   it, alternating sides. That alternation is also why this beat the two other
+   candidates: it varies down the page without becoming another fifty-fifty
+   zigzag, which is the pattern a reader stops seeing after the second one.
+
+   The chrome carries the site's real host rather than three macOS traffic
+   lights. A frame showing actual information is a frame; one mimicking an
+   operating system is a sticker. Work that never shipped publicly gets the
+   frame with no bar rather than an invented address. */
 
 .wc-chrome {
   border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
@@ -1903,44 +1908,6 @@
   position: relative;
   aspect-ratio: 16 / 9;
   display: block;
-}
-
-/* A — Plate. The capture runs the full column under a two-column header, so
-   the image is the widest thing on the page and the claim reads as a caption
-   set above it rather than a column competing with it. */
-.wc-plate-head {
-  display: grid;
-  gap: 1rem 4rem;
-  align-items: baseline;
-  margin-bottom: 1.5rem;
-}
-@media (min-width: 768px) {
-  .wc-plate-head {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  }
-}
-
-/* B — Band. The capture breaks the content column entirely and runs edge to
-   edge; the claim sits under it in a single offset column. The widest, loudest
-   option, and the only one that uses the full viewport. */
-.wc-band {
-  width: 100vw;
-  margin-inline: calc(50% - 50vw);
-}
-.wc-band-text {
-  margin-inline: auto;
-  width: 100%;
-  max-width: 84rem;
-  padding-inline: clamp(1.25rem, 4.5vw, 3.5rem);
-  margin-top: 1.75rem;
-}
-@media (min-width: 768px) {
-  .wc-band-inner {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 4rem;
-    align-items: start;
-  }
 }
 
 /* C — Margin note. The capture keeps two thirds and the argument runs as a

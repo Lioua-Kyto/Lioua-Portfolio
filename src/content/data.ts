@@ -539,56 +539,47 @@ export const rawContent: z.input<typeof contentSchema> = {
       gallery: [
         {
           src: "/work/Rezervitoo/dashboard.webp",
-          alt: "The Rezervitoo provider dashboard.",
+          alt: "Rezervitoo's provider dashboard showing occupancy, bookings and revenue.",
+          side: "note-left",
+          title: "Resolved before the page paints",
           caption:
-            "Where a provider lands: occupancy, bookings and revenue resolved server-side before the page paints.",
+            "Occupancy, bookings and revenue are aggregated and cached on the server. Cached responses land in about 40ms, down from 176.",
           fit: "cover",
         },
         {
           src: "/work/Rezervitoo/listings.webp",
-          alt: "The listings index.",
+          alt: "The Rezervitoo listings index, mixing hotels, hostels, agency packages and host properties.",
+          side: "note-right",
+          title: "Four provider types, one model",
           caption:
-            "Hotels, hostels, agencies and hosts in one index. Four provider types, one polymorphic model underneath.",
+            "Hotels, hostels, agencies and hosts wanted four schemas. One polymorphic model carries all of them, cutting the onboarding surface by roughly 60%.",
           fit: "cover",
         },
         {
-          src: "/work/Rezervitoo/listing-details.webp",
-          alt: "A single listing's detail view.",
-          caption: null,
-          fit: "contain",
-        },
-        {
           src: "/work/Rezervitoo/providers-ar.webp",
-          alt: "The providers screen rendered in Arabic, right to left.",
+          alt: "The Rezervitoo provider screen in Arabic, with the full layout mirrored right to left.",
+          side: "note-left",
+          title: "Arabic that actually mirrors",
           caption:
-            "The same screen in Arabic. The layout mirrors: navigation, tables, icons, not just the strings.",
+            "Not translated strings in a left-to-right frame. Navigation, tables and icons all flip, because a half-mirrored layout is worse than none.",
           fit: "cover",
         },
         {
           src: "/work/Rezervitoo/swagger-api.webp",
-          alt: "The project's OpenAPI documentation.",
+          alt: "The Rezervitoo API browsable in Swagger, with every endpoint grouped and documented.",
+          side: "note-right",
+          title: "400+ endpoints, documented as written",
           caption:
-            "Every endpoint documented as it was written. This is where the 400+ figure comes from.",
-          fit: "cover",
-        },
-        {
-          src: "/work/Rezervitoo/dashboard-dark.webp",
-          alt: "The dashboard in dark mode.",
-          caption: "Theming is a token swap, not a second stylesheet.",
-          fit: "cover",
-        },
-        {
-          src: "/work/Rezervitoo/reports.webp",
-          alt: "The reports queue.",
-          caption:
-            "Moderation and reporting, because a multi-provider marketplace needs an answer for bad actors on day one.",
+            "The whole surface is browsable and typed. Someone joining reads the contract instead of asking what a field is supposed to mean.",
           fit: "cover",
         },
         {
           src: "/work/Rezervitoo/notifications-dark.webp",
-          alt: "Live notifications.",
+          alt: "Rezervitoo's real-time notification feed in dark mode.",
+          side: "note-left",
+          title: "Pushed, never polled",
           caption:
-            "Pushed over Channels behind a custom JWT WebSocket middleware. No polling, no refresh.",
+            "Notifications arrive over Channels behind custom JWT WebSocket middleware. Nothing on screen waits for a refresh to find out what changed.",
           fit: "cover",
         },
       ],
@@ -801,54 +792,38 @@ export const rawContent: z.input<typeof contentSchema> = {
       gallery: [
         {
           src: "/work/JobPortal/hr-callroom.webp",
-          alt: "The in-browser interview room.",
+          alt: "The Faderco portal's in-browser interview room, running over WebRTC.",
+          side: "note-left",
+          title: "The interview moved into the browser",
           caption:
-            "The change that mattered: interviews moved into the browser over WebRTC, and a four-hour round-trip per candidate became zero.",
+            "WebRTC replaced a four-hour round trip with a fifteen-minute call. This is the change the whole project is judged on.",
           fit: "cover",
         },
         {
           src: "/work/JobPortal/hr-dashboard.webp",
-          alt: "The HR dashboard.",
+          alt: "The Faderco hiring pipeline dashboard, showing candidates by stage.",
+          side: "note-right",
+          title: "What replaced the spreadsheet",
           caption:
-            "The pipeline at a glance. This is what replaced the spreadsheet.",
+            "Every candidate, stage and decision in one pipeline. Before this the process lived in a file passed between inboxes.",
           fit: "cover",
         },
         {
           src: "/work/JobPortal/hr-applications.webp",
-          alt: "The applications queue.",
-          caption: "Intake through offer for 50+ candidates a cycle.",
-          fit: "cover",
-        },
-        {
-          src: "/work/JobPortal/hr-interviews.webp",
-          alt: "Interview scheduling.",
-          caption: null,
-          fit: "cover",
-        },
-        {
-          src: "/work/JobPortal/hr-talentpool.webp",
-          alt: "The talent pool.",
+          alt: "The Faderco applications list, tracking candidates from intake through offer.",
+          side: "note-left",
+          title: "Intake through offer, 50+ a cycle",
           caption:
-            "Candidates who were not right this time, kept findable for when they are.",
-          fit: "cover",
-        },
-        {
-          src: "/work/JobPortal/hr-jobposts.webp",
-          alt: "Job post management.",
-          caption: null,
+            "Applications, screening, interviews and offers as one tracked flow, so nobody is lost between two stages neither side owns.",
           fit: "cover",
         },
         {
           src: "/work/JobPortal/dm-dashboard.webp",
-          alt: "The department manager's view.",
+          alt: "The department manager's dashboard for raising and following hiring requests.",
+          side: "note-right",
+          title: "Two roles, two surfaces",
           caption:
-            "A second role with its own surface: managers raise requests, HR runs the process.",
-          fit: "cover",
-        },
-        {
-          src: "/work/JobPortal/login.webp",
-          alt: "Sign-in, over Google OAuth2.",
-          caption: null,
+            "Managers raise hiring requests, HR runs the process. Each sees only the surface their job needs, off the same data.",
           fit: "cover",
         },
       ],
@@ -1171,51 +1146,38 @@ export const rawContent: z.input<typeof contentSchema> = {
       gallery: [
         {
           src: "/work/FitGuild/home.webp",
-          alt: "The FitGuild storefront.",
+          alt: "The FitGuild storefront home page.",
+          side: "note-left",
+          title: "The storefront was the easy half",
           caption:
-            "Built to sharpen the full-stack loop end to end: storefront, admin and the data between them.",
-          fit: "cover",
-        },
-        {
-          src: "/work/FitGuild/shop.webp",
-          alt: "The shop index.",
-          caption: null,
-          fit: "cover",
-        },
-        {
-          src: "/work/FitGuild/p-details.webp",
-          alt: "A product page.",
-          caption: null,
+            "Browsing, cart and checkout are the part everyone builds. It is here to set up what sits behind it.",
           fit: "cover",
         },
         {
           src: "/work/FitGuild/checkout.webp",
-          alt: "Checkout.",
-          caption: "Atomic. The order either exists completely or not at all.",
+          alt: "The FitGuild checkout, confirming an order against live stock.",
+          side: "note-right",
+          title: "Complete, or not at all",
+          caption:
+            "Payment, stock and the order row commit together. A failure part-way through leaves nothing half-written to reconcile by hand.",
           fit: "cover",
         },
         {
           src: "/work/FitGuild/ad-analytics.webp",
-          alt: "The admin analytics view.",
-          caption: "The half most storefront demos skip: the operator's side.",
-          fit: "cover",
-        },
-        {
-          src: "/work/FitGuild/ad-products.webp",
-          alt: "Product administration.",
-          caption: null,
-          fit: "cover",
-        },
-        {
-          src: "/work/FitGuild/ad-orders.webp",
-          alt: "Order administration.",
-          caption: null,
+          alt: "FitGuild's admin analytics, showing revenue and order flow.",
+          side: "note-left",
+          title: "The half most demos skip",
+          caption:
+            "Revenue, stock movement and order flow from the operator's side. A storefront without this is a catalogue, not a business.",
           fit: "cover",
         },
         {
           src: "/work/FitGuild/ad-inventory.webp",
-          alt: "Inventory.",
-          caption: null,
+          alt: "The FitGuild inventory surface, tracking stock levels and movements.",
+          side: "note-right",
+          title: "Nine back-office surfaces",
+          caption:
+            "Stock, suppliers, purchase orders and returns. The ERP behind the shop is the reason this project exists at all.",
           fit: "cover",
         },
       ],
@@ -1487,58 +1449,47 @@ export const rawContent: z.input<typeof contentSchema> = {
       gallery: [
         {
           src: "/work/PraxisOS/nexus.webp",
-          alt: "The Nexus dashboard.",
+          alt: "The PraxisOS dashboard, with counters, today's agenda and a weekly focus chart.",
+          side: "note-left",
+          title: "Ten tools, one window",
           caption:
-            "Everything at a glance: clickable counters that deep-link into each panel, today's agenda, a consistency strip and the week's focus hours.",
+            "Counters deep-link into each panel, beside today's agenda and a weekly focus chart. All of it local, with no server to reach.",
           fit: "cover",
         },
         {
           src: "/work/PraxisOS/flow-widget.webp",
-          alt: "The focus timer with its pinned mini widget.",
+          alt: "The PraxisOS focus timer popped out as a small always-on-top window.",
+          side: "note-right",
+          title: "A timer that outlives its window",
           caption:
-            "The timer pops out into a small always-on-top window and keeps counting while you work in another app — the two clocks never drift.",
+            "The focus timer pops into a small always-on-top panel and keeps counting while you work in something else entirely.",
           fit: "cover",
         },
         {
           src: "/work/PraxisOS/workout-session.webp",
-          alt: "A guided workout session.",
+          alt: "A PraxisOS workout session stepping through sets with timers.",
+          side: "note-left",
+          title: "A session engine, not a checklist",
           caption:
-            "A session engine that walks preview → work → rest per set, with time-based and rep-based exercises and superset handling.",
-          fit: "cover",
-        },
-        {
-          src: "/work/PraxisOS/mastery.webp",
-          alt: "The Mastery skill tracker.",
-          caption:
-            "Not just courses — books, projects and deliberate practice too, grouped by the skill area you choose.",
+            "Preview, work and rest per set, handling time-based and rep-based exercises without branching into two interfaces.",
           fit: "cover",
         },
         {
           src: "/work/PraxisOS/codex.webp",
-          alt: "The Codex notes editor.",
+          alt: "PraxisOS notes with inline images and full-text search results.",
+          side: "note-right",
+          title: "Search across everything written",
           caption:
-            "Rich text notes with inline images, backed by SQLite full-text search over title, body and tags.",
+            "Rich notes with inline images, indexed by SQLite full-text search over title, body and tags. Local, and instant.",
           fit: "cover",
         },
         {
           src: "/work/PraxisOS/ledger.webp",
-          alt: "The Ledger budget panel.",
+          alt: "The PraxisOS ledger, showing transactions and a spend-by-category chart.",
+          side: "note-left",
+          title: "Money tracked without an account",
           caption:
-            "Income, expense, transfer and debt, with a spend-by-category chart. The currency sits after the amount, the way it reads locally.",
-          fit: "cover",
-        },
-        {
-          src: "/work/PraxisOS/discipline.webp",
-          alt: "The Discipline habit matrix.",
-          caption:
-            "Daily, weekly or custom cadences with streaks. Any past day can be checked in, so training outside the app still counts.",
-          fit: "cover",
-        },
-        {
-          src: "/work/PraxisOS/settings-theme.webp",
-          alt: "Theme and preset settings.",
-          caption:
-            "Eight built-in themes plus custom presets that inherit their base theme and change only the accent.",
+            "Income, expense, transfer and debt, with spend by category. Nothing leaves the machine, because nothing needs to.",
           fit: "cover",
         },
       ],

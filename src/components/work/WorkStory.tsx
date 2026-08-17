@@ -14,6 +14,7 @@ import type { Shot } from "@/content/schemas";
 type Block =
   | { kind: "stack"; shot: Shot; index: number }
   | { kind: "spread"; shot: Shot; index: number }
+  | { kind: "note"; shot: Shot; index: number }
   | { kind: "facing"; left: Shot; right: Shot; index: number };
 
 function group(shots: readonly Shot[]): Block[] {
@@ -27,11 +28,12 @@ function group(shots: readonly Shot[]): Block[] {
       i += 1;
       continue;
     }
-    blocks.push({
-      kind: shot.side ? "spread" : "stack",
-      shot,
-      index: i,
-    });
+    const kind = !shot.side
+      ? "stack"
+      : shot.side.startsWith("note")
+        ? "note"
+        : "spread";
+    blocks.push({ kind, shot, index: i });
   }
   return blocks;
 }
@@ -54,9 +56,17 @@ function group(shots: readonly Shot[]): Block[] {
 export function WorkStory({
   shots,
   onOpen,
+  host,
 }: {
   shots: readonly Shot[];
   onOpen: (shot: Shot, origin: DOMRect) => void;
+  /**
+   * The live host, printed in the browser frame's bar. Absent for work that
+   * never shipped publicly, and the bar is then omitted rather than filled
+   * with something invented — a frame showing a URL that does not resolve is
+   * worse than a frame showing nothing.
+   */
+  host?: string | null;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const blocks = group(shots);
@@ -210,6 +220,63 @@ export function WorkStory({
       className="mt-16 flex flex-col gap-[clamp(5rem,14vh,10rem)]"
     >
       {blocks.map((block) => {
+        if (block.kind === "note") {
+          const { shot, index } = block;
+          const flip = shot.side === "note-right";
+          return (
+            <div
+              key={shot.src}
+              data-block
+              className={`wc-note ${flip ? "wc-note--flip" : ""}`}
+            >
+              <div
+                data-role="media"
+                data-from={flip ? "right" : "left"}
+                className="wc-note-media"
+              >
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    onOpen(shot, event.currentTarget.getBoundingClientRect());
+                  }}
+                  className="wc-chrome group block w-full text-left"
+                  aria-label={`Open ${shot.alt} in the zoom viewer`}
+                >
+                  {host ? (
+                    <span className="wc-chrome-bar">
+                      <span className="truncate">{host}</span>
+                    </span>
+                  ) : null}
+                  <span className="wc-chrome-media">
+                    <Image
+                      src={shot.src}
+                      alt={shot.alt}
+                      fill
+                      sizes="(max-width: 767px) 92vw, 62vw"
+                      quality={90}
+                      priority={index === 0}
+                      loading={index === 0 ? undefined : "eager"}
+                      className="object-cover object-top"
+                    />
+                  </span>
+                </button>
+              </div>
+              <div data-from={flip ? "left" : "right"} className="wc-note-text">
+                {shot.title ? (
+                  <h3 className="type-display text-title leading-tight font-semibold text-balance">
+                    {shot.title}
+                  </h3>
+                ) : null}
+                {shot.caption ? (
+                  <p className="mt-3 text-base text-slate text-pretty">
+                    {shot.caption}
+                  </p>
+                ) : null}
+              </div>
+            </div>
+          );
+        }
+
         if (block.kind === "facing") {
           return (
             <div

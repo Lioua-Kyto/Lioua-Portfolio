@@ -172,7 +172,16 @@ export default async function WorkDetail({
                 drag to pan.
               </p>
             ) : null}
-            <WorkGallery shots={item.gallery} />
+            {/* The host only, not the whole URL: a frame's address bar shows
+                where you are, and the path of one screenshot is noise. */}
+            <WorkGallery
+              shots={item.gallery}
+              host={
+                item.links.live
+                  ? new URL(item.links.live).host.replace(/^www\./, "")
+                  : null
+              }
+            />
           </section>
         ) : (
           <section className="mt-24" aria-label="Screens">
