@@ -1872,3 +1872,102 @@
     text-align: left;
   }
 }
+
+/* ---- Wide-capture treatments (variant candidates) ----
+
+   A 16:9 desktop capture wants width. Dropped into the 50/50 spread the
+   phone renders use, it renders at ~46vw and reads as the smaller, lesser
+   artefact — which is the opposite of what these projects deserve. All three
+   treatments below give the width back and put the argument somewhere other
+   than directly beside the image. The chrome carries the real URL rather than
+   three fake traffic-light dots: a frame that shows actual information is a
+   frame, one that mimics macOS is a sticker. */
+
+.wc-chrome {
+  border: 1px solid color-mix(in oklab, var(--ink) 14%, transparent);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+}
+.wc-chrome-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  font-family: var(--font-martian-mono), monospace;
+  font-size: var(--text-fine);
+  color: var(--slate);
+}
+.wc-chrome-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: block;
+}
+
+/* A — Plate. The capture runs the full column under a two-column header, so
+   the image is the widest thing on the page and the claim reads as a caption
+   set above it rather than a column competing with it. */
+.wc-plate-head {
+  display: grid;
+  gap: 1rem 4rem;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 768px) {
+  .wc-plate-head {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+
+/* B — Band. The capture breaks the content column entirely and runs edge to
+   edge; the claim sits under it in a single offset column. The widest, loudest
+   option, and the only one that uses the full viewport. */
+.wc-band {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+.wc-band-text {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 84rem;
+  padding-inline: clamp(1.25rem, 4.5vw, 3.5rem);
+  margin-top: 1.75rem;
+}
+@media (min-width: 768px) {
+  .wc-band-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 4rem;
+    align-items: start;
+  }
+}
+
+/* C — Margin note. The capture keeps two thirds and the argument runs as a
+   slim column in the margin beside it, alternating sides. Closest in spirit to
+   the printed page the rest of the site is set like, and the only one of the
+   three that alternates without becoming another 50/50 zigzag. */
+.wc-note {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .wc-note {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 3.4fr);
+  }
+  /* The tracks flip with the content. Swapping only the columns left the
+     capture in the narrow track, so every other item rendered a third of the
+     size of its neighbour. */
+  .wc-note--flip {
+    grid-template-columns: minmax(0, 3.4fr) minmax(0, 8fr);
+  }
+  .wc-note--flip .wc-note-media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .wc-note--flip .wc-note-text {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
