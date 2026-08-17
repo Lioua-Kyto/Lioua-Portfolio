@@ -67,8 +67,14 @@ export function WorkStory({
       if (!scope) return;
       const mm = gsap.matchMedia();
 
+      // Every entrance below reverses on the way back up, so scrolling down
+      // through the page a second time plays it again rather than presenting
+      // an already-assembled page. `reverse` runs the tween backwards on
+      // leave-back; the fourth slot stays `none` so re-entering from below
+      // does not fire a second play on top of the reverse.
+      const TOGGLE = "play none none reverse";
+
       mm.add("(min-width: 768px)", () => {
-        // Plain captures: rise and settle, no reverse, exactly as before.
         for (const figure of gsap.utils.toArray<HTMLElement>("[data-shot]")) {
           gsap.fromTo(
             figure,
@@ -81,6 +87,7 @@ export function WorkStory({
               scrollTrigger: {
                 trigger: figure,
                 start: "top 92%",
+                toggleActions: TOGGLE,
                 invalidateOnRefresh: true,
               },
             },
@@ -104,6 +111,7 @@ export function WorkStory({
               scrollTrigger: {
                 trigger: part.closest("[data-block]") ?? part,
                 start: "top 85%",
+                toggleActions: TOGGLE,
                 invalidateOnRefresh: true,
               },
             },
@@ -123,6 +131,7 @@ export function WorkStory({
             scrollTrigger: {
               trigger: pair,
               start: "top 80%",
+              toggleActions: TOGGLE,
               invalidateOnRefresh: true,
             },
           });

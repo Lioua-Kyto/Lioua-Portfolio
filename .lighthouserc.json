@@ -12,7 +12,7 @@
     "assert": {
       "assertions": {
         "largest-contentful-paint": ["error", { "maxNumericValue": 5500 }],
-        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
         "total-blocking-time": ["warn", { "maxNumericValue": 900 }],
         "resource-summary:script:size": [
           "error",

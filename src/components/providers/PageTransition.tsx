@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { gsap } from "@/lib/motion/gsap";
+import { gsap, ScrollTrigger } from "@/lib/motion/gsap";
 
 /**
  * Project pages arrive from below and leave the same way.
@@ -48,6 +48,20 @@ export function PageTransition({ children }: { children: ReactNode }) {
         duration: 0.62,
         ease: "power3.out",
         clearProps: "transform,willChange",
+        // Re-measure once the transform is gone.
+        //
+        // While this wrapper is translated, every element on the page reports a
+        // position up to a full viewport below where it will actually rest. Any
+        // ScrollTrigger that measures in that window — and the arriving page
+        // refreshes as soon as its images decode — bakes in the offset and
+        // keeps it after the transform clears. That is why the curtain misbehaved
+        // only on a *second* visit to a project: the first visit's images load
+        // slowly enough that the refresh lands after this tween, while cached
+        // ones land in the middle of it. A reload "fixed" it because a cold load
+        // never runs this transition at all.
+        onComplete: () => {
+          ScrollTrigger.refresh();
+        },
       },
     );
   }, [pathname]);
