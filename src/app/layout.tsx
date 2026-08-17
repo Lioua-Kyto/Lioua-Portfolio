@@ -68,31 +68,24 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    type: "profile",
-    firstName: "Lioua",
-    lastName: "Zeddam",
+    // `website`, not `profile`. Both are valid Open Graph, but `profile` is a
+    // person object and the scrapers treat it as a lesser citizen for link
+    // cards. This page is a site, and the Person is already declared properly
+    // in the JSON-LD below where it actually earns something.
+    type: "website",
     siteName: "Lioua Zeddam",
     title: content.site.title,
     description: content.site.description,
     url: "/",
     locale: "en_GB",
-    images: [
-      {
-        url: "/android-chrome-512x512.png",
-        width: 512,
-        height: 512,
-        alt: "Lioua Zeddam",
-      },
-    ],
+    // No `images` here on purpose. `opengraph-image.tsx` is a file convention
+    // and beats anything set in this object, so listing an image here would be
+    // a line that looks authoritative and silently does nothing.
   },
   twitter: {
-    // Square art in a `summary_large_image` slot gets letterboxed or centre
-    // cropped. `summary` is the card built for a square thumbnail, so the
-    // image is shown whole beside the text instead of being cut to 1.91:1.
-    card: "summary",
+    card: "summary_large_image",
     title: content.site.title,
     description: content.site.description,
-    images: ["/android-chrome-512x512.png"],
   },
   // No `google-site-verification` here by design — it is issued per property
   // and belongs in Search Console's DNS or file method, not committed to a
