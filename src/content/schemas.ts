@@ -28,6 +28,20 @@ export const shotSchema = z.object({
   alt: z.string().min(1),
   caption: z.string().min(1).nullable(),
   fit: z.enum(["cover", "contain"]),
+  /**
+   * Where the image sits when the shot is a full spread rather than a plain
+   * capture. `null` keeps the stacked column every project has used until now:
+   * framed capture, small caption beneath.
+   *
+   * `left`/`right` put the image on that side with its argument opposite, at
+   * heading size. `facing` is a pair — two consecutive `facing` shots are
+   * grouped into one block, images on the outside turned toward each other
+   * with the text held between them. Device renders on transparent grounds
+   * earn this; a flat screenshot does not, and should stay `null`.
+   */
+  side: z.enum(["left", "right", "facing"]).nullable().default(null),
+  /** The spread's heading. Only read when `side` is set. */
+  title: z.string().min(1).nullable().default(null),
 });
 
 /**

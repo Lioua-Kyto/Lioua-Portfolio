@@ -1813,3 +1813,62 @@
   background: var(--signal);
   border-color: var(--signal);
 }
+
+/* ---- Project spreads ---- */
+
+/* A device render and the one claim it proves, side by side. Unlayered: the
+   grid and the ordering have to beat the utilities on the same elements.
+   No frame and no surface behind the media — the renders carry their own
+   transparent ground, and a box drawn around a photographed phone reads as a
+   screenshot of a screenshot. */
+.work-spread {
+  display: grid;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .work-spread {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+  /* The flip swaps the columns without reordering the DOM, so the reading
+     order stays image-then-argument for a screen reader either way. */
+  .work-spread--flip .work-spread-media {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .work-spread--flip .work-spread-text {
+    grid-column: 1;
+    grid-row: 1;
+  }
+}
+.work-spread-media {
+  /* The renders are drawn with their own generous margin, so they are pushed
+     slightly past the text column's edge to sit optically flush with it. */
+  margin-inline: calc(clamp(1rem, 3vw, 3rem) * -1);
+}
+
+/* Two renders turned toward each other, the argument held between them. The
+   middle column is narrow on purpose: the text is the thing being closed in
+   on, and a wide measure would stop the pair reading as a pair. */
+.work-facing {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: center;
+  overflow-x: clip;
+}
+@media (min-width: 768px) {
+  .work-facing {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr);
+  }
+}
+.work-facing-text {
+  text-align: center;
+}
+@media (max-width: 767.98px) {
+  /* Stacked, the pair loses its facing geometry, so the text leads instead of
+     being marooned between two images that are no longer opposite. */
+  .work-facing-text {
+    order: -1;
+    text-align: left;
+  }
+}

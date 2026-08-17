@@ -163,10 +163,15 @@ export default async function WorkDetail({
             <h2 className="hairline pt-4">
               <Label index="A">Screens</Label>
             </h2>
-            <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
-              Click any screen to open it in the zoom viewer. Wheel to zoom,
-              drag to pan.
-            </p>
+            {/* Only promise the zoom viewer where it exists. A project told in
+                spreads has no framed capture to click, and an instruction for
+                an affordance that is not there is worse than no instruction. */}
+            {item.gallery.some((shot) => shot.side === null) ? (
+              <p className="mt-4 max-w-[46ch] font-mono text-fine text-slate">
+                Click any screen to open it in the zoom viewer. Wheel to zoom,
+                drag to pan.
+              </p>
+            ) : null}
             <WorkGallery shots={item.gallery} />
           </section>
         ) : (

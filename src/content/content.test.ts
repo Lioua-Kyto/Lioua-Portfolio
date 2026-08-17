@@ -11,9 +11,9 @@ describe("content", () => {
   it("merges client work and products into one list with unique slugs", () => {
     const slugs = content.work.map((w) => w.slug);
     expect(slugs).toEqual([
+      "brewphoria",
       "rezervitoo",
       "faderco",
-      "brewphoria",
       "fitguild",
       "praxisos",
     ]);

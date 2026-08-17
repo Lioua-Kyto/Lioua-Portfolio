@@ -132,6 +132,383 @@ export const rawContent: z.input<typeof contentSchema> = {
   // the hook is the thing said out loud; the detail earns it.
   work: [
     {
+      slug: "brewphoria",
+      title: "BrewPhoria",
+      kind: "product",
+      context: "Personal product · solo",
+      period: "2026",
+      hook: "Every order moves four tables at once. They all commit, or nothing happened.",
+      summary:
+        "Cross-platform coffee ordering: a Flutter client on a layered Node/Express/TypeScript API.",
+      stack:
+        "Flutter · Node.js · PostgreSQL · Prisma · Express · TypeScript · Riverpod · Dio · Hive · Redis · Gemini",
+      metric: {
+        value: "1",
+        label:
+          "transaction covers the order, the stock, the cart and the points",
+      },
+      highlights: [
+        "Offline-first guest cart that merges conflict-free the moment you sign in. It survives cold starts.",
+        "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
+        "An AI barista (Gemini, tool-augmented) that resolves “something sweet and cold” to real menu items.",
+      ],
+      // Device renders rather than raw screenshots: the app's warm cream and
+      // amber is a palette the site does not share, and a phone held in frame
+      // reads as a product where a flat capture reads as a file. The card
+      // greyscales it back to the rail's one palette until hover.
+      cover: {
+        src: "/work/Brewphoria/onboarding-thumbnail.webp",
+        alt: "Three iPhones showing BrewPhoria's welcome, sign-in and AI barista screens.",
+        fit: "contain",
+      },
+      // A spread, not a contact sheet. Each render carries the one claim it
+      // proves, at heading size, on the side its mockups are turned away from.
+      gallery: [
+        {
+          src: "/work/Brewphoria/home-left.webp",
+          alt: "The BrewPhoria storefront home screen on an iPhone, showing the drink categories and featured menu.",
+          side: "left",
+          title: "The menu opens before the network answers",
+          caption:
+            "The catalogue is cached to Hive on first run, so a cold start on bad signal opens to a full menu instead of a spinner. The network reconciles behind it, and the reader never watches that happen.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/a-barista-right.webp",
+          alt: "BrewPhoria's AI barista conversation, turning a spoken craving into a priced drink.",
+          side: "right",
+          title: "“Something sweet and cold” is a query",
+          caption:
+            "A tool-augmented Gemini agent resolves loose language against the live catalogue rather than a prompt full of product names. Add a drink to the menu at nine and it is orderable by speech at nine.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/product-detail-right.webp",
+          alt: "Two iPhones showing a BrewPhoria drink's detail screen with size, milk and syrup options.",
+          side: "right",
+          title: "Priced as you build it, and never by the phone",
+          caption:
+            "Size, milk, shots and syrups reprice on every tap — computed on the server, rendered by the client. The phone displays a number it was handed; it never does the arithmetic that decides what you pay.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/orders-checkout-left.webp",
+          alt: "Two iPhones showing BrewPhoria's checkout sheet and the order history that follows it.",
+          side: "left",
+          title: "One transaction, or nothing happened",
+          caption:
+            "Checkout writes the order, decrements stock, empties the cart and credits points inside a single Prisma transaction. A connection dropped mid-tap leaves no half-order and no phantom stock to reconcile by hand.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/loyalty-left.webp",
+          alt: "BrewPhoria's loyalty screen showing the points balance and tier progress.",
+          side: "facing",
+          title: "Points that cannot be spent twice",
+          caption:
+            "Earning and redeeming write to the same ledger as checkout, under the same transaction. Two impatient taps on a slow connection cannot spend one free cup twice, which is the failure a loyalty scheme is judged on.",
+          fit: "contain",
+        },
+        {
+          src: "/work/Brewphoria/loyalty-redeem-right.webp",
+          alt: "Redeeming BrewPhoria points against a drink at checkout.",
+          side: "facing",
+          title: null,
+          caption: null,
+          fit: "contain",
+        },
+      ],
+      diagram: {
+        title: "What happens at checkout",
+        caption:
+          "The phone never decides a price. Order, stock, cart and loyalty all move inside one database transaction, and the push notification is sent only after it commits.",
+        columns: [
+          {
+            title: "Who calls",
+            nodes: [
+              {
+                id: "app",
+                label: "Flutter app",
+                note: "Guest cart works offline",
+                kind: "client",
+              },
+              {
+                id: "fb",
+                label: "Firebase Auth",
+                note: "Issues the identity token",
+                kind: "external",
+              },
+            ],
+          },
+          {
+            title: "The service",
+            nodes: [
+              {
+                id: "mw",
+                label: "Middleware",
+                note: "Verifies the token, rate limits",
+                kind: "service",
+              },
+              {
+                id: "ctl",
+                label: "Controllers",
+                note: "Validates every request with Zod",
+                kind: "service",
+              },
+              {
+                id: "ord",
+                label: "Checkout service",
+                note: "Recomputes totals, stock and points",
+                kind: "service",
+              },
+              {
+                id: "ai",
+                label: "AI barista",
+                note: "Answers are tied to real catalogue items",
+                kind: "service",
+              },
+            ],
+          },
+          {
+            title: "What it keeps",
+            nodes: [
+              {
+                id: "pg",
+                label: "PostgreSQL",
+                note: "One transaction: order, stock, cart, ledger",
+                kind: "data",
+              },
+              {
+                id: "redis",
+                label: "Redis",
+                note: "Catalogue cache, purged on any write",
+                kind: "data",
+              },
+              {
+                id: "gem",
+                label: "Google Gemini",
+                note: "Recommendation text",
+                kind: "external",
+              },
+              {
+                id: "fcm",
+                label: "Firebase FCM",
+                note: "Sent after the commit, never inside it",
+                kind: "external",
+              },
+            ],
+          },
+        ],
+        flows: [
+          { from: "app", to: "fb", label: "sign in" },
+          { from: "app", to: "mw", label: "bearer token" },
+          { from: "mw", to: "ctl", label: null },
+          { from: "ctl", to: "ord", label: null },
+          { from: "ctl", to: "ai", label: null },
+          { from: "ord", to: "pg", label: "single transaction" },
+          { from: "ord", to: "redis", label: null },
+          { from: "ai", to: "gem", label: null },
+          { from: "ord", to: "fcm", label: "after commit" },
+        ],
+      },
+      erd: {
+        title: "An order that cannot change under you",
+        caption:
+          "What you bought is copied onto the order at the moment of purchase: name, image, price and options. The catalogue can be edited afterwards and a delivered order still reads exactly as it did at the till.",
+        columns: [
+          {
+            title: "Who buys",
+            entities: [
+              {
+                id: "user",
+                name: "User",
+                fields: [
+                  "firebaseUid",
+                  "email",
+                  "displayName",
+                  "role",
+                  "fcmToken",
+                ],
+                kind: "core",
+              },
+              {
+                id: "loy",
+                name: "LoyaltyAccount",
+                fields: [
+                  "user (1:1)",
+                  "currentPoints",
+                  "lifetimePoints",
+                  "tier",
+                ],
+                kind: "owned",
+              },
+              {
+                id: "ledger",
+                name: "LoyaltyTransaction",
+                fields: ["type", "points", "description"],
+                kind: "owned",
+              },
+            ],
+          },
+          {
+            title: "What is for sale",
+            entities: [
+              {
+                id: "prod",
+                name: "Product",
+                fields: [
+                  "slug",
+                  "price (Decimal)",
+                  "stock",
+                  "type",
+                  "avgRating",
+                ],
+                kind: "core",
+              },
+              {
+                id: "grp",
+                name: "ModifierGroup",
+                fields: ["name", "selectionType", "isRequired"],
+                kind: "support",
+              },
+              {
+                id: "opt",
+                name: "ModifierOption",
+                fields: ["label", "priceDelta (Decimal)", "isDefault"],
+                kind: "support",
+              },
+            ],
+          },
+          {
+            title: "What was bought",
+            entities: [
+              {
+                id: "order",
+                name: "Order",
+                fields: [
+                  "subtotal / total",
+                  "loyaltyDiscount",
+                  "pointsEarned",
+                  "status",
+                  "estimatedReadyAt",
+                ],
+                kind: "owned",
+              },
+              {
+                id: "item",
+                name: "OrderItem",
+                fields: [
+                  "productName (snapshot)",
+                  "unitPrice (snapshot)",
+                  "modifiers (JSON)",
+                  "quantity",
+                ],
+                kind: "owned",
+              },
+              {
+                id: "rev",
+                name: "Review",
+                fields: ["orderItem (1:1)", "rating", "comment", "isVisible"],
+                kind: "support",
+              },
+            ],
+          },
+        ],
+        relations: [
+          { from: "user", to: "order", label: "one to many" },
+          { from: "user", to: "loy", label: "one to one" },
+          { from: "loy", to: "ledger", label: "one to many" },
+          { from: "prod", to: "grp", label: "one to many" },
+          { from: "grp", to: "opt", label: "one to many" },
+          { from: "order", to: "item", label: "one to many" },
+          { from: "item", to: "rev", label: "one to one" },
+        ],
+      },
+      flow: {
+        title: "From a guest cart to a confirmed order",
+        caption:
+          "The phone can build a cart with nobody signed in, and none of the numbers it holds are trusted. At checkout the server recomputes all of them and moves four things at once, or moves none of them.",
+        lanes: [
+          { id: "cust", label: "Customer" },
+          { id: "app", label: "Flutter app" },
+          { id: "api", label: "API" },
+          { id: "db", label: "PostgreSQL" },
+        ],
+        steps: [
+          {
+            id: "b1",
+            lane: "cust",
+            label: "Builds a cart as a guest",
+            note: "Kept on the device, survives a restart",
+            state: null,
+            kind: "step",
+          },
+          {
+            id: "b2",
+            lane: "app",
+            label: "Signs in with Firebase",
+            note: null,
+            state: null,
+            kind: "step",
+          },
+          {
+            id: "b3",
+            lane: "app",
+            label: "Replays each local line",
+            note: "Merged by product and option set",
+            state: null,
+            kind: "step",
+          },
+          {
+            id: "b4",
+            lane: "cust",
+            label: "Picks address, tip and points",
+            note: null,
+            state: null,
+            kind: "step",
+          },
+          {
+            id: "b5",
+            lane: "api",
+            label: "Revalidates every number",
+            note: "What the client sent is an input, not a total",
+            state: null,
+            kind: "gate",
+          },
+          {
+            id: "b6",
+            lane: "db",
+            label: "Opens one transaction",
+            note: null,
+            state: null,
+            kind: "step",
+          },
+          {
+            id: "b7",
+            lane: "db",
+            label: "Order, stock, cart, points",
+            note: "All four commit or none of them do",
+            state: "CONFIRMED",
+            kind: "gate",
+          },
+          {
+            id: "b8",
+            lane: "api",
+            label: "Sends the confirmation",
+            note: "After the commit, never inside it",
+            state: null,
+            kind: "end",
+          },
+        ],
+      },
+      access: "public repo, link on its way",
+      links: { live: null, source: "https://github.com/Lioua-Kyto/Brewphoria" },
+      todos: [
+        "TODO(author): screens",
+        "TODO(author): source link — repo currently private",
+      ],
+    },
+    {
       slug: "rezervitoo",
       title: "Rezervitoo",
       kind: "flagship",
@@ -766,375 +1143,6 @@ export const rawContent: z.input<typeof contentSchema> = {
         source: "https://github.com/Zeddam-Lioua/Job-Portal",
       },
       todos: [],
-    },
-    {
-      slug: "brewphoria",
-      title: "BrewPhoria",
-      kind: "product",
-      context: "Personal product · solo",
-      period: "2026",
-      hook: "I didn't know Flutter. So I built a whole coffee app in it.",
-      summary:
-        "Cross-platform coffee ordering: a Flutter client on a layered Node/Express/TypeScript API.",
-      stack:
-        "Flutter · Node.js · PostgreSQL · Prisma · Express · TypeScript · Riverpod · Dio · Hive · Redis · Gemini",
-      metric: {
-        value: "1",
-        label:
-          "transaction covers the order, the stock, the cart and the points",
-      },
-      highlights: [
-        "Offline-first guest cart that merges conflict-free the moment you sign in. It survives cold starts.",
-        "Atomic checkout: order, stock, cart, and loyalty all move in one transaction, or none do.",
-        "An AI barista (Gemini, tool-augmented) that resolves “something sweet and cold” to real menu items.",
-      ],
-      cover: {
-        src: "/work/Brewphoria/home-l.webp",
-        alt: "BrewPhoria's storefront home screen on mobile.",
-        fit: "contain",
-      },
-      gallery: [
-        {
-          src: "/work/Brewphoria/onboarding-1.webp",
-          alt: "The onboarding screen.",
-          caption:
-            "First Flutter build. I did not know the framework when I started this.",
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/home-l.webp",
-          alt: "The storefront home screen.",
-          caption: null,
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/product-detail-l-1.webp",
-          alt: "A product detail screen.",
-          caption: "Options, sizes and extras priced as you choose them.",
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/product-detail-options-d.webp",
-          alt: "Product options in dark mode.",
-          caption:
-            "Light and dark carried through every screen, not just the shell.",
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/cart-l.webp",
-          alt: "The cart.",
-          caption: null,
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/checkout-l.webp",
-          alt: "Checkout.",
-          caption: null,
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/loyalty-l.webp",
-          alt: "The loyalty screen.",
-          caption:
-            "Points, tiers and redemption: the reason a coffee app gets opened twice a day.",
-          fit: "contain",
-        },
-        {
-          src: "/work/Brewphoria/orders-d.webp",
-          alt: "Order history in dark mode.",
-          caption: null,
-          fit: "contain",
-        },
-      ],
-      diagram: {
-        title: "What happens at checkout",
-        caption:
-          "The phone never decides a price. Order, stock, cart and loyalty all move inside one database transaction, and the push notification is sent only after it commits.",
-        columns: [
-          {
-            title: "Who calls",
-            nodes: [
-              {
-                id: "app",
-                label: "Flutter app",
-                note: "Guest cart works offline",
-                kind: "client",
-              },
-              {
-                id: "fb",
-                label: "Firebase Auth",
-                note: "Issues the identity token",
-                kind: "external",
-              },
-            ],
-          },
-          {
-            title: "The service",
-            nodes: [
-              {
-                id: "mw",
-                label: "Middleware",
-                note: "Verifies the token, rate limits",
-                kind: "service",
-              },
-              {
-                id: "ctl",
-                label: "Controllers",
-                note: "Validates every request with Zod",
-                kind: "service",
-              },
-              {
-                id: "ord",
-                label: "Checkout service",
-                note: "Recomputes totals, stock and points",
-                kind: "service",
-              },
-              {
-                id: "ai",
-                label: "AI barista",
-                note: "Answers are tied to real catalogue items",
-                kind: "service",
-              },
-            ],
-          },
-          {
-            title: "What it keeps",
-            nodes: [
-              {
-                id: "pg",
-                label: "PostgreSQL",
-                note: "One transaction: order, stock, cart, ledger",
-                kind: "data",
-              },
-              {
-                id: "redis",
-                label: "Redis",
-                note: "Catalogue cache, purged on any write",
-                kind: "data",
-              },
-              {
-                id: "gem",
-                label: "Google Gemini",
-                note: "Recommendation text",
-                kind: "external",
-              },
-              {
-                id: "fcm",
-                label: "Firebase FCM",
-                note: "Sent after the commit, never inside it",
-                kind: "external",
-              },
-            ],
-          },
-        ],
-        flows: [
-          { from: "app", to: "fb", label: "sign in" },
-          { from: "app", to: "mw", label: "bearer token" },
-          { from: "mw", to: "ctl", label: null },
-          { from: "ctl", to: "ord", label: null },
-          { from: "ctl", to: "ai", label: null },
-          { from: "ord", to: "pg", label: "single transaction" },
-          { from: "ord", to: "redis", label: null },
-          { from: "ai", to: "gem", label: null },
-          { from: "ord", to: "fcm", label: "after commit" },
-        ],
-      },
-      erd: {
-        title: "An order that cannot change under you",
-        caption:
-          "What you bought is copied onto the order at the moment of purchase: name, image, price and options. The catalogue can be edited afterwards and a delivered order still reads exactly as it did at the till.",
-        columns: [
-          {
-            title: "Who buys",
-            entities: [
-              {
-                id: "user",
-                name: "User",
-                fields: [
-                  "firebaseUid",
-                  "email",
-                  "displayName",
-                  "role",
-                  "fcmToken",
-                ],
-                kind: "core",
-              },
-              {
-                id: "loy",
-                name: "LoyaltyAccount",
-                fields: [
-                  "user (1:1)",
-                  "currentPoints",
-                  "lifetimePoints",
-                  "tier",
-                ],
-                kind: "owned",
-              },
-              {
-                id: "ledger",
-                name: "LoyaltyTransaction",
-                fields: ["type", "points", "description"],
-                kind: "owned",
-              },
-            ],
-          },
-          {
-            title: "What is for sale",
-            entities: [
-              {
-                id: "prod",
-                name: "Product",
-                fields: [
-                  "slug",
-                  "price (Decimal)",
-                  "stock",
-                  "type",
-                  "avgRating",
-                ],
-                kind: "core",
-              },
-              {
-                id: "grp",
-                name: "ModifierGroup",
-                fields: ["name", "selectionType", "isRequired"],
-                kind: "support",
-              },
-              {
-                id: "opt",
-                name: "ModifierOption",
-                fields: ["label", "priceDelta (Decimal)", "isDefault"],
-                kind: "support",
-              },
-            ],
-          },
-          {
-            title: "What was bought",
-            entities: [
-              {
-                id: "order",
-                name: "Order",
-                fields: [
-                  "subtotal / total",
-                  "loyaltyDiscount",
-                  "pointsEarned",
-                  "status",
-                  "estimatedReadyAt",
-                ],
-                kind: "owned",
-              },
-              {
-                id: "item",
-                name: "OrderItem",
-                fields: [
-                  "productName (snapshot)",
-                  "unitPrice (snapshot)",
-                  "modifiers (JSON)",
-                  "quantity",
-                ],
-                kind: "owned",
-              },
-              {
-                id: "rev",
-                name: "Review",
-                fields: ["orderItem (1:1)", "rating", "comment", "isVisible"],
-                kind: "support",
-              },
-            ],
-          },
-        ],
-        relations: [
-          { from: "user", to: "order", label: "one to many" },
-          { from: "user", to: "loy", label: "one to one" },
-          { from: "loy", to: "ledger", label: "one to many" },
-          { from: "prod", to: "grp", label: "one to many" },
-          { from: "grp", to: "opt", label: "one to many" },
-          { from: "order", to: "item", label: "one to many" },
-          { from: "item", to: "rev", label: "one to one" },
-        ],
-      },
-      flow: {
-        title: "From a guest cart to a confirmed order",
-        caption:
-          "The phone can build a cart with nobody signed in, and none of the numbers it holds are trusted. At checkout the server recomputes all of them and moves four things at once, or moves none of them.",
-        lanes: [
-          { id: "cust", label: "Customer" },
-          { id: "app", label: "Flutter app" },
-          { id: "api", label: "API" },
-          { id: "db", label: "PostgreSQL" },
-        ],
-        steps: [
-          {
-            id: "b1",
-            lane: "cust",
-            label: "Builds a cart as a guest",
-            note: "Kept on the device, survives a restart",
-            state: null,
-            kind: "step",
-          },
-          {
-            id: "b2",
-            lane: "app",
-            label: "Signs in with Firebase",
-            note: null,
-            state: null,
-            kind: "step",
-          },
-          {
-            id: "b3",
-            lane: "app",
-            label: "Replays each local line",
-            note: "Merged by product and option set",
-            state: null,
-            kind: "step",
-          },
-          {
-            id: "b4",
-            lane: "cust",
-            label: "Picks address, tip and points",
-            note: null,
-            state: null,
-            kind: "step",
-          },
-          {
-            id: "b5",
-            lane: "api",
-            label: "Revalidates every number",
-            note: "What the client sent is an input, not a total",
-            state: null,
-            kind: "gate",
-          },
-          {
-            id: "b6",
-            lane: "db",
-            label: "Opens one transaction",
-            note: null,
-            state: null,
-            kind: "step",
-          },
-          {
-            id: "b7",
-            lane: "db",
-            label: "Order, stock, cart, points",
-            note: "All four commit or none of them do",
-            state: "CONFIRMED",
-            kind: "gate",
-          },
-          {
-            id: "b8",
-            lane: "api",
-            label: "Sends the confirmation",
-            note: "After the commit, never inside it",
-            state: null,
-            kind: "end",
-          },
-        ],
-      },
-      access: "public repo, link on its way",
-      links: { live: null, source: "https://github.com/Lioua-Kyto/Brewphoria" },
-      todos: [
-        "TODO(author): screens",
-        "TODO(author): source link — repo currently private",
-      ],
     },
     {
       slug: "fitguild",
