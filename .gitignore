@@ -38,6 +38,10 @@ assets/
 # local tooling and working notes — kept on disk, not part of the project
 .agents/
 .claude/
+# design-hook cache. It was neither git-ignored nor prettier-ignored, so it
+# failed `prettier --check .` locally and was one `git add -A` away from being
+# committed to a public repo.
+.impeccable/
 CLAUDE.md
 TASKS.md
 skills-lock.json

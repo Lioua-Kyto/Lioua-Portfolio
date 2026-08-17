@@ -24,15 +24,15 @@ Then open `http://localhost:3000`.
 
 ## Scripts
 
-| Command             | What it does                                   |
-| ------------------- | ---------------------------------------------- |
-| `npm run dev`       | Start the dev server                           |
-| `npm run build`     | Production build                               |
-| `npm run start`     | Serve the production build                     |
-| `npm run typecheck` | `tsc --noEmit`                                 |
-| `npm run lint`      | ESLint (strict, zero warnings)                 |
-| `npm run test`      | Unit tests (Vitest)                            |
-| `npm run e2e`       | End-to-end smoke suite (Playwright)            |
+| Command             | What it does                        |
+| ------------------- | ----------------------------------- |
+| `npm run dev`       | Start the dev server                |
+| `npm run build`     | Production build                    |
+| `npm run start`     | Serve the production build          |
+| `npm run typecheck` | `tsc --noEmit`                      |
+| `npm run lint`      | ESLint (strict, zero warnings)      |
+| `npm run test`      | Unit tests (Vitest)                 |
+| `npm run e2e`       | End-to-end smoke suite (Playwright) |
 
 ## Notes
 

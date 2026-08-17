@@ -7,5 +7,6 @@ package-lock.json
 next-env.d.ts
 .agents
 .claude
+.impeccable
 *.pdf
 .env.example
