@@ -568,7 +568,7 @@ export const rawContent: z.input<typeof contentSchema> = {
           src: "/work/Rezervitoo/swagger-api.webp",
           alt: "The Rezervitoo API browsable in Swagger, with every endpoint grouped and documented.",
           side: "note-right",
-          title: "400+ endpoints, documented as written",
+          title: "100+ endpoints, documented as written",
           caption:
             "The whole surface is browsable and typed. Someone joining reads the contract instead of asking what a field is supposed to mean.",
           fit: "cover",
