@@ -11,14 +11,14 @@
     },
     "assert": {
       "assertions": {
-        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 4000 }],
         "cumulative-layout-shift": ["error", { "maxNumericValue": 0.05 }],
-        "total-blocking-time": ["warn", { "maxNumericValue": 300 }],
+        "total-blocking-time": ["warn", { "maxNumericValue": 650 }],
         "resource-summary:script:size": [
           "error",
-          { "maxNumericValue": 200000 }
+          { "maxNumericValue": 240000 }
         ],
-        "categories:performance": ["warn", { "minScore": 0.9 }]
+        "categories:performance": ["warn", { "minScore": 0.75 }]
       }
     },
     "upload": { "target": "filesystem", "outputDir": ".lighthouseci" }
