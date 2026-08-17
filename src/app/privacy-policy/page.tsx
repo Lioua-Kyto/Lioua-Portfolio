@@ -143,6 +143,15 @@ export default function PrivacyPolicy() {
                 personalisation are denied permanently — not merely until you
                 accept, but on every request this site ever makes.
               </p>
+              <p>
+                One thing does run without asking:{" "}
+                <span className="text-ink">Vercel Speed Insights</span>, which
+                reports how quickly pages rendered for you. It sets no cookie,
+                identifies nobody, and records timings rather than anything you
+                did. It is here because a site that loads badly on your
+                connection is worth knowing about, and measuring only the people
+                who accepted would hide exactly the visits that went worst.
+              </p>
             </Clause>
 
             <Clause index="04" title="Consent, and taking it back">

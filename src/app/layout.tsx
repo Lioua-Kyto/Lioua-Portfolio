@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { RouteScrollReset } from "@/components/providers/RouteScrollReset";
 import { AnchorScroll } from "@/components/providers/AnchorScroll";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PageTransition } from "@/components/providers/PageTransition";
 import { Analytics } from "@/components/providers/Analytics";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -181,6 +182,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </SmoothScrollProvider>
         <CookieConsent />
         <Analytics />
+        {/* Core Web Vitals from real visits, which is the only place the LCP
+            number that matters can come from — a lab run on a CI box is a
+            proxy for it, not a measurement of it.
+            Not behind the consent gate, unlike GA and Clarity: it sets no
+            cookie, identifies nobody, and reports timings rather than
+            behaviour. Gating it would also mean only ever measuring the
+            performance of people who accepted, which is the half least likely
+            to have bounced on a slow load. Disclosed in the privacy policy. */}
+        <SpeedInsights />
       </body>
     </html>
   );
