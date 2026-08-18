@@ -1938,3 +1938,52 @@
     grid-row: 1;
   }
 }
+
+/* ---- Contact form states ---- */
+
+/* The honeypot. Positioned off-screen rather than display:none, because the
+   simpler bots skip anything that is not rendered, and this one is meant to
+   be found and filled. Never reachable by tab, pointer or screen reader. */
+.contact-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* The button holds one width across all four states. Without a floor, the box
+   snaps narrower on "Sent" and again on the spinner, and the line of text
+   beside it jumps twice per submission. */
+.contact-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.5rem;
+}
+.contact-send:disabled {
+  cursor: progress;
+}
+
+/* Sent: the button fills green for the moment it holds, then returns with
+   everything else. The colour is the palette's own `ok`, not a new green
+   introduced for one state. */
+.contact-send[data-state="sent"] {
+  background: var(--ok);
+  border-color: var(--ok);
+  color: var(--paper);
+}
+
+.contact-spinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  border-top-color: var(--ink);
+  animation: contact-spin 0.7s linear infinite;
+}
+@keyframes contact-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

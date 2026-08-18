@@ -1940,7 +1940,7 @@ export const rawContent: z.input<typeof contentSchema> = {
     // The résumé and the author's account both use the liwaa- address; an
     // earlier liouazeddam@ spelling was a typo.
     email: "liwaazeddam@gmail.com",
-    linkedin: "linkedin.com/in/lioua",
+    linkedin: "linkedin.com/in/lioua-zeddam",
     github: "github.com/Lioua-Kyto",
     // Read from .env.local, which is gitignored: the repo is public and the
     // number should not live in it. Absent or blank, the WhatsApp link simply
